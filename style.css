@@ -1,0 +1,162 @@
+/* ========== VARIABLES & RESET ========== */
+:root{
+  --radius:12px; --maxw:1100px; --accent:#3ea0ff; --danger:#e05a4f;
+  --muted-dark:#9fb1c8; --muted-light:#5b6c7b;
+  --bg-dark:#071019; --card-dark:rgba(255,255,255,0.03); --text-dark:#eaf6ff;
+  --bg-light:#f6fbff; --card-light:#ffffff; --text-light:#052033;
+  --safe-padding:18px;
+}
+html[data-theme='dark']{ --bg:var(--bg-dark); --card:var(--card-dark); --text:var(--text-dark); --muted:var(--muted-dark); --glass: rgba(255,255,255,0.02); }
+html[data-theme='light']{ --bg:var(--bg-light); --card:var(--card-light); --text:var(--text-light); --muted:var(--muted-light); --glass: rgba(11,26,43,0.03); }
+
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;padding:0}
+body{
+  font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial;
+  background: linear-gradient(180deg,var(--bg), rgba(0,0,0,0.03));
+  color:var(--text); -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
+  line-height:1.45; overflow-x:hidden;
+}
+
+/* ========== LAYOUT - full-width mobile fix ========== */
+.wrapper{max-width:var(--maxw); margin:0 auto; padding:var(--safe-padding); width:100%;}
+img, video { max-width:100%; height:auto; display:block; }
+
+/* header */
+.header{
+  display:flex; justify-content:space-between; align-items:center; gap:12px;
+  padding:8px 0; margin-bottom:12px;
+}
+.brand{display:flex; gap:12px; align-items:center}
+.logo{
+  width:64px; height:64px; border-radius:12px; overflow:hidden; flex-shrink:0;
+  border:1px solid rgba(0,0,0,0.06); background:linear-gradient(135deg,#0e1720,#08121a);
+}
+.logo img{width:100%; height:100%; object-fit:cover}
+.site-title h1{margin:0; font-family:"Playfair Display",serif;font-size:1.1rem}
+.site-title p{margin:0;color:var(--muted);font-size:0.88rem}
+
+/* top buttons */
+.top-actions{display:flex; align-items:center; gap:8px}
+.btn{background:var(--accent); color:#fff; padding:8px 12px; border-radius:10px; border:none; cursor:pointer; font-weight:600}
+.btn.ghost{background:transparent;border:1px solid rgba(0,0,0,0.06); color:var(--muted)}
+.icon-btn{display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:10px;background:linear-gradient(180deg, rgba(255,255,255,0.02), transparent);color:var(--accent);text-decoration:none}
+
+/* card */
+.card{
+  background: linear-gradient(180deg,var(--card), var(--glass));
+  border-radius:var(--radius); padding:16px; margin-bottom:16px; border:1px solid rgba(0,0,0,0.06);
+  box-shadow: 0 8px 24px rgba(2,6,10,0.28);
+}
+
+/* hero */
+.hero{display:flex; gap:16px; align-items:flex-start}
+@media(max-width:860px){ .hero{flex-direction:column; align-items:center; text-align:center} .hero .meta{width:100%} }
+.avatar{width:120px; height:120px; border-radius:14px; overflow:hidden; border:1px solid rgba(0,0,0,0.06)}
+.avatar img{width:100%; height:100%; object-fit:cover}
+.meta .name{font-family:"Playfair Display",serif; font-size:1.25rem; margin:0}
+.meta .role{margin-top:6px;color:var(--muted); font-size:0.95rem}
+.meta .bio{margin-top:10px; color:var(--text); font-weight:300}
+
+/* tags and contacts */
+.tags{display:flex; gap:8px; flex-wrap:wrap; margin-top:10px; justify-content:center}
+.tag{padding:6px 10px;border-radius:999px;border:1px solid rgba(0,0,0,0.04); color:var(--muted); font-size:0.86rem; background-color:transparent}
+
+/* reviews + ads row */
+.row{display:flex; gap:16px; align-items:flex-start}
+.row .left{flex:2} .row .right{flex:1; min-width:220px}
+@media(max-width:860px){ .row{flex-direction:column} .row .right{min-width:unset} }
+
+/* reviews */
+.avg-score{font-family:"Playfair Display",serif; font-size:1.5rem; font-weight:700}
+.stars{display:flex; gap:6px; align-items:center}
+.star{font-size:1.05rem; color:rgba(255,255,255,0.06); cursor:pointer}
+.star.active{color:#ffd166}
+
+/* posts/projects */
+.section-title{display:flex; justify-content:space-between; align-items:center}
+.post-list{display:flex; flex-direction:column; gap:12px; margin-top:12px}
+.post{display:flex; gap:12px; align-items:flex-start; padding:12px; border-radius:10px; background:linear-gradient(180deg, rgba(255,255,255,0.01), transparent); border:1px solid rgba(0,0,0,0.04)}
+.post-thumb{width:120px; height:84px; border-radius:8px; overflow:hidden; flex-shrink:0; background:#111}
+.post-thumb img{width:100%;height:100%;object-fit:cover}
+.post-body h4{margin:0; font-size:1rem}
+.post-body p{margin:6px 0 0 0; color:var(--muted); font-size:0.95rem}
+.post-actions{display:flex; gap:8px; margin-top:8px}
+
+/* post modal (detail) */
+.modal{position:fixed; inset:0; display:none; align-items:center; justify-content:center; background:rgba(2,6,10,0.6); z-index:80; padding:20px}
+.modal.show{display:flex}
+.modal .dialog{width:100%; max-width:900px; background:var(--card); border-radius:12px; padding:18px; max-height:90vh; overflow:auto}
+.post-full .post-full-img{width:100%; height:320px; border-radius:10px; overflow:hidden}
+.post-full h2{margin:10px 0 6px 0}
+.post-full .meta{color:var(--muted); font-size:0.95rem}
+
+/* comments inside post modal */
+.inline-comments{margin-top:12px; display:flex; flex-direction:column; gap:8px}
+.inline-comments .citem{padding:8px; border-radius:8px; background:linear-gradient(180deg, rgba(255,255,255,0.01), transparent); border:1px solid rgba(0,0,0,0.04)}
+
+/* message box */
+.comment-form{display:flex; flex-direction:column; gap:8px; margin-top:12px}
+.comment-form input, .comment-form textarea, input[type="text"]{padding:10px; border-radius:8px; border:1px solid rgba(0,0,0,0.06); background:transparent; color:var(--text)}
+
+/* editor toolbar sticky */
+.editor-toolbar{position:sticky; top:12px; z-index:70; display:none; gap:8px; align-items:center; padding:10px; border-radius:10px; background:linear-gradient(180deg, rgba(0,0,0,0.45), rgba(0,0,0,0.2)); backdrop-filter: blur(6px); margin-bottom:12px}
+.editor-toolbar.show{display:flex}
+
+/* editor panel modal */
+.panel{width:100%; max-width:760px; background:var(--card); padding:16px; border-radius:12px}
+.panel h3{margin-top:0}
+
+/* small */
+.note{color:var(--muted); font-size:0.9rem}
+.footer{padding:18px 0; text-align:center; color:var(--muted)}
+
+/* responsive tweaks for full width mobile fix */
+@media(max-width:520px){
+  .wrapper{padding:14px}
+  .logo{width:56px;height:56px}
+  .site-title h1{font-size:1rem}
+  .post-thumb{width:90px;height:64px}
+  .post-full .post-full-img{height:220px}
+}
+/* === Scrollable containers (for reviews, comments, posts) === */
+.scroll-area {
+  max-height: 280px;          /* tinggi maksimal kotak, bisa kamu ubah */
+  overflow-y: auto;
+  padding-right: 4px;         /* ruang buat scrollbar */
+  scroll-behavior: smooth;
+}
+
+/* Scrollbar halus dan tipis */
+.scroll-area::-webkit-scrollbar {
+  width: 6px;
+}
+.scroll-area::-webkit-scrollbar-track {
+  background: transparent;
+}
+.scroll-area::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,0.2);
+  border-radius: 4px;
+}
+.scroll-area::-webkit-scrollbar-thumb:hover {
+  background: rgba(255,255,255,0.35);
+}
+/* === Scrollable container universal (posts, reviews, comments, messages) === */
+.scroll-area {
+  max-height: 280px;          /* kamu bisa ubah misal 250px atau 300px */
+  overflow-y: auto;
+  padding-right: 4px;
+  scroll-behavior: smooth;
+}
+
+/* scrollbar tipis & elegan */
+.scroll-area::-webkit-scrollbar {
+  width: 6px;
+}
+.scroll-area::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,0.2);
+  border-radius: 4px;
+}
+.scroll-area::-webkit-scrollbar-thumb:hover {
+  background: rgba(255,255,255,0.35);
+}

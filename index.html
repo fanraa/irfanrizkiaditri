@@ -1,0 +1,995 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <title>Irfan Rizki Aditri — Personal</title>
+
+  <!-- Icons & Fonts -->
+  <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Playfair+Display:wght@500;700&display=swap" rel="stylesheet">
+
+  <!-- local stylesheet -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="wrapper">
+
+    <!-- Editor toolbar (visible when editor logged in) -->
+    <div id="editorToolbar" class="editor-toolbar" aria-hidden="true">
+      <button class="btn ghost" id="btnEditProfile"><i class='bx bx-edit'></i> Edit Profile</button>
+      <button class="btn ghost" id="btnManagePosts"><i class='bx bx-book-open'></i> Manage Posts</button>
+      <button class="btn ghost" id="btnManageComments"><i class='bx bx-message-square-dots'></i> Manage Comments</button>
+      <button class="btn ghost" id="btnManageReviews"><i class='bx bx-star'></i> Manage Reviews</button>
+      <div style="flex:1"></div>
+      <button class="btn ghost" id="btnResetVisitors">Reset Visitors</button>
+      <button class="btn" id="btnLogout">Logout</button>
+    </div>
+
+    <!-- HEADER -->
+    <header class="header">
+      <div class="brand">
+        <div class="logo">
+          <!-- logoImg needed by JS -->
+          <img id="logoImg" alt="logo">
+        </div>
+        <div class="site-title">
+          <!-- siteName & siteTag needed by JS -->
+          <h1 id="siteName">Irfan Rizki Aditri</h1>
+          <p id="siteTag">S1 Fisika — ITERA</p>
+        </div>
+      </div>
+
+      <div class="top-actions">
+        <div class="note" id="visitorSmall">Visitors: 0</div>
+        <a class="icon-btn" id="waBtn" href="https://wa.me/6285788918217" target="_blank" title="WhatsApp"><i class='bx bxl-whatsapp'></i></a>
+        <a class="icon-btn" id="igBtn" href="https://www.instagram.com/irfanrizkiaditri" target="_blank" title="Instagram"><i class='bx bxl-instagram'></i></a>
+        <a class="icon-btn" id="liBtn" href="#" title="LinkedIn"><i class='bx bxl-linkedin'></i></a>
+        <button class="btn ghost" id="openEditor">Editor</button>
+        <button class="btn" id="themeBtn">Mode</button>
+      </div>
+    </header>
+
+    <!-- HERO -->
+    <section class="card hero">
+      <div class="avatar"><a id="avatarLink" href="https://www.instagram.com/irfanrizkiaditri" target="_blank"><img id="mainAvatar" alt="avatar"></a></div>
+      <div class="meta">
+        <div class="name" id="displayName">Irfan Rizki Aditri</div>
+        <div class="role" id="displayRole">S1 Fisika — ITERA</div>
+        <div class="bio" id="displayBio">Saya menempuh S1 Fisika di ITERA dan suka menulis serta bereksperimen.</div>
+
+        <div class="tags" id="tagsWrapper">
+          <!-- tags filled by JS -->
+          <div class="tag" data-key="location">Sumatera</div>
+          <div class="tag" data-key="family">Mahasiswa</div>
+          <div class="tag" data-key="study">Fisika</div>
+          <div class="tag" data-key="campus">Itera</div>
+        </div>
+
+        <div class="contact-line">
+          <a class="icon-btn" href="mailto:yourmail@example.com"><i class='bx bx-envelope'></i></a>
+          <a class="icon-btn" href="https://wa.me/6285788918217" target="_blank"><i class='bx bxl-whatsapp'></i></a>
+          <a class="icon-btn" href="https://www.instagram.com/irfanrizkiaditri" target="_blank"><i class='bx bxl-instagram'></i></a>
+        </div>
+      </div>
+    </section>
+
+  <!-- REVIEWS + ADS -->
+<section class="card" style="padding:20px">
+  <div class="row" style="display:flex;gap:20px;flex-wrap:wrap">
+
+    <!-- LEFT: REVIEWS -->
+    <div class="left" style="flex:1;min-width:280px">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px">
+
+        <!-- Skor rata-rata -->
+        <div style="text-align:center">
+          <div class="avg-score" id="avgScore" style="font-size:2.4rem;font-weight:700;color:#ffd166;">-</div>
+          <div class="note" id="reviewsCount" style="font-size:0.9rem">— ulasan</div>
+        </div>
+
+        <!-- Form beri rating -->
+        <div style="flex:1;text-align:right;min-width:250px">
+          <div class="note">Beri rating</div>
+          <div id="starForm" class="stars" style="margin-top:6px;display:flex;justify-content:flex-end;gap:6px;font-size:1.6rem;cursor:pointer;">
+            <span class="star" data-val="1" style="color:#555;transition:0.2s;">★</span>
+            <span class="star" data-val="2" style="color:#555;transition:0.2s;">★</span>
+            <span class="star" data-val="3" style="color:#555;transition:0.2s;">★</span>
+            <span class="star" data-val="4" style="color:#555;transition:0.2s;">★</span>
+            <span class="star" data-val="5" style="color:#555;transition:0.2s;">★</span>
+          </div>
+
+          <div style="margin-top:10px;display:flex;gap:8px;justify-content:flex-end;align-items:center;flex-wrap:wrap">
+            <input id="reviewName" placeholder="Nama (opsional)" style="padding:8px 10px;border-radius:8px;border:1px solid rgba(255,255,255,0.1);background:transparent;color:var(--text);width:160px">
+            <button class="btn" id="submitReview" style="background:#ffd166;color:#000;">Kirim</button>
+          </div>
+        </div>
+      </div>
+
+      <hr style="border:none;height:1px;background:rgba(255,255,255,0.08);margin:16px 0">
+
+      <div id="reviewsList" class="scroll-area" style="margin-top:8px;display:flex;flex-direction:column;gap:10px;"></div>
+
+    </div>
+
+    <!-- RIGHT: ADS -->
+    <aside class="right" style="flex:1;min-width:260px;max-width:400px;">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div class="note" style="font-weight:600">Berita & Iklan</div>
+        <div class="note">Live Feed</div>
+      </div>
+      <div id="adsArea" style="margin-top:12px;display:flex;flex-direction:column;gap:8px"></div>
+
+      <div style="margin-top:12px;font-size:0.85rem;color:var(--muted);">
+        Berita diperbarui otomatis setiap 1 menit dan bisa kamu tambahkan manual lewat menu Editor.
+      </div>
+    </aside>
+
+  </div>
+</section>
+
+
+    <!-- BLOG / PROJECTS -->
+    <section class="card" id="projectsBlock">
+      <div class="section-title">
+        <h3>Blog & Projects</h3>
+        <div class="note">Tambah posting melalui akun editor — tampilan ringkas; klik untuk detail</div>
+      </div>
+
+      <div id="postList" class="post-list"></div>
+    </section>
+
+    <!-- MESSAGES -->
+    <section class="card">
+      <h3>Kotak Pesan</h3>
+      <div class="comment-form" style="margin-top:8px">
+        <input id="commentName" placeholder="Nama (opsional)">
+        <textarea id="commentText" placeholder="Tulis pesan atau saran..." rows="4"></textarea>
+        <div style="display:flex; justify-content:flex-end; gap:8px">
+          <button class="btn" id="sendComment">Kirim Pesan</button>
+        </div>
+      </div>
+
+      <div id="commentList" class="scroll-area"></div>
+
+    </section>
+
+    <footer class="footer">
+      <div class="note">© 2025 Irfan Rizki Aditri • Personal</div>
+    </footer>
+  </div>
+
+  <!-- EDITOR LOGIN MODAL -->
+  <div id="loginModal" class="modal" aria-hidden="true">
+    <div class="dialog panel">
+      <h3>Editor Login</h3>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <input id="editorUser" placeholder="Username">
+        <input id="editorPass" type="password" placeholder="Password">
+        <div style="display:flex;justify-content:flex-end;gap:8px">
+          <button class="btn ghost" id="closeLogin">Batal</button>
+          <button class="btn" id="doLogin">Masuk</button>
+        </div>
+        <div class="note">Editor dapat mengelola posting, komentar, review, dan mengubah profil (lokal).</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- EDITOR PANEL (manage) -->
+  <div id="editorPanel" class="modal" aria-hidden="true">
+    <div class="dialog panel">
+      <h3 id="panelTitle">Editor Panel</h3>
+      <div id="panelBody" style="margin-top:10px"></div>
+      <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:12px">
+        <button class="btn ghost" id="closePanel">Tutup</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- POST DETAIL MODAL -->
+  <div id="postModal" class="modal" aria-hidden="true">
+    <div class="dialog panel post-full">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <h3 id="postModalTitle">Judul</h3>
+        <div style="display:flex;gap:8px">
+          <button class="btn ghost" id="sharePostBtn"><i class='bx bx-share'></i> Share</button>
+          <button class="btn ghost" id="closePostModal">Tutup</button>
+        </div>
+      </div>
+      <div style="margin-top:8px;color:var(--muted)" id="postMeta">oleh Editor • tanggal</div>
+      <div class="post-full-img" style="margin-top:12px; overflow:hidden; border-radius:10px">
+        <img id="postModalImg" alt="" style="width:100%;height:100%;object-fit:cover">
+      </div>
+      <div style="margin-top:12px" id="postModalCaption"></div>
+
+      <div style="display:flex;gap:8px; margin-top:12px; align-items:center">
+        <button class="btn ghost" id="likePostBtn">❤ <span id="likeCount">0</span></button>
+      </div>
+
+      <div class="inline-comments" id="postCommentsArea"></div>
+
+      <div style="margin-top:12px" class="note">Tambahkan komentar pada postingan (otomatis muncul di sini):</div>
+      <div style="display:flex;gap:8px;margin-top:8px">
+        <input id="postCommentName" placeholder="Nama (opsional)" style="flex:1">
+        <input id="postCommentText" placeholder="Komentar..." style="flex:2">
+        <button class="btn" id="postCommentSend">Kirim</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+/* ===========================
+   KEYS & DEFAULTS
+   =========================== */
+const KEYS = {
+  THEME: 'irfan_theme_v2',
+  VISITORS: 'irfan_visitors_v2',
+  PROFILE: 'irfan_profile_v2',
+  POSTS: 'irfan_posts_v2',
+  COMMENTS: 'irfan_comments_v2',
+  REVIEWS: 'irfan_reviews_v2',
+  EDITOR_SESSION: 'irfan_editor_v2',
+  ADS_SEED: 'irfan_ads_seed_v2'
+};
+
+const DEFAULT_PROFILE = {
+  name: 'Irfan Rizki Aditri',
+  role: 'S1 Fisika — Institut Teknologi Sumatera',
+  bio: 'Saya menempuh S1 Fisika di ITERA dan suka menulis serta bereksperimen.',
+  avatar: '',
+  location: 'Pulau Sumatra',
+  family: 'Anak terakhir dari 3'
+};
+
+/* ===========================
+   UTIL
+   =========================== */
+function getJSON(k, d){ try{ const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch(e){ return d; } }
+function setJSON(k, v){ localStorage.setItem(k, JSON.stringify(v)) }
+function escapeHtml(s){ return String(s||'').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+
+/* ===========================
+   THEME init / toggle
+   =========================== */
+(function initTheme(){
+  const t = localStorage.getItem(KEYS.THEME) || 'dark';
+  document.documentElement.setAttribute('data-theme', t);
+})();
+document.getElementById('themeBtn').addEventListener('click', ()=>{
+  const cur = document.documentElement.getAttribute('data-theme') || 'dark';
+  const nxt = cur === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', nxt);
+  localStorage.setItem(KEYS.THEME, nxt);
+});
+
+/* ===========================
+   VISITOR counter (small)
+   =========================== */
+let visitors = Number(localStorage.getItem(KEYS.VISITORS));
+if(!visitors || isNaN(visitors)) visitors = 200;
+visitors += 1;
+localStorage.setItem(KEYS.VISITORS, visitors);
+document.getElementById('visitorSmall').textContent = 'Visitors: ' + visitors;
+
+/* ===========================
+   PROFILE init (avatar fallback & rotate)
+   =========================== */
+let profile = getJSON(KEYS.PROFILE, DEFAULT_PROFILE);
+const unsplashList = [
+  'https://source.unsplash.com/collection/542909/400x400?portrait,man',
+  'https://source.unsplash.com/collection/2228551/400x400?portrait,man',
+  'https://source.unsplash.com/collection/888146/400x400?portrait,headshot',
+  'https://source.unsplash.com/featured/400x400/?portrait,young,man'
+];
+let avatarI = 0;
+
+/* single applyProfile implementation (fixed duplicates) */
+function applyProfile(){
+  try {
+    setJSON(KEYS.PROFILE, profile);
+    document.getElementById('siteName').textContent = profile.name || DEFAULT_PROFILE.name;
+    document.getElementById('displayName').textContent = profile.name || DEFAULT_PROFILE.name;
+    document.getElementById('siteTag').textContent = profile.role || DEFAULT_PROFILE.role;
+    document.getElementById('displayRole').textContent = profile.role || DEFAULT_PROFILE.role;
+    document.getElementById('displayBio').textContent = profile.bio || DEFAULT_PROFILE.bio;
+
+    // tags — use data-key mapping
+    const map = {
+      location: profile.location || DEFAULT_PROFILE.location,
+      family: profile.family || DEFAULT_PROFILE.family,
+      study: profile.study || '',
+      campus: profile.campus || ''
+    };
+    document.querySelectorAll('#tagsWrapper .tag').forEach(el=>{
+      const k = el.dataset.key;
+      if(k && map[k] !== undefined) el.textContent = map[k];
+    });
+
+    const avatarSrc = profile.avatar || (unsplashList[avatarI] + '&_=' + Date.now());
+    const mainAvatar = document.getElementById('mainAvatar');
+    const logoImg = document.getElementById('logoImg');
+    if(mainAvatar) mainAvatar.src = avatarSrc;
+    if(logoImg) logoImg.src = avatarSrc;
+    const avatarLink = document.getElementById('avatarLink');
+    if(avatarLink) avatarLink.href = 'https://www.instagram.com/irfanrizkiaditri';
+  } catch(e){
+    console.error('applyProfile error', e);
+  }
+}
+
+if(!profile.avatar){
+  profile.avatar = unsplashList[0] + '&_=' + Date.now();
+  setJSON(KEYS.PROFILE, profile);
+}
+applyProfile();
+setInterval(()=>{ avatarI = (avatarI+1) % unsplashList.length; if(!profile.avatar){ const s = unsplashList[avatarI] + '&_=' + Date.now(); const ma = document.getElementById('mainAvatar'); const li = document.getElementById('logoImg'); if(ma) ma.src = s; if(li) li.src = s; } }, 7000);
+
+/* ===========================
+   POSTS / PROJECTS SECTION
+   =========================== */
+
+// Ambil & simpan data posts dari localStorage
+function getPosts() { return getJSON(KEYS.POSTS, []); }
+function savePosts(posts) { setJSON(KEYS.POSTS, posts); renderPosts(); }
+
+// Render semua posting di halaman utama
+function renderPosts() {
+  const container = document.getElementById('postList');
+  container.innerHTML = '';
+  const posts = getPosts();
+
+  if (!posts.length) {
+    container.innerHTML = `<div class="note">Belum ada posting. Masuk sebagai editor untuk menambah.</div>`;
+    if (isEditor()) {
+      const btn = document.createElement('button');
+      btn.className = 'btn';
+      btn.textContent = 'Tambah Post (Editor)';
+      btn.addEventListener('click', () => openEditorPanel('posts'));
+      container.appendChild(btn);
+    }
+    return;
+  }
+
+  posts.slice().reverse().forEach(p => {
+    const div = document.createElement('div');
+    div.className = 'post';
+    div.style.cursor = 'pointer';
+    const caption = String(p.caption || '');
+    div.innerHTML = `
+      <div class="post-thumb">${p.img ? `<img src="${p.img}" alt="">` : ''}</div>
+      <div class="post-body">
+        <h4>${escapeHtml(p.title || '(Tanpa judul)')}</h4>
+        <p>${escapeHtml(caption).slice(0, 200)}${caption.length > 200 ? '...' : ''}</p>
+        <div class="note" style="margin-top:6px;">
+          ${new Date(p.ts || Date.now()).toLocaleDateString()} • ❤️ ${p.likes || 0}
+        </div>
+      </div>`;
+    div.addEventListener('click', () => openPostModal(p.id));
+    container.appendChild(div);
+  });
+}
+renderPosts();
+
+/* ==== Buat contoh post awal (jika kosong) ==== */
+if (getPosts().length === 0) {
+  const sample = [{
+    id: Date.now(),
+    title: 'Selamat datang di blog kecilku',
+    caption: 'Ini adalah contoh posting. Masuk sebagai editor untuk menambahkan posting baru berisi judul, caption, dan gambar.',
+    img: '',
+    ts: Date.now(),
+    likes: 0,
+    comments: []
+  }];
+  savePosts(sample);
+}
+
+/* ===========================
+   POST MODAL (lihat detail)
+   =========================== */
+function openPostModal(id) {
+  const posts = getPosts();
+  const p = posts.find(x => String(x.id) === String(id));
+  if (!p) return;
+
+  const pm = document.getElementById('postModal');
+  pm.classList.add('show');
+  pm.setAttribute('aria-hidden', 'false');
+
+  document.getElementById('postModalTitle').textContent = p.title || '(Tanpa judul)';
+  document.getElementById('postMeta').textContent = `oleh Editor • ${new Date(p.ts || Date.now()).toLocaleString()}`;
+  document.getElementById('postModalCaption').innerHTML = `<p style="color:var(--text);line-height:1.6">${escapeHtml(p.caption || '')}</p>`;
+  document.getElementById('postModalImg').src = p.img || '';
+  document.getElementById('likeCount').textContent = p.likes || 0;
+
+  // Render komentar post
+  const cArea = document.getElementById('postCommentsArea');
+  cArea.innerHTML = '';
+  (p.comments || []).slice().reverse().forEach(c => {
+    const el = document.createElement('div');
+    el.className = 'citem';
+    el.innerHTML = `
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div><strong>${escapeHtml(c.name || 'Anonim')}</strong></div>
+        <div class="note">${new Date(c.ts || Date.now()).toLocaleString()}</div>
+      </div>
+      <div style="margin-top:6px">${escapeHtml(c.text)}</div>`;
+    cArea.appendChild(el);
+  });
+
+  // Simpan ID posting yang dibuka
+  pm.setAttribute('data-open', id);
+
+  // Render tombol share modern
+  renderShareButtons(p);
+}
+
+// Tutup modal post
+document.getElementById('closePostModal').addEventListener('click', () => {
+  const pm = document.getElementById('postModal');
+  pm.classList.remove('show');
+  pm.setAttribute('aria-hidden', 'true');
+});
+
+/* ===========================
+   LIKE & KOMENTAR POST
+   =========================== */
+document.getElementById('likePostBtn').addEventListener('click', () => {
+  const id = document.getElementById('postModal').getAttribute('data-open');
+  const posts = getPosts();
+  const p = posts.find(x => String(x.id) === String(id));
+  if (!p) return;
+  p.likes = (p.likes || 0) + 1;
+  savePosts(posts);
+  document.getElementById('likeCount').textContent = p.likes;
+});
+
+document.getElementById('postCommentSend').addEventListener('click', () => {
+  const id = document.getElementById('postModal').getAttribute('data-open');
+  const name = document.getElementById('postCommentName').value.trim();
+  const text = document.getElementById('postCommentText').value.trim();
+  if (!text) return alert('Tulis komentar dulu.');
+
+  const posts = getPosts();
+  const p = posts.find(x => String(x.id) === String(id));
+  if (!p) return;
+
+  p.comments = p.comments || [];
+  p.comments.push({ name: name || 'Anonim', text, ts: Date.now() });
+  savePosts(posts);
+
+  document.getElementById('postCommentName').value = '';
+  document.getElementById('postCommentText').value = '';
+  openPostModal(id);
+});
+
+/* ===========================
+   SHARE POST (Modern)
+   =========================== */
+function renderShareButtons(post) {
+  const area = document.getElementById('sharePostBtn');
+  const container = document.createElement('div');
+  container.style.display = 'flex';
+  container.style.gap = '10px';
+  container.style.flexWrap = 'wrap';
+  container.style.marginTop = '8px';
+
+  const url = location.href.split('#')[0] + '#post-' + post.id;
+  const enc = encodeURIComponent(url);
+  const title = encodeURIComponent(post.title);
+
+  const btns = [
+    { icon: 'bxl-whatsapp', color: '#25D366', link: `https://wa.me/?text=${title}%20${enc}` },
+    { icon: 'bxl-telegram', color: '#0088cc', link: `https://t.me/share/url?url=${enc}&text=${title}` },
+    { icon: 'bxl-twitter', color: '#1DA1F2', link: `https://twitter.com/intent/tweet?url=${enc}&text=${title}` },
+    { icon: 'bxl-facebook', color: '#1877f2', link: `https://www.facebook.com/sharer/sharer.php?u=${enc}` },
+    { icon: 'bx-link-alt', color: '#999', link: '#copy' }
+  ];
+
+  btns.forEach(b => {
+    const a = document.createElement('a');
+    a.href = b.link; a.target = "_blank";
+    a.style.color = b.color;
+    a.style.fontSize = "1.6rem";
+    a.innerHTML = `<i class='bx ${b.icon}'></i>`;
+    if (b.link === '#copy') {
+      a.addEventListener('click', e => {
+        e.preventDefault();
+        navigator.clipboard.writeText(url);
+        alert('Link disalin ke clipboard!');
+      });
+    }
+    container.appendChild(a);
+  });
+
+  area.replaceWith(container);
+
+  // Jika di HP, aktifkan share bawaan
+  if (navigator.share) {
+    const native = document.createElement('button');
+    native.className = 'btn';
+    native.textContent = 'Share…';
+    native.addEventListener('click', () => navigator.share({ title: post.title, text: post.caption, url }));
+    container.appendChild(native);
+  }
+}
+
+/* ===========================
+   KOMENTAR UMUM (Guestbook)
+   =========================== */
+function getComments() { return getJSON(KEYS.COMMENTS, []); }
+function saveComments(arr) { setJSON(KEYS.COMMENTS, arr); renderSiteComments(); }
+
+function renderSiteComments() {
+  const list = getComments();
+  const el = document.getElementById('commentList');
+  el.innerHTML = '';
+
+  if (!list.length) {
+    el.innerHTML = '<div class="note">Belum ada pesan. Tinggalkan pesan sopan ya 😊</div>';
+    return;
+  }
+
+  list.slice().reverse().forEach(c => {
+    const d = document.createElement('div');
+    d.className = 'comment';
+    d.innerHTML = `
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div><strong>${escapeHtml(c.name || 'Anonim')}</strong></div>
+        <div class="note">${new Date(c.ts || Date.now()).toLocaleString()}</div>
+      </div>
+      <div style="margin-top:8px">${escapeHtml(c.text)}</div>`;
+    el.appendChild(d);
+  });
+}
+document.getElementById('sendComment').addEventListener('click', () => {
+  const name = document.getElementById('commentName').value.trim();
+  const text = document.getElementById('commentText').value.trim();
+  if (!text) return alert('Tulis pesan terlebih dahulu.');
+  const arr = getComments();
+  arr.push({ name: name || 'Anonim', text, ts: Date.now() });
+  saveComments(arr);
+  document.getElementById('commentName').value = '';
+  document.getElementById('commentText').value = '';
+});
+renderSiteComments();
+
+/* ===========================
+   REVIEWS (Ulasan bintang)
+   =========================== */
+function getReviews() { return getJSON(KEYS.REVIEWS, []); }
+function saveReviews(arr) { setJSON(KEYS.REVIEWS, arr); renderReviews(); }
+
+function renderReviews() {
+  const list = getReviews();
+  const total = list.length;
+  const sum = list.reduce((s, r) => s + Number(r.stars || 0), 0);
+  const avg = total ? (sum / total) : 0;
+
+  document.getElementById('avgScore').textContent = avg ? avg.toFixed(1) : '-';
+  document.getElementById('reviewsCount').textContent = total + ' ulasan';
+  const container = document.getElementById('reviewsList');
+  container.innerHTML = '';
+
+  if (!list.length) {
+    container.innerHTML = '<div class="note">Belum ada ulasan.</div>';
+    return;
+  }
+
+  list.slice().reverse().forEach(r => {
+    const el = document.createElement('div');
+    el.className = 'comment';
+    el.innerHTML = `
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <strong>${escapeHtml(r.name || 'Anonim')}</strong>
+        <div class="note">${new Date(r.ts || Date.now()).toLocaleString()}</div>
+      </div>
+      <div style="margin-top:8px">${renderStarsInline(r.stars)}</div>
+      <div style="margin-top:6px;color:var(--muted)">${escapeHtml(r.text || '')}</div>`;
+    container.appendChild(el);
+  });
+}
+function renderStarsInline(n) {
+  let s = '';
+  for (let i = 1; i <= 5; i++)
+    s += `<span style="color:${i <= n ? '#ffd166' : 'rgba(255,255,255,0.1)'}">★</span>`;
+  return s;
+}
+renderReviews();
+
+// Bintang interaktif
+let selStar = 0;
+document.querySelectorAll('#starForm .star').forEach(s => {
+  s.addEventListener('mouseover', () => {
+    const v = Number(s.dataset.val);
+    document.querySelectorAll('#starForm .star').forEach(x =>
+      x.style.color = (Number(x.dataset.val) <= v ? '#ffd166' : 'rgba(255,255,255,0.1)'));
+  });
+  s.addEventListener('mouseout', () => {
+    document.querySelectorAll('#starForm .star').forEach(x =>
+      x.style.color = (Number(x.dataset.val) <= selStar ? '#ffd166' : 'rgba(255,255,255,0.1)'));
+  });
+  s.addEventListener('click', () => { selStar = Number(s.dataset.val); });
+});
+document.getElementById('submitReview').addEventListener('click', () => {
+  if (selStar <= 0) return alert('Pilih bintang terlebih dahulu.');
+  const name = document.getElementById('reviewName').value.trim();
+  const txt = prompt('Tulis komentar singkat untuk ulasan (opsional):') || '';
+  const arr = getReviews();
+  arr.push({ name: name || 'Anonim', stars: selStar, text: txt, ts: Date.now() });
+  saveReviews(arr);
+  selStar = 0;
+  document.getElementById('reviewName').value = '';
+  document.querySelectorAll('#starForm .star').forEach(x => x.style.color = 'rgba(255,255,255,0.1)');
+});
+
+/* ===========================
+   ADS / NEWS OTOMATIS + MANUAL
+   =========================== */
+
+// ---- Sumber berita otomatis (RSS) ----
+const NEWS_SOURCES = [
+  "https://www.reuters.com/business/feed/",
+  "https://www.antaranews.com/rss/terkini.xml",
+  "https://www.techradar.com/rss",
+  "https://www.nature.com/subjects/physics.rss"
+];
+
+// ---- Simpan berita manual lokal ----
+const KEY_MANUAL_NEWS = "irfan_manual_news_v1";
+function getManualNews() { return getJSON(KEY_MANUAL_NEWS, []); }
+function saveManualNews(arr) { setJSON(KEY_MANUAL_NEWS, arr); }
+
+// ---- Render seluruh berita (otomatis + manual) ----
+async function renderNews() {
+  const adsArea = document.getElementById("adsArea");
+  adsArea.innerHTML = `<div class="note">Memuat berita otomatis...</div>`;
+  adsArea.style.opacity = 0.4;
+
+  try {
+    // Pilih sumber berita otomatis berikutnya
+    if (typeof window.newsIndex === "undefined") window.newsIndex = 0;
+    const source = NEWS_SOURCES[window.newsIndex % NEWS_SOURCES.length];
+    window.newsIndex++;
+
+    // Ambil berita RSS → JSON
+    const res = await fetch(
+      `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(source)}`
+    );
+    const data = await res.json();
+    const autoItems = (data.items || []).slice(0, 3).map((item) => ({
+      title: item.title,
+      link: item.link,
+      source: new URL(item.link).hostname,
+      type: "auto",
+    }));
+
+    // Ambil berita manual dari localStorage
+    const manualItems = getManualNews().map((n) => ({
+      title: n.title,
+      link: n.link,
+      source: n.source || "manual",
+      type: "manual",
+    }));
+
+    // Gabungkan semua
+    const all = [...autoItems, ...manualItems];
+
+    // Render semua kartu
+    adsArea.innerHTML = "";
+    all.forEach((a) => {
+      const d = document.createElement("div");
+      d.className = "card";
+      d.style.padding = "10px";
+      d.style.cursor = "pointer";
+      d.innerHTML = `
+        <div style="display:flex;flex-direction:column;gap:4px">
+          <strong style="font-size:0.95rem;line-height:1.4">${a.title}</strong>
+          <div class="note">${a.source}</div>
+        </div>
+      `;
+      d.addEventListener("click", () => window.open(a.link, "_blank"));
+      adsArea.appendChild(d);
+    });
+  } catch (err) {
+    console.error("Gagal memuat berita:", err);
+    adsArea.innerHTML = `<div class="note">Tidak dapat memuat berita otomatis 😕</div>`;
+  } finally {
+    adsArea.style.opacity = 1;
+  }
+}
+
+// Jalankan saat halaman dibuka
+renderNews();
+
+// Ganti otomatis tiap 1 menit
+setInterval(renderNews, 60000);
+
+// ---- Editor Panel Tambahan untuk Berita Manual ----
+document.getElementById("btnManagePosts").insertAdjacentHTML(
+  "afterend",
+  `<button class="btn ghost" id="btnManageNews"><i class='bx bx-news'></i> Manage News</button>`
+);
+document.getElementById("btnManageNews").addEventListener("click", () =>
+  openEditorPanel("news")
+);
+
+// Tambahkan ke fungsi panel editor
+const _openEditorPanel_old = openEditorPanel;
+openEditorPanel = function (section) {
+  if (section !== "news") return _openEditorPanel_old(section);
+
+  if (!isEditor()) return alert("Silakan login sebagai editor terlebih dahulu.");
+
+  const modal = document.getElementById("editorPanel");
+  modal.classList.add("show");
+  modal.setAttribute("aria-hidden", "false");
+  const body = document.getElementById("panelBody");
+  document.getElementById("panelTitle").textContent = "Editor — News (Manual)";
+
+  const news = getManualNews();
+  let html = `
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div style="display:flex;gap:6px;align-items:center">
+        <input id="manualTitle" placeholder="Judul berita" style="flex:1;padding:8px;border-radius:8px">
+        <input id="manualLink" placeholder="Link sumber" style="flex:1;padding:8px;border-radius:8px">
+        <button class="btn" id="addManualNews">Tambah</button>
+      </div>
+      <div class="note">Klik pada daftar untuk membuka sumber.</div>
+  `;
+  if (!news.length) html += `<div class="note">Belum ada berita manual.</div>`;
+  news
+    .slice()
+    .reverse()
+    .forEach((n, i) => {
+      const idx = news.length - 1 - i;
+      html += `
+        <div class="card" style="padding:10px;cursor:pointer" data-link="${n.link}">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div style="flex:1;min-width:0">
+              <strong style="font-size:0.9rem">${n.title}</strong>
+              <div class="note">${n.source || n.link}</div>
+            </div>
+            <button class="btn ghost" data-del="${idx}">Hapus</button>
+          </div>
+        </div>`;
+    });
+  html += `</div>`;
+  body.innerHTML = html;
+
+  body.querySelectorAll("[data-link]").forEach((el) => {
+    el.addEventListener("click", (e) => {
+      if (e.target.hasAttribute("data-del")) return;
+      const link = el.getAttribute("data-link");
+      if (link) window.open(link, "_blank");
+    });
+  });
+
+  body.querySelectorAll("[data-del]").forEach((btn) =>
+    btn.addEventListener("click", () => {
+      const idx = Number(btn.getAttribute("data-del"));
+      if (confirm("Hapus berita manual ini?")) {
+        const arr = getManualNews();
+        arr.splice(idx, 1);
+        saveManualNews(arr);
+        openEditorPanel("news");
+      }
+    })
+  );
+
+  document
+    .getElementById("addManualNews")
+    .addEventListener("click", () => {
+      const title = document
+        .getElementById("manualTitle")
+        .value.trim();
+      const link = document
+        .getElementById("manualLink")
+        .value.trim();
+      if (!title || !link) return alert("Isi judul dan link berita dulu.");
+      const arr = getManualNews();
+      arr.push({ title, link, source: new URL(link).hostname });
+      saveManualNews(arr);
+      alert("Berita manual ditambahkan!");
+      openEditorPanel("news");
+    });
+};
+
+/* ===========================
+   EDITOR: login / session (client-side demo)
+   =========================== */
+const EDITOR = {user:'irfanrizkiaditri', pass:'#I47r32a6'};
+function isEditor(){ return sessionStorage.getItem(KEYS.EDITOR_SESSION) === '1'; }
+function setEditor(val){
+  if(val){ sessionStorage.setItem(KEYS.EDITOR_SESSION, '1'); }
+  else { sessionStorage.removeItem(KEYS.EDITOR_SESSION); }
+  updateEditorUI();
+}
+
+document.getElementById('openEditor').addEventListener('click', ()=> {
+  document.getElementById('loginModal').classList.add('show'); document.getElementById('loginModal').setAttribute('aria-hidden','false');
+});
+document.getElementById('closeLogin').addEventListener('click', ()=> {
+  document.getElementById('loginModal').classList.remove('show'); document.getElementById('loginModal').setAttribute('aria-hidden','true');
+});
+document.getElementById('doLogin').addEventListener('click', ()=>{
+  const u = document.getElementById('editorUser').value.trim(), p = document.getElementById('editorPass').value;
+  if(u === EDITOR.user && p === EDITOR.pass){
+    setEditor(true);
+    document.getElementById('loginModal').classList.remove('show');
+    alert('Login editor berhasil. Toolbar aktif.');
+  } else alert('Username atau password salah.');
+});
+
+document.getElementById('btnLogout').addEventListener('click', ()=>{
+  if(confirm('Logout editor?')){ setEditor(false); rotateAdsOnLogout(); alert('Logout berhasil. Iklan akan diperbarui pada kunjungan selanjutnya.'); }
+});
+
+function updateEditorUI(){
+  const toolbar = document.getElementById('editorToolbar');
+  if(isEditor()){ toolbar.classList.add('show'); toolbar.setAttribute('aria-hidden','false'); } else { toolbar.classList.remove('show'); toolbar.setAttribute('aria-hidden','true'); }
+}
+updateEditorUI();
+
+document.getElementById('btnEditProfile').addEventListener('click', ()=> openEditorPanel('profile'));
+document.getElementById('btnManagePosts').addEventListener('click', ()=> openEditorPanel('posts'));
+document.getElementById('btnManageComments').addEventListener('click', ()=> openEditorPanel('comments'));
+document.getElementById('btnManageReviews').addEventListener('click', ()=> openEditorPanel('reviews'));
+document.getElementById('closePanel').addEventListener('click', ()=> closeEditorPanel());
+
+document.getElementById('btnResetVisitors').addEventListener('click', ()=> {
+  if(!isEditor()) return alert('Hanya editor yang bisa reset visitor.');
+  if(confirm('Reset visitor counter ke 200 (lokal)?')){ localStorage.setItem(KEYS.VISITORS, 200); document.getElementById('visitorSmall').textContent = 'Visitors: 200'; alert('Visitor counter telah di-reset (lokal).'); }
+});
+
+/* ===========================
+   Editor Panel content builder (profile, posts, comments, reviews)
+   =========================== */
+function openEditorPanel(section){
+  if(!isEditor()){ return alert('Silakan login sebagai editor terlebih dahulu.'); }
+  const modal = document.getElementById('editorPanel'); modal.classList.add('show'); modal.setAttribute('aria-hidden','false');
+  const body = document.getElementById('panelBody'); body.innerHTML = '';
+  document.getElementById('panelTitle').textContent = 'Editor — ' + section;
+
+  if(section === 'profile'){
+    body.innerHTML = `<div style="display:flex;gap:12px;flex-wrap:wrap">
+      <div style="min-width:120px">
+        <div style="width:120px;height:120px;border-radius:10px;overflow:hidden"><img id="editorAvatarPreview" src="${profile.avatar}" style="width:100%;height:100%;object-fit:cover"></div>
+        <div style="margin-top:8px"><input id="editorAvatarInput" type="file" accept="image/*"></div>
+      </div>
+      <div style="flex:1;display:flex;flex-direction:column;gap:8px">
+        <input id="editorName" value="${escapeHtml(profile.name)}" placeholder="Nama">
+        <input id="editorRole" value="${escapeHtml(profile.role)}" placeholder="Role">
+        <textarea id="editorBio" placeholder="Bio" style="min-height:120px">${escapeHtml(profile.bio)}</textarea>
+        <div style="display:flex;justify-content:flex-end;gap:8px">
+          <button class="btn ghost" id="cancelProfile">Batal</button>
+          <button class="btn" id="saveProfile">Simpan</button>
+        </div>
+      </div>
+    </div>`;
+    document.getElementById('editorAvatarInput').addEventListener('change', (ev)=>{
+      const f = ev.target.files && ev.target.files[0]; if(!f) return;
+      const r = new FileReader(); r.onload = e=> { profile.avatar = e.target.result; setJSON(KEYS.PROFILE, profile); applyProfile(); document.getElementById('editorAvatarPreview').src = profile.avatar; alert('Avatar disimpan (lokal).'); }; r.readAsDataURL(f);
+    });
+    document.getElementById('cancelProfile').addEventListener('click', ()=> closeEditorPanel());
+    document.getElementById('saveProfile').addEventListener('click', ()=> {
+      profile.name = document.getElementById('editorName').value.trim() || profile.name;
+      profile.role = document.getElementById('editorRole').value.trim() || profile.role;
+      profile.bio = document.getElementById('editorBio').value.trim() || profile.bio;
+      setJSON(KEYS.PROFILE, profile); applyProfile(); alert('Profil diperbarui (lokal).'); closeEditorPanel();
+    });
+    return;
+  }
+
+  if(section === 'posts'){
+    const posts = getPosts();
+    let html = `<div style="display:flex;flex-direction:column;gap:8px">
+      <div style="display:flex;gap:8px;align-items:center"><input id="newPostTitle" placeholder="Judul" style="flex:1;padding:8px;border-radius:8px"><input id="newPostImg" type="file" accept="image/*"><button class="btn" id="createPost">Buat</button></div>
+      <div class="note">Posting yang ada:</div>`;
+    if(!posts.length) html += `<div class="note">Belum ada posting.</div>`;
+    posts.slice().reverse().forEach((p, idx)=>{
+      html += `<div style="display:flex;justify-content:space-between;align-items:center;padding:8px;border-radius:8px;background:linear-gradient(180deg, rgba(255,255,255,0.01), transparent);margin-bottom:6px">
+        <div><strong>${escapeHtml(p.title)}</strong><div class="note">${new Date(p.ts || Date.now()).toLocaleString()}</div></div>
+        <div style="display:flex;gap:8px"><button class="btn ghost" data-edit="${p.id}">Edit</button><button class="btn ghost" data-del="${p.id}">Hapus</button></div>
+      </div>`;
+    });
+    html += `</div>`;
+    body.innerHTML = html;
+
+    document.getElementById('createPost').addEventListener('click', ()=>{
+      const title = document.getElementById('newPostTitle').value.trim();
+      const file = document.getElementById('newPostImg').files && document.getElementById('newPostImg').files[0];
+      if(!title) return alert('Masukkan judul.');
+      if(file){
+        const r = new FileReader(); r.onload = e=>{
+          const arr = getPosts(); arr.push({id: Date.now(), title, caption:'(tulis caption di edit)', img:e.target.result, ts: Date.now(), likes:0, comments:[]}); savePosts(arr); alert('Posting dibuat.'); openEditorPanel('posts');
+        }; r.readAsDataURL(file);
+      } else {
+        const arr = getPosts(); arr.push({id: Date.now(), title, caption:'(tulis caption di edit)', img:'', ts: Date.now(), likes:0, comments:[]}); savePosts(arr); alert('Posting dibuat.'); openEditorPanel('posts');
+      }
+    });
+
+    // attach delete/edit handlers (delegation)
+    body.querySelectorAll('[data-del]').forEach(b=>{
+      b.addEventListener('click', ()=> {
+        const id = b.getAttribute('data-del');
+        if(confirm('Hapus posting ini (lokal)?')) { const arr = getPosts(); const idx = arr.findIndex(x=> String(x.id) === String(id)); if(idx>=0){ arr.splice(idx,1); savePosts(arr); openEditorPanel('posts'); } }
+      });
+    });
+    body.querySelectorAll('[data-edit]').forEach(b=>{
+      b.addEventListener('click', ()=> {
+        const id = b.getAttribute('data-edit');
+        const arr = getPosts(); const idx = arr.findIndex(x=> String(x.id) === String(id)); const p = arr[idx];
+        body.innerHTML = `<h4>Edit Post</h4><input id="editTitle" value="${escapeHtml(p.title)}" style="padding:8px;border-radius:8px"><textarea id="editCaption" style="min-height:140px;padding:8px;border-radius:8px">${escapeHtml(p.caption)}</textarea>
+          <div style="display:flex;gap:8px;align-items:center;margin-top:8px"><input id="editImg" type="file" accept="image/*"><button class="btn ghost" id="cancelEdit">Batal</button><button class="btn" id="saveEdit">Simpan</button></div>`;
+        document.getElementById('cancelEdit').addEventListener('click', ()=> openEditorPanel('posts'));
+        document.getElementById('saveEdit').addEventListener('click', ()=>{
+          p.title = document.getElementById('editTitle').value.trim() || p.title;
+          p.caption = document.getElementById('editCaption').value.trim() || p.caption;
+          const fileinp = document.getElementById('editImg');
+          if(fileinp.files && fileinp.files[0]){
+            const r = new FileReader(); r.onload = e=> { p.img = e.target.result; arr[idx]=p; savePosts(arr); alert('Posting diperbarui.'); openEditorPanel('posts'); }; r.readAsDataURL(fileinp.files[0]);
+          } else { arr[idx]=p; savePosts(arr); alert('Posting diperbarui.'); openEditorPanel('posts'); }
+        });
+      });
+    });
+
+    return;
+  }
+
+  if(section === 'comments'){
+    const comments = getComments();
+    let html = `<div style="display:flex;flex-direction:column;gap:8px"><div class="note">Hapus komentar individual jika perlu.</div>`;
+    if(!comments.length) html += `<div class="note">Belum ada komentar.</div>`;
+    comments.slice().reverse().forEach((c,i)=>{
+      const idx = comments.length -1 - i;
+      html += `<div style="padding:8px;border-radius:8px;background:linear-gradient(180deg, rgba(255,255,255,0.01), transparent);display:flex;justify-content:space-between;align-items:center">
+        <div><strong>${escapeHtml(c.name||'Anonim')}</strong><div class="note">${escapeHtml(c.text)}</div><div class="note">${new Date(c.ts || Date.now()).toLocaleString()}</div></div>
+        <div style="display:flex;gap:8px"><button class="btn ghost" data-delc="${idx}">Hapus</button></div>
+      </div>`;
+    });
+    html += `</div>`;
+    body.innerHTML = html;
+    body.querySelectorAll('[data-delc]').forEach(b=> b.addEventListener('click', ()=>{
+      const idx = Number(b.getAttribute('data-delc'));
+      if(confirm('Hapus komentar ini (lokal)?')){ const arr = getComments(); arr.splice(idx,1); saveComments(arr); openEditorPanel('comments'); }
+    }));
+    return;
+  }
+
+  if(section === 'reviews'){
+    const rev = getReviews();
+    let html = `<div style="display:flex;flex-direction:column;gap:8px"><div class="note">Hapus review individual jika diperlukan.</div>`;
+    if(!rev.length) html += `<div class="note">Belum ada review.</div>`;
+    rev.slice().reverse().forEach((r,i)=>{
+      const idx = rev.length -1 - i;
+      html += `<div style="padding:8px;border-radius:8px;background:linear-gradient(180deg, rgba(255,255,255,0.01), transparent);display:flex;justify-content:space-between;align-items:center">
+        <div><strong>${escapeHtml(r.name||'Anonim')}</strong><div class="note">${renderStarsInline(r.stars)}</div><div class="note">${escapeHtml(r.text||'')}</div></div>
+        <div style="display:flex;gap:8px"><button class="btn ghost" data-delr="${idx}">Hapus</button></div>
+      </div>`;
+    });
+    html += `</div>`; body.innerHTML = html;
+    body.querySelectorAll('[data-delr]').forEach(b=> b.addEventListener('click', ()=>{
+      const idx = Number(b.getAttribute('data-delr')); if(confirm('Hapus review (lokal)?')){ const arr = getReviews(); arr.splice(idx,1); saveReviews(arr); openEditorPanel('reviews'); }
+    }));
+    return;
+  }
+}
+
+function closeEditorPanel(){ document.getElementById('editorPanel').classList.remove('show'); document.getElementById('editorPanel').setAttribute('aria-hidden','true'); }
+
+/* ===========================
+   INIT: apply data & UI
+   =========================== */
+(function init(){
+  profile = getJSON(KEYS.PROFILE, DEFAULT_PROFILE);
+  applyProfile();
+  renderPosts();
+  renderSiteComments();
+  renderReviews();
+  renderAds();
+  updateEditorUI();
+})();
+</script>
+</body>
+</html>
