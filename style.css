@@ -18,7 +18,7 @@ body{
   line-height:1.45; overflow-x:hidden;
 }
 
-/* ========== LAYOUT - full-width mobile fix ========== */
+/* LAYOUT - full-width mobile fix */
 .wrapper{
   max-width:var(--maxw); margin:0 auto;
   padding:var(--safe-padding); width:100%;
@@ -135,7 +135,6 @@ img, video { max-width:100%; height:auto; display:block; }
 .note{color:var(--muted); font-size:0.9rem}
 .footer{padding:18px 0; text-align:center; color:var(--muted)}
 
-/* responsive tweaks for full width mobile fix */
 @media(max-width:520px){
   .wrapper{padding:14px}
   .logo{width:56px;height:56px}
@@ -143,37 +142,13 @@ img, video { max-width:100%; height:auto; display:block; }
   .post-thumb{width:90px;height:64px}
   .post-full .post-full-img{height:220px}
 }
-/* === Scrollable containers (for reviews, comments, posts) === */
+/* Scrollable containers */
 .scroll-area {
-  max-height: 280px;          /* tinggi maksimal kotak, bisa kamu ubah */
-  overflow-y: auto;
-  padding-right: 4px;         /* ruang buat scrollbar */
-  scroll-behavior: smooth;
-}
-
-/* Scrollbar halus dan tipis */
-.scroll-area::-webkit-scrollbar {
-  width: 6px;
-}
-.scroll-area::-webkit-scrollbar-track {
-  background: transparent;
-}
-.scroll-area::-webkit-scrollbar-thumb {
-  background: rgba(255,255,255,0.2);
-  border-radius: 4px;
-}
-.scroll-area::-webkit-scrollbar-thumb:hover {
-  background: rgba(255,255,255,0.35);
-}
-/* === Scrollable container universal (posts, reviews, comments, messages) === */
-.scroll-area {
-  max-height: 280px;          /* kamu bisa ubah misal 250px atau 300px */
+  max-height: 280px;
   overflow-y: auto;
   padding-right: 4px;
   scroll-behavior: smooth;
 }
-
-/* scrollbar tipis & elegan */
 .scroll-area::-webkit-scrollbar {
   width: 6px;
 }
@@ -184,4 +159,3 @@ img, video { max-width:100%; height:auto; display:block; }
 .scroll-area::-webkit-scrollbar-thumb:hover {
   background: rgba(255,255,255,0.35);
 }
-
