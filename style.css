@@ -1,7 +1,7 @@
-:root{
+:root {
   --radius:12px; --maxw:1100px; --accent:#3ea0ff; --danger:#e05a4f;
   --muted-dark:#9fb1c8; --muted-light:#5b6c7b;
-  --bg-dark:#000; /* SOLID HITAM */
+  --bg-dark:#000;
   --card-dark:rgba(255,255,255,0.03); --text-dark:#eaf6ff;
   --bg-light:#f6fbff; --card-light:#ffffff; --text-light:#052033;
   --safe-padding:18px;
@@ -10,18 +10,42 @@ html[data-theme='dark']{ --bg:var(--bg-dark); --card:var(--card-dark); --text:va
 html[data-theme='light']{ --bg:var(--bg-light); --card:var(--card-light); --text:var(--text-light); --muted:var(--muted-light); --glass: rgba(11,26,43,0.03); }
 
 *{box-sizing:border-box}
-html,body{height:100%;margin:0;padding:0}
+html,body{height:100%;margin:0;padding:0;max-width:100vw;overflow-x:hidden;}
 body{
   font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial;
-  background: var(--bg); /* sekarang solid hitam di dark mode */
+  background: var(--bg);
   color:var(--text); -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
   line-height:1.45; overflow-x:hidden;
 }
 
 /* ========== LAYOUT - full-width mobile fix ========== */
-.wrapper{max-width:var(--maxw); margin:0 auto; padding:var(--safe-padding); width:100%;}
+.wrapper{
+  max-width:var(--maxw); margin:0 auto;
+  padding:var(--safe-padding); width:100%;
+}
 img, video { max-width:100%; height:auto; display:block; }
 
+@media(max-width:860px) {
+  .wrapper {
+    max-width:100vw !important;
+    width:100vw !important;
+    padding:10px;
+    overflow-x:hidden !important;
+  }
+  body, html {
+    max-width:100vw !important;
+    overflow-x:hidden !important;
+  }
+  .row {
+    flex-direction: column !important;
+  }
+  .card, .panel, .modal .dialog {
+    max-width:100vw !important;
+    width:100vw !important;
+    box-sizing: border-box;
+    overflow-x:auto;
+  }
+}
 /* header */
 .header{
   display:flex; justify-content:space-between; align-items:center; gap:12px;
@@ -160,3 +184,4 @@ img, video { max-width:100%; height:auto; display:block; }
 .scroll-area::-webkit-scrollbar-thumb:hover {
   background: rgba(255,255,255,0.35);
 }
+
