@@ -4,75 +4,140 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
   <title>Irfan Rizki Aditri — Personal</title>
+
   <!-- Icons & Fonts -->
   <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Playfair+Display:wght@500;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
-  <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/10.10.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.10.0/firebase-firestore-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.10.0/firebase-storage-compat.js"></script>
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="style/main.css">
+
+<!-- Firebase SDKs (add before js/firebase-init.js) -->
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-storage-compat.js"></script>
+
 </head>
 <body>
+
+  <!-- Hamburger menu -->
+  <div id="hamburgerMenu" class="hamburger" aria-label="Buka menu" tabindex="0">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+
+  <!-- Sidebar menu -->
+  <aside id="sideMenu" class="side-menu" aria-label="Sidebar navigasi">
+    <nav class="side-menu-content">
+      <ul>
+        <li><a href="#" id="menuHome"><i class='bx bx-home'></i> Beranda</a></li>
+        <li><a href="#" id="menuAbout"><i class='bx bx-user'></i> Tentang</a></li>
+        <li class="menu-contact">
+          <a href="#" id="menuContact">Kontak <span id="contactCaret" class="caret">&#9660;</span></a>
+          <div id="contactSubmenu" class="contact-submenu" aria-hidden="true">
+            <a href="https://wa.me/6285788918217" target="_blank" title="WhatsApp"><i class="bx bxl-whatsapp"></i> WhatsApp</a>
+            <a href="https://www.instagram.com/irfanrizkiaditri" target="_blank" title="Instagram"><i class="bx bxl-instagram"></i> Instagram</a>
+            <a href="https://www.linkedin.com/in/irfanrizkiaditri" target="_blank" title="LinkedIn"><i class="bx bxl-linkedin"></i> LinkedIn</a>
+            <a href="mailto:irfanrizkiaditri@gmail.com" title="Email"><i class='bx bx-envelope'></i> Email</a>
+            <a href="https://github.com/fanraa" target="_blank" title="GitHub"><i class='bx bxl-github'></i> GitHub</a>
+          </div>
+        </li>
+      </ul>
+    </nav>
+  </aside>
+
+  <!-- Toast container -->
+  <div id="toastContainer" aria-live="polite" aria-atomic="true"></div>
+
+  <!-- About Modal -->
+  <div id="aboutModal" class="modal" aria-hidden="true" role="dialog" aria-labelledby="aboutTitle">
+    <div class="about-dialog">
+      <button id="closeAbout" class="close-about" aria-label="Tutup" style="float:right;background:transparent;border:none;color:var(--muted);font-size:20px;">&times;</button>
+      <div class="about-top">
+        <div class="about-avatar-wrap">
+          <img id="aboutAvatar" alt="Foto profil Irfan">
+        </div>
+      </div>
+      <h2 id="aboutTitle">Tentang Saya</h2>
+      <div class="about-body">
+        <p>
+          Halo, saya <strong>Irfan Rizki Aditri</strong>, mahasiswa S1 Fisika di <strong>Institut Teknologi Sumatera (ITERA)</strong>.
+        </p>
+        <p>
+          Saya memiliki minat pada fisika, penulisan, dan pengembangan solusi digital. Halaman ini menampilkan karya, pemikiran, dan informasi singkat tentang kegiatan akademik serta proyek.
+        </p>
+        <p>
+          Terima kasih atas kunjungan Anda. Jika ingin berkolaborasi atau menghubungi, silakan gunakan kontak pada menu.
+        </p>
+      </div>
+    </div>
+  </div>
+
   <div class="wrapper">
-    <!-- Editor toolbar (visible when editor logged in) -->
-    <div id="editorToolbar" class="editor-toolbar" aria-hidden="true">
-      <button class="btn ghost" id="btnEditProfile"><i class='bx bx-edit'></i> Edit Profile</button>
-      <button class="btn ghost" id="btnManagePosts"><i class='bx bx-book-open'></i> Manage Posts</button>
-      <button class="btn ghost" id="btnManageComments"><i class='bx bx-message-square-dots'></i> Manage Comments</button>
-      <button class="btn ghost" id="btnManageReviews"><i class='bx bx-star'></i> Manage Reviews</button>
+    <!-- Editor toolbar -->
+    <div id="editorToolbar" class="editor-toolbar" aria-hidden="true" role="toolbar">
+      <button class="btn ghost" id="btnEditProfile"><i class='bx bx-edit'></i> Edit Profil</button>
+      <button class="btn ghost" id="btnManagePosts"><i class='bx bx-book-open'></i> Kelola Post</button>
+      <button class="btn ghost" id="btnManageComments"><i class='bx bx-message-square-dots'></i> Kelola Komentar</button>
+      <button class="btn ghost" id="btnManageReviews"><i class='bx bx-star'></i> Kelola Ulasan</button>
       <div style="flex:1"></div>
-      <button class="btn ghost" id="btnManageNews"><i class='bx bx-news'></i> Manage News</button>
+      <button class="btn ghost" id="btnManageNews"><i class='bx bx-news'></i> Kelola Berita</button>
       <button class="btn ghost" id="btnResetVisitors">Reset Visitors</button>
-      <button class="btn" id="btnLogout">Logout</button>
+      <button class="btn" id="btnLogout">Logout Editor</button>
     </div>
 
-    <!-- HEADER -->
-    <header class="header">
+    <!-- Header -->
+    <header class="header" role="banner">
       <div class="brand">
-        <div class="logo">
-          <img id="logoImg" alt="logo">
-        </div>
         <div class="site-title">
           <h1 id="siteName">Irfan Rizki Aditri</h1>
           <p id="siteTag">S1 Fisika — ITERA</p>
         </div>
       </div>
-      <div class="top-actions">
-        <div class="note" id="visitorSmall">Visitors: 0</div>
+
+      <div class="top-actions" role="navigation" aria-label="Tindakan">
+        <div id="statusSmall" class="note">Status: <span id="onlineStatus">—</span></div>
+        <div id="visitorSmall" class="note">Visitors: 0</div>
         <a class="icon-btn" id="waBtn" href="https://wa.me/6285788918217" target="_blank" title="WhatsApp"><i class='bx bxl-whatsapp'></i></a>
         <a class="icon-btn" id="igBtn" href="https://www.instagram.com/irfanrizkiaditri" target="_blank" title="Instagram"><i class='bx bxl-instagram'></i></a>
-        <a class="icon-btn" id="liBtn" href="#" title="LinkedIn"><i class='bx bxl-linkedin'></i></a>
+        <a class="icon-btn" id="liBtn" href="https://www.linkedin.com/in/irfanrizkiaditri" target="_blank" title="LinkedIn"><i class='bx bxl-linkedin'></i></a>
+
         <button class="btn ghost" id="openEditor">Editor</button>
         <button class="btn" id="themeBtn">Mode</button>
+
+        <button class="btn" id="loginBtn">Masuk dengan Google</button>
+        <button class="btn" id="logoutBtn" style="display:none;">Keluar</button>
+        <span id="userInfo" aria-live="polite"></span>
       </div>
     </header>
 
-    <!-- HERO -->
-    <section class="card hero">
-      <div class="avatar"><a id="avatarLink" href="https://www.instagram.com/irfanrizkiaditri" target="_blank"><img id="mainAvatar" alt="avatar"></a></div>
+    <!-- Hero -->
+    <section class="card hero" aria-labelledby="heroTitle">
+      <div class="avatar"><a id="avatarLink" href="https://www.instagram.com/irfanrizkiaditri" target="_blank"><img id="mainAvatar" alt="Foto Irfan"></a></div>
       <div class="meta">
         <div class="name" id="displayName">Irfan Rizki Aditri</div>
         <div class="role" id="displayRole">S1 Fisika — ITERA</div>
-        <div class="bio" id="displayBio">Saya menempuh S1 Fisika di ITERA dan suka menulis serta bereksperimen.</div>
-        <div class="tags" id="tagsWrapper">
+        <div class="bio" id="displayBio">Saya menempuh S1 Fisika di ITERA dan gemar mengeksplorasi ilmu serta menulis.</div>
+        <div class="tags" id="tagsWrapper" aria-hidden="false">
           <div class="tag" data-key="location">Sumatera</div>
           <div class="tag" data-key="family">Mahasiswa</div>
           <div class="tag" data-key="study">Fisika</div>
           <div class="tag" data-key="campus">Itera</div>
+          <div class="tag" data-key="gender">Laki-Laki</div>
         </div>
-        <div class="contact-line">
-          <a class="icon-btn" href="mailto:yourmail@example.com"><i class='bx bx-envelope'></i></a>
-          <a class="icon-btn" href="https://wa.me/6285788918217" target="_blank"><i class='bx bxl-whatsapp'></i></a>
-          <a class="icon-btn" href="https://www.instagram.com/irfanrizkiaditri" target="_blank"><i class='bx bxl-instagram'></i></a>
+        <div class="contact-line" aria-label="Kontak cepat">
+          <a class="icon-btn" href="mailto:irfanrizkiaditri@gmail.com" title="Email"><i class='bx bx-envelope'></i></a>
+          <a class="icon-btn" href="https://wa.me/6285788918217" target="_blank" title="WhatsApp"><i class='bx bxl-whatsapp'></i></a>
+          <a class="icon-btn" href="https://www.instagram.com/irfanrizkiaditri" target="_blank" title="Instagram"><i class='bx bxl-instagram'></i></a>
         </div>
       </div>
     </section>
 
-    <!-- REVIEWS + ADS -->
+    <!-- Reviews + News -->
     <section class="card" style="padding:20px">
       <div class="row" style="display:flex;gap:20px;flex-wrap:wrap">
-        <!-- LEFT: REVIEWS -->
         <div class="left" style="flex:1;min-width:280px">
           <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px">
             <div style="text-align:center">
@@ -80,13 +145,13 @@
               <div class="note" id="reviewsCount" style="font-size:0.9rem">— ulasan</div>
             </div>
             <div style="flex:1;text-align:right;min-width:250px">
-              <div class="note">Beri rating</div>
+              <div class="note">Beri penilaian</div>
               <div id="starForm" class="stars" style="margin-top:6px;display:flex;justify-content:flex-end;gap:6px;font-size:1.6rem;cursor:pointer;">
-                <span class="star" data-val="1" style="color:#555;transition:0.2s;">★</span>
-                <span class="star" data-val="2" style="color:#555;transition:0.2s;">★</span>
-                <span class="star" data-val="3" style="color:#555;transition:0.2s;">★</span>
-                <span class="star" data-val="4" style="color:#555;transition:0.2s;">★</span>
-                <span class="star" data-val="5" style="color:#555;transition:0.2s;">★</span>
+                <span class="star" data-val="1">★</span>
+                <span class="star" data-val="2">★</span>
+                <span class="star" data-val="3">★</span>
+                <span class="star" data-val="4">★</span>
+                <span class="star" data-val="5">★</span>
               </div>
               <div style="margin-top:10px;display:flex;gap:8px;justify-content:flex-end;align-items:center;flex-wrap:wrap">
                 <input id="reviewName" placeholder="Nama (opsional)" style="padding:8px 10px;border-radius:8px;border:1px solid rgba(255,255,255,0.1);background:transparent;color:var(--text);width:160px">
@@ -94,35 +159,36 @@
               </div>
             </div>
           </div>
-          <hr style="border:none;height:1px;background:rgba(255,255,255,0.08);margin:16px 0">
+
+          <hr style="border:none;height:1px;background:rgba(18, 16, 16, 0.265);margin:16px 0">
           <div id="reviewsList" class="scroll-area" style="margin-top:8px;display:flex;flex-direction:column;gap:10px;"></div>
         </div>
-        <!-- RIGHT: ADS -->
+
         <aside class="right" style="flex:1;min-width:260px;max-width:400px;">
           <div style="display:flex;justify-content:space-between;align-items:center">
-            <div class="note" style="font-weight:600">Berita & Iklan</div>
+            <div class="note" style="font-weight:600">Berita & Sorotan</div>
             <div class="note">Live Feed</div>
           </div>
-          <div id="adsArea" style="margin-top:12px;display:flex;flex-direction:column;gap:8px"></div>
+          <div id="adsArea" class="scroll-area" style="margin-top:12px;display:flex;flex-direction:column;gap:8px"></div>
           <div style="margin-top:12px;font-size:0.85rem;color:var(--muted);">
-            Berita diperbarui otomatis setiap 1 menit dan bisa kamu tambahkan manual lewat menu Editor.
+            Berita diperbarui otomatis setiap 1 menit. Tambahan berita manual dapat dikelola melalui panel khusus.
           </div>
         </aside>
       </div>
     </section>
 
-    <!-- BLOG / PROJECTS -->
-    <section class="card" id="projectsBlock">
+    <!-- Blog / Projects -->
+    <section class="card" id="projectsBlock" aria-labelledby="projectsTitle">
       <div class="section-title">
-        <h3>Blog & Projects</h3>
-        <div class="note">Tambah posting melalui akun editor — tampilan ringkas; klik untuk detail</div>
+        <h3 id="projectsTitle">Blog & Proyek</h3>
+        <div class="note" id="projectsNote">Konten terbaru dipublikasikan secara berkala. Masuk untuk melihat opsi tambahan.</div>
       </div>
-      <div id="postList" class="post-list"></div>
+      <div id="postList" class="post-list" aria-live="polite"></div>
     </section>
 
-    <!-- MESSAGES -->
-    <section class="card">
-      <h3>Kotak Pesan</h3>
+    <!-- Messages (Komentar) -->
+    <section class="card" aria-labelledby="messagesTitle">
+      <h3 id="messagesTitle">Kotak Pesan</h3>
       <div class="comment-form" style="margin-top:8px">
         <input id="commentName" placeholder="Nama (opsional)">
         <textarea id="commentText" placeholder="Tulis pesan atau saran..." rows="4"></textarea>
@@ -130,32 +196,35 @@
           <button class="btn" id="sendComment">Kirim Pesan</button>
         </div>
       </div>
-      <div id="commentList" class="scroll-area"></div>
+      <div id="commentList" class="scroll-area" style="margin-top:12px"></div>
     </section>
 
-    <footer class="footer">
-      <div class="note">© 2025 Irfan Rizki Aditri • Personal</div>
+    <footer class="footer" role="contentinfo">
+      <div class="note">© 2025 Irfan Rizki Aditri • Situs Pribadi</div>
     </footer>
   </div>
 
-  <!-- EDITOR LOGIN MODAL -->
-  <div id="loginModal" class="modal" aria-hidden="true">
-    <div class="dialog panel">
-      <h3>Editor Login</h3>
-      <div style="display:flex;flex-direction:column;gap:8px">
-        <input id="editorUser" placeholder="Username">
-        <input id="editorPass" type="password" placeholder="Password">
-        <div style="display:flex;justify-content:flex-end;gap:8px">
-          <button class="btn ghost" id="closeLogin">Batal</button>
-          <button class="btn" id="doLogin">Masuk</button>
+  <!-- Modals & Panels (login, editor, post modal) -->
+  <div id="loginModal" class="modal" aria-hidden="true" role="dialog" aria-labelledby="loginTitle">
+    <div class="dialog panel" style="max-width:420px;">
+      <h3 id="loginTitle">Masuk Editor</h3>
+      <!-- Improved login UI for creator pin and Google auth -->
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div style="display:flex;gap:8px">
+          <input id="editorUser" placeholder="Username (creator)" style="flex:1" value="">
+          <input id="editorPin" type="password" placeholder="PIN (creator)" style="width:140px">
         </div>
-        <div class="note">Editor dapat mengelola posting, komentar, review, dan mengubah profil (cloud).</div>
+        <div style="display:flex;gap:8px">
+          <button class="btn ghost" id="closeLogin">Batal</button>
+          <button class="btn" id="doLogin">Login Creator</button>
+          <button class="btn" id="googleLogin">Masuk dengan Google</button>
+        </div>
+        <div class="note">Creator dapat mengunci avatar dan melakukan operasi offline. PIN creator hanya untuk demo.</div>
       </div>
     </div>
   </div>
 
-  <!-- EDITOR PANEL (manage) -->
-  <div id="editorPanel" class="modal" aria-hidden="true">
+  <div id="editorPanel" class="modal" aria-hidden="true" role="dialog" aria-labelledby="panelTitle">
     <div class="dialog panel">
       <h3 id="panelTitle">Editor Panel</h3>
       <div id="panelBody" style="margin-top:10px"></div>
@@ -165,13 +234,12 @@
     </div>
   </div>
 
-  <!-- POST DETAIL MODAL -->
-  <div id="postModal" class="modal" aria-hidden="true">
+  <div id="postModal" class="modal" aria-hidden="true" role="dialog" aria-labelledby="postModalTitle">
     <div class="dialog panel post-full">
       <div style="display:flex;justify-content:space-between;align-items:center">
         <h3 id="postModalTitle">Judul</h3>
         <div style="display:flex;gap:8px">
-          <button class="btn ghost" id="sharePostBtn"><i class='bx bx-share'></i> Share</button>
+          <button class="btn ghost" id="sharePostBtn"><i class='bx bx-share'></i> Bagikan</button>
           <button class="btn ghost" id="closePostModal">Tutup</button>
         </div>
       </div>
@@ -193,623 +261,20 @@
     </div>
   </div>
 
-<script>
-// FIREBASE INIT
-const firebaseConfig = {
-  apiKey: "AIzaSyDpPVoSzktWFsR1DhIxpYU-gUDmbvNSwHs",
-  authDomain: "irfanrizkiaditri-site.firebaseapp.com",
-  projectId: "irfanrizkiaditri-site",
-  storageBucket: "irfanrizkiaditri-site.appspot.com",
-  messagingSenderId: "599243074823",
-  appId: "1:599243074823:web:1e440b2566c11daea229a2",
-  measurementId: "G-VJFXR0B0ZC"
-};
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
-const storage = firebase.storage();
-
-// THEME
-(function initTheme(){
-  const t = localStorage.getItem("irfan_theme_v2") || 'dark';
-  document.documentElement.setAttribute('data-theme', t);
-  document.body.style.background = t === 'dark' ? "#000" : "";
-})();
-document.getElementById('themeBtn').addEventListener('click', ()=>{
-  const cur = document.documentElement.getAttribute('data-theme') || 'dark';
-  const nxt = cur === 'dark' ? 'light' : 'dark';
-  document.documentElement.setAttribute('data-theme', nxt);
-  localStorage.setItem("irfan_theme_v2", nxt);
-  document.body.style.background = nxt === 'dark' ? "#000" : "";
-});
-
-// RESPONSIVE FIX
-document.body.style.overflowX = "hidden";
-window.addEventListener('resize', ()=>{
-  document.body.style.overflowX = "hidden";
-});
-
-// PROFILE DEFAULT
-const DEFAULT_PROFILE = {
-  name: 'Irfan Rizki Aditri',
-  role: 'S1 Fisika — Institut Teknologi Sumatera',
-  bio: 'Saya menempuh S1 Fisika di ITERA dan suka menulis serta bereksperimen.',
-  avatar: '',
-  location: 'Pulau Sumatra',
-  family: 'Anak terakhir dari 3',
-  study: 'Fisika',
-  campus: 'Itera'
-};
-
-// FIREBASE UTILS
-async function fbGetProfile() {
-  const doc = await db.collection("profile").doc("main").get();
-  return doc.exists ? doc.data() : DEFAULT_PROFILE;
-}
-async function fbSetProfile(profile) {
-  await db.collection("profile").doc("main").set(profile);
-}
-// Avatar upload to Firebase Storage
-async function uploadAvatar(file) {
-  const ext = file.name.split('.').pop();
-  const avatarRef = storage.ref('avatars/profile.' + ext);
-  await avatarRef.put(file);
-  return await avatarRef.getDownloadURL();
-}
-// Visitors
-async function fbGetVisitors() {
-  const doc = await db.collection("visitors").doc("counter").get();
-  return doc.exists ? doc.data().count : 200;
-}
-async function fbIncVisitors() {
-  const ref = db.collection("visitors").doc("counter");
-  let count = 200;
-  await db.runTransaction(async tx => {
-    const doc = await tx.get(ref);
-    if (doc.exists) count = doc.data().count;
-    count += 1;
-    tx.set(ref, { count });
-  });
-  return count;
-}
-async function fbResetVisitors() {
-  await db.collection("visitors").doc("counter").set({ count: 200 });
-  return 200;
-}
-// Posts
-async function fbGetPosts() {
-  const snap = await db.collection("posts").orderBy("ts", "desc").get();
-  return snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-}
-async function fbAddPost(post) {
-  const docRef = await db.collection("posts").add(post);
-  return docRef.id;
-}
-async function fbUpdatePost(id, data) {
-  await db.collection("posts").doc(id).update(data);
-}
-async function fbDeletePost(id) {
-  await db.collection("posts").doc(id).delete();
-}
-// Comments
-async function fbGetComments() {
-  const snap = await db.collection("comments").orderBy("ts", "desc").get();
-  return snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-}
-async function fbAddComment(comment) {
-  await db.collection("comments").add(comment);
-}
-async function fbDeleteComment(id) {
-  await db.collection("comments").doc(id).delete();
-}
-// Reviews
-async function fbGetReviews() {
-  const snap = await db.collection("reviews").orderBy("ts", "desc").get();
-  return snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-}
-async function fbAddReview(review) {
-  await db.collection("reviews").add(review);
-}
-async function fbDeleteReview(id) {
-  await db.collection("reviews").doc(id).delete();
-}
-// Manual News
-async function fbGetManualNews() {
-  const snap = await db.collection("manual_news").orderBy("ts", "desc").get();
-  return snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-}
-async function fbAddManualNews(news) {
-  await db.collection("manual_news").add(news);
-}
-async function fbDeleteManualNews(id) {
-  await db.collection("manual_news").doc(id).delete();
-}
-
-// VISITOR COUNTER
-async function updateVisitors() {
-  const visitors = await fbIncVisitors();
-  document.getElementById('visitorSmall').textContent = 'Visitors: ' + visitors;
-}
-updateVisitors();
-
-// PROFILE
-async function applyProfile(){
-  let profile = await fbGetProfile();
-  document.getElementById('siteName').textContent = profile.name;
-  document.getElementById('displayName').textContent = profile.name;
-  document.getElementById('siteTag').textContent = profile.role;
-  document.getElementById('displayRole').textContent = profile.role;
-  document.getElementById('displayBio').textContent = profile.bio;
-  const map = {
-    location: profile.location,
-    family: profile.family,
-    study: profile.study,
-    campus: profile.campus
-  };
-  document.querySelectorAll('#tagsWrapper .tag').forEach(el=>{
-    const k = el.dataset.key;
-    if(k && map[k] !== undefined) el.textContent = map[k];
-  });
-  document.getElementById('mainAvatar').src = profile.avatar || '';
-  document.getElementById('logoImg').src = profile.avatar || '';
-  document.getElementById('avatarLink').href = 'https://www.instagram.com/irfanrizkiaditri';
-}
-applyProfile();
-
-// POSTS
-async function renderPosts() {
-  const container = document.getElementById('postList');
-  container.innerHTML = '';
-  const posts = await fbGetPosts();
-  if (!posts.length) {
-    container.innerHTML = `<div class="note">Belum ada posting. Masuk sebagai editor untuk menambah.</div>`;
-    return;
-  }
-  posts.forEach(p => {
-    const div = document.createElement('div');
-    div.className = 'post';
-    div.style.cursor = 'pointer';
-    const caption = String(p.caption || '');
-    div.innerHTML = `
-      <div class="post-thumb">${p.img ? `<img src="${p.img}" alt="">` : ''}</div>
-      <div class="post-body">
-        <h4>${p.title || '(Tanpa judul)'}</h4>
-        <p>${caption.slice(0, 200)}${caption.length > 200 ? '...' : ''}</p>
-        <div class="note" style="margin-top:6px;">
-          ${new Date(p.ts || Date.now()).toLocaleDateString()} • ❤️ ${p.likes || 0}
-        </div>
-      </div>`;
-    div.addEventListener('click', () => openPostModal(p.id));
-    container.appendChild(div);
-  });
-}
-renderPosts();
-
-// COMMENTS
-async function renderSiteComments() {
-  const list = await fbGetComments();
-  const el = document.getElementById('commentList');
-  el.innerHTML = '';
-  if (!list.length) {
-    el.innerHTML = '<div class="note">Belum ada pesan. Tinggalkan pesan sopan ya 😊</div>';
-    return;
-  }
-  list.forEach(c => {
-    const d = document.createElement('div');
-    d.className = 'comment';
-    d.innerHTML = `
-      <div style="display:flex;justify-content:space-between;align-items:center">
-        <div><strong>${c.name || 'Anonim'}</strong></div>
-        <div class="note">${new Date(c.ts || Date.now()).toLocaleString()}</div>
-      </div>
-      <div style="margin-top:8px">${c.text}</div>`;
-    el.appendChild(d);
-  });
-}
-document.getElementById('sendComment').addEventListener('click', async () => {
-  const name = document.getElementById('commentName').value.trim();
-  const text = document.getElementById('commentText').value.trim();
-  if (!text) return alert('Tulis pesan terlebih dahulu.');
-  await fbAddComment({ name: name || 'Anonim', text, ts: Date.now() });
-  document.getElementById('commentName').value = '';
-  document.getElementById('commentText').value = '';
-  renderSiteComments();
-});
-renderSiteComments();
-
-// REVIEWS
-async function renderReviews() {
-  const list = await fbGetReviews();
-  const total = list.length;
-  const sum = list.reduce((s, r) => s + Number(r.stars || 0), 0);
-  const avg = total ? (sum / total) : 0;
-  document.getElementById('avgScore').textContent = avg ? avg.toFixed(1) : '-';
-  document.getElementById('reviewsCount').textContent = total + ' ulasan';
-  const container = document.getElementById('reviewsList');
-  container.innerHTML = '';
-  if (!list.length) {
-    container.innerHTML = '<div class="note">Belum ada ulasan.</div>';
-    return;
-  }
-  list.forEach(r => {
-    const el = document.createElement('div');
-    el.className = 'comment';
-    el.innerHTML = `
-      <div style="display:flex;justify-content:space-between;align-items:center">
-        <strong>${r.name || 'Anonim'}</strong>
-        <div class="note">${new Date(r.ts || Date.now()).toLocaleString()}</div>
-      </div>
-      <div style="margin-top:8px">${renderStarsInline(r.stars)}</div>
-      <div style="margin-top:6px;color:var(--muted)">${r.text || ''}</div>`;
-    container.appendChild(el);
-  });
-}
-function renderStarsInline(n) {
-  let s = '';
-  for (let i = 1; i <= 5; i++)
-    s += `<span style="color:${i <= n ? '#ffd166' : 'rgba(255,255,255,0.1)'}">★</span>`;
-  return s;
-}
-renderReviews();
-
-let selStar = 0;
-document.querySelectorAll('#starForm .star').forEach(s => {
-  s.addEventListener('mouseover', () => {
-    const v = Number(s.dataset.val);
-    document.querySelectorAll('#starForm .star').forEach(x =>
-      x.style.color = (Number(x.dataset.val) <= v ? '#ffd166' : 'rgba(255,255,255,0.1)'));
-  });
-  s.addEventListener('mouseout', () => {
-    document.querySelectorAll('#starForm .star').forEach(x =>
-      x.style.color = (Number(x.dataset.val) <= selStar ? '#ffd166' : 'rgba(255,255,255,0.1)'));
-  });
-  s.addEventListener('click', () => { selStar = Number(s.dataset.val); });
-});
-document.getElementById('submitReview').addEventListener('click', async () => {
-  if (selStar <= 0) return alert('Pilih bintang terlebih dahulu.');
-  const name = document.getElementById('reviewName').value.trim();
-  const txt = prompt('Tulis komentar singkat untuk ulasan (opsional):') || '';
-  await fbAddReview({ name: name || 'Anonim', stars: selStar, text: txt, ts: Date.now() });
-  selStar = 0;
-  document.getElementById('reviewName').value = '';
-  document.querySelectorAll('#starForm .star').forEach(x => x.style.color = 'rgba(255,255,255,0.1)');
-  renderReviews();
-});
-
-// ADS / NEWS
-const NEWS_SOURCES = [
-  "https://www.reuters.com/business/feed/",
-  "https://www.antaranews.com/rss/terkini.xml",
-  "https://www.techradar.com/rss",
-  "https://www.nature.com/subjects/physics.rss"
-];
-async function renderNews() {
-  const adsArea = document.getElementById("adsArea");
-  adsArea.innerHTML = `<div class="note">Memuat berita otomatis...</div>`;
-  adsArea.style.opacity = 0.4;
-  try {
-    if (typeof window.newsIndex === "undefined") window.newsIndex = 0;
-    const source = NEWS_SOURCES[window.newsIndex % NEWS_SOURCES.length];
-    window.newsIndex++;
-    const res = await fetch(
-      `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(source)}`
-    );
-    const data = await res.json();
-    const autoItems = (data.items || []).slice(0, 3).map((item) => ({
-      title: item.title,
-      link: item.link,
-      source: new URL(item.link).hostname,
-      type: "auto",
-    }));
-    const manualItems = await fbGetManualNews();
-    const all = [...autoItems, ...manualItems];
-    adsArea.innerHTML = "";
-    all.forEach((a) => {
-      const d = document.createElement("div");
-      d.className = "card";
-      d.style.padding = "10px";
-      d.style.cursor = "pointer";
-      d.innerHTML = `
-        <div style="display:flex;flex-direction:column;gap:4px">
-          <strong style="font-size:0.95rem;line-height:1.4">${a.title}</strong>
-          <div class="note">${a.source}</div>
-        </div>
-      `;
-      d.addEventListener("click", () => window.open(a.link, "_blank"));
-      adsArea.appendChild(d);
-    });
-  } catch (err) {
-    adsArea.innerHTML = `<div class="note">Tidak dapat memuat berita otomatis 😕</div>`;
-  } finally {
-    adsArea.style.opacity = 1;
-  }
-}
-renderNews();
-setInterval(renderNews, 60000);
-
-// EDITOR LOGIN
-const EDITOR = {user:'irfanrizkiaditri', pass:'#I47r32a6'}; // *** DEMO ONLY! Jangan gunakan password editor langsung di client untuk produksi ***
-function isEditor(){ return sessionStorage.getItem("irfan_editor_v2") === '1'; }
-function setEditor(val){
-  if(val){ sessionStorage.setItem("irfan_editor_v2", '1'); }
-  else { sessionStorage.removeItem("irfan_editor_v2"); }
-  updateEditorUI();
-}
-document.getElementById('openEditor').addEventListener('click', ()=> {
-  document.getElementById('loginModal').classList.add('show'); document.getElementById('loginModal').setAttribute('aria-hidden','false');
-});
-document.getElementById('closeLogin').addEventListener('click', ()=> {
-  document.getElementById('loginModal').classList.remove('show'); document.getElementById('loginModal').setAttribute('aria-hidden','true');
-});
-document.getElementById('doLogin').addEventListener('click', ()=>{
-  const u = document.getElementById('editorUser').value.trim(), p = document.getElementById('editorPass').value;
-  if(u === EDITOR.user && p === EDITOR.pass){
-    setEditor(true);
-    document.getElementById('loginModal').classList.remove('show');
-    alert('Login editor berhasil. Toolbar aktif.');
-  } else alert('Username atau password salah.');
-});
-document.getElementById('btnLogout').addEventListener('click', ()=>{
-  if(confirm('Logout editor?')){ setEditor(false); alert('Logout berhasil.'); }
-});
-function updateEditorUI(){
-  const toolbar = document.getElementById('editorToolbar');
-  if(isEditor()){ toolbar.classList.add('show'); toolbar.setAttribute('aria-hidden','false'); } else { toolbar.classList.remove('show'); toolbar.setAttribute('aria-hidden','true'); }
-}
-updateEditorUI();
-
-document.getElementById('btnEditProfile').addEventListener('click', ()=> openEditorPanel('profile'));
-document.getElementById('btnManagePosts').addEventListener('click', ()=> openEditorPanel('posts'));
-document.getElementById('btnManageComments').addEventListener('click', ()=> openEditorPanel('comments'));
-document.getElementById('btnManageReviews').addEventListener('click', ()=> openEditorPanel('reviews'));
-document.getElementById('btnManageNews').addEventListener('click', ()=> openEditorPanel('news'));
-document.getElementById('closePanel').addEventListener('click', ()=> closeEditorPanel());
-document.getElementById('btnResetVisitors').addEventListener('click', async ()=> {
-  if(!isEditor()) return alert('Hanya editor yang bisa reset visitor.');
-  if(confirm('Reset visitor counter ke 200 (cloud)?')){
-    await fbResetVisitors();
-    document.getElementById('visitorSmall').textContent = 'Visitors: 200';
-    alert('Visitor counter telah di-reset (cloud).');
-  }
-});
-
-/* ========== EDITOR PANEL PROFILE: UPLOAD AVATAR STORAGE ========== */
-async function openEditorPanel(section){
-  if(!isEditor()){ return alert('Silakan login sebagai editor terlebih dahulu.'); }
-  const modal = document.getElementById('editorPanel'); modal.classList.add('show'); modal.setAttribute('aria-hidden','false');
-  const body = document.getElementById('panelBody'); body.innerHTML = '';
-  document.getElementById('panelTitle').textContent = 'Editor — ' + section;
-  if(section === 'profile'){
-    let profile = await fbGetProfile();
-    let selectedAvatarFile = null;
-    body.innerHTML = `<div style="display:flex;gap:12px;flex-wrap:wrap">
-      <div style="min-width:120px">
-        <div style="width:120px;height:120px;border-radius:10px;overflow:hidden"><img id="editorAvatarPreview" src="${profile.avatar}" style="width:100%;height:100%;object-fit:cover"></div>
-        <div style="margin-top:8px"><input id="editorAvatarInput" type="file" accept="image/*"></div>
-      </div>
-      <div style="flex:1;display:flex;flex-direction:column;gap:8px">
-        <input id="editorName" value="${profile.name}" placeholder="Nama">
-        <input id="editorRole" value="${profile.role}" placeholder="Role">
-        <textarea id="editorBio" placeholder="Bio" style="min-height:120px">${profile.bio}</textarea>
-        <input id="editorLocation" value="${profile.location}" placeholder="Lokasi">
-        <input id="editorFamily" value="${profile.family}" placeholder="Family">
-        <input id="editorStudy" value="${profile.study}" placeholder="Studi">
-        <input id="editorCampus" value="${profile.campus}" placeholder="Kampus">
-        <div style="display:flex;justify-content:flex-end;gap:8px">
-          <button class="btn ghost" id="cancelProfile">Batal</button>
-          <button class="btn" id="saveProfile">Simpan</button>
-        </div>
-      </div>
-    </div>`;
-    document.getElementById('editorAvatarInput').addEventListener('change', (ev)=>{
-      const file = ev.target.files[0];
-      if(file){
-        selectedAvatarFile = file;
-        document.getElementById('editorAvatarPreview').src = URL.createObjectURL(file);
-      }
-    });
-    document.getElementById('cancelProfile').addEventListener('click', ()=> closeEditorPanel());
-    document.getElementById('saveProfile').addEventListener('click', async ()=>{
-      profile.name = document.getElementById('editorName').value.trim() || profile.name;
-      profile.role = document.getElementById('editorRole').value.trim() || profile.role;
-      profile.bio = document.getElementById('editorBio').value.trim() || profile.bio;
-      profile.location = document.getElementById('editorLocation').value.trim() || profile.location;
-      profile.family = document.getElementById('editorFamily').value.trim() || profile.family;
-      profile.study = document.getElementById('editorStudy').value.trim() || profile.study;
-      profile.campus = document.getElementById('editorCampus').value.trim() || profile.campus;
-      if (selectedAvatarFile) {
-        const url = await uploadAvatar(selectedAvatarFile);
-        profile.avatar = url;
-      }
-      await fbSetProfile(profile); await applyProfile(); alert('Profil diperbarui (cloud).'); closeEditorPanel();
-    });
-    return;
-  }
-  if(section === 'posts'){
-    const posts = await fbGetPosts();
-    let html = `<div style="display:flex;flex-direction:column;gap:8px">
-      <div style="display:flex;gap:8px;align-items:center">
-        <input id="newPostTitle" placeholder="Judul" style="flex:1;padding:8px;border-radius:8px">
-        <input id="newPostImg" type="file" accept="image/*">
-        <button class="btn" id="createPost">Buat</button>
-      </div>
-      <div class="note">Posting yang ada:</div>`;
-    if(!posts.length) html += `<div class="note">Belum ada posting.</div>`;
-    posts.forEach((p)=>{
-      html += `<div style="display:flex;justify-content:space-between;align-items:center;padding:8px;border-radius:8px;background:linear-gradient(180deg, rgba(255,255,255,0.01), transparent);margin-bottom:6px">
-        <div><strong>${p.title}</strong><div class="note">${new Date(p.ts || Date.now()).toLocaleString()}</div></div>
-        <div style="display:flex;gap:8px">
-          <button class="btn ghost" data-edit="${p.id}">Edit</button>
-          <button class="btn ghost" data-del="${p.id}">Hapus</button>
-        </div>
-      </div>`;
-    });
-    html += `</div>`;
-    body.innerHTML = html;
-    document.getElementById('createPost').addEventListener('click', async ()=>{
-      const title = document.getElementById('newPostTitle').value.trim();
-      const file = document.getElementById('newPostImg').files && document.getElementById('newPostImg').files[0];
-      if(!title) return alert('Masukkan judul.');
-      let img = '';
-      if(file){
-        const r = new FileReader();
-        r.onload = async (e)=>{
-          img = e.target.result;
-          await fbAddPost({title, caption:'(tulis caption di edit)', img, ts: Date.now(), likes:0, comments:[]});
-          alert('Posting dibuat.');
-          renderPosts(); openEditorPanel('posts');
-        }; r.readAsDataURL(file);
-      } else {
-        await fbAddPost({title, caption:'(tulis caption di edit)', img:'', ts: Date.now(), likes:0, comments:[]});
-        alert('Posting dibuat.');
-        renderPosts(); openEditorPanel('posts');
-      }
-    });
-    body.querySelectorAll('[data-del]').forEach(b=>{
-      b.addEventListener('click', async ()=>{
-        const id = b.getAttribute('data-del');
-        if(confirm('Hapus posting ini (cloud)?')){
-          await fbDeletePost(id);
-          alert('Posting dihapus.');
-          renderPosts(); openEditorPanel('posts');
-        }
-      });
-    });
-    body.querySelectorAll('[data-edit]').forEach(b=>{
-      b.addEventListener('click', async ()=>{
-        const id = b.getAttribute('data-edit');
-        const postsArr = await fbGetPosts();
-        const p = postsArr.find(x=>x.id === id);
-        body.innerHTML = `<h4>Edit Post</h4>
-          <input id="editTitle" value="${p.title}" style="padding:8px;border-radius:8px">
-          <textarea id="editCaption" style="min-height:140px;padding:8px;border-radius:8px">${p.caption}</textarea>
-          <div style="display:flex;gap:8px;align-items:center;margin-top:8px">
-            <input id="editImg" type="file" accept="image/*">
-            <button class="btn ghost" id="cancelEdit">Batal</button>
-            <button class="btn" id="saveEdit">Simpan</button>
-          </div>`;
-        document.getElementById('cancelEdit').addEventListener('click', ()=> openEditorPanel('posts'));
-        document.getElementById('saveEdit').addEventListener('click', async ()=>{
-          let title = document.getElementById('editTitle').value.trim() || p.title;
-          let caption = document.getElementById('editCaption').value.trim() || p.caption;
-          const fileinp = document.getElementById('editImg');
-          if(fileinp.files && fileinp.files[0]){
-            const r = new FileReader();
-            r.onload = async (e)=>{
-              let img = e.target.result;
-              await fbUpdatePost(id, {title, caption, img});
-              alert('Posting diperbarui.');
-              renderPosts(); openEditorPanel('posts');
-            }; r.readAsDataURL(fileinp.files[0]);
-          } else {
-            await fbUpdatePost(id, {title, caption});
-            alert('Posting diperbarui.');
-            renderPosts(); openEditorPanel('posts');
-          }
-        });
-      });
-    });
-    return;
-  }
-  if(section === 'comments'){
-    const comments = await fbGetComments();
-    let html = `<div style="display:flex;flex-direction:column;gap:8px"><div class="note">Hapus komentar individual jika perlu.</div>`;
-    if(!comments.length) html += `<div class="note">Belum ada komentar.</div>`;
-    comments.forEach((c)=>{
-      html += `<div style="padding:8px;border-radius:8px;background:linear-gradient(180deg, rgba(255,255,255,0.01), transparent);display:flex;justify-content:space-between;align-items:center">
-        <div><strong>${c.name||'Anonim'}</strong><div class="note">${c.text}</div><div class="note">${new Date(c.ts || Date.now()).toLocaleString()}</div></div>
-        <div style="display:flex;gap:8px"><button class="btn ghost" data-delc="${c.id}">Hapus</button></div>
-      </div>`;
-    });
-    html += `</div>`;
-    body.innerHTML = html;
-    body.querySelectorAll('[data-delc]').forEach(b=> b.addEventListener('click', async ()=>{
-      const id = b.getAttribute('data-delc');
-      if(confirm('Hapus komentar ini (cloud)?')){
-        await fbDeleteComment(id);
-        alert('Komentar dihapus.');
-        renderSiteComments(); openEditorPanel('comments');
-      }
-    }));
-    return;
-  }
-  if(section === 'reviews'){
-    const rev = await fbGetReviews();
-    let html = `<div style="display:flex;flex-direction:column;gap:8px"><div class="note">Hapus review individual jika diperlukan.</div>`;
-    if(!rev.length) html += `<div class="note">Belum ada review.</div>`;
-    rev.forEach((r)=>{
-      html += `<div style="padding:8px;border-radius:8px;background:linear-gradient(180deg, rgba(255,255,255,0.01), transparent);display:flex;justify-content:space-between;align-items:center">
-        <div><strong>${r.name||'Anonim'}</strong><div class="note">${renderStarsInline(r.stars)}</div><div class="note">${r.text||''}</div></div>
-        <div style="display:flex;gap:8px"><button class="btn ghost" data-delr="${r.id}">Hapus</button></div>
-      </div>`;
-    });
-    html += `</div>`;
-    body.innerHTML = html;
-    body.querySelectorAll('[data-delr]').forEach(b=> b.addEventListener('click', async ()=>{
-      const id = b.getAttribute('data-delr');
-      if(confirm('Hapus review (cloud)?')){
-        await fbDeleteReview(id);
-        alert('Review dihapus.');
-        renderReviews(); openEditorPanel('reviews');
-      }
-    }));
-    return;
-  }
-  if(section === 'news'){
-    const news = await fbGetManualNews();
-    let html = `
-      <div style="display:flex;flex-direction:column;gap:10px">
-        <div style="display:flex;gap:6px;align-items:center">
-          <input id="manualTitle" placeholder="Judul berita" style="flex:1;padding:8px;border-radius:8px">
-          <input id="manualLink" placeholder="Link sumber" style="flex:1;padding:8px;border-radius:8px">
-          <button class="btn" id="addManualNews">Tambah</button>
-        </div>
-        <div class="note">Klik pada daftar untuk membuka sumber.</div>
-    `;
-    if (!news.length) html += `<div class="note">Belum ada berita manual.</div>`;
-    news.forEach((n) => {
-      html += `
-        <div class="card" style="padding:10px;cursor:pointer" data-link="${n.link}">
-          <div style="display:flex;justify-content:space-between;align-items:center">
-            <div style="flex:1;min-width:0">
-              <strong style="font-size:0.9rem">${n.title}</strong>
-              <div class="note">${n.source || n.link}</div>
-            </div>
-            <button class="btn ghost" data-del="${n.id}">Hapus</button>
-          </div>
-        </div>`;
-    });
-    html += `</div>`;
-    body.innerHTML = html;
-    body.querySelectorAll("[data-link]").forEach((el) => {
-      el.addEventListener("click", (e) => {
-        if (e.target.hasAttribute("data-del")) return;
-        const link = el.getAttribute("data-link");
-        if (link) window.open(link, "_blank");
-      });
-    });
-    body.querySelectorAll("[data-del]").forEach((btn) =>
-      btn.addEventListener("click", async () => {
-        const id = btn.getAttribute("data-del");
-        if (confirm("Hapus berita manual ini?")) {
-          await fbDeleteManualNews(id);
-          alert("Berita manual dihapus!");
-          openEditorPanel("news");
-        }
-      })
-    );
-    document.getElementById("addManualNews").addEventListener("click", async () => {
-      const title = document.getElementById("manualTitle").value.trim();
-      const link = document.getElementById("manualLink").value.trim();
-      if (!title || !link) return alert("Isi judul dan link berita dulu.");
-      await fbAddManualNews({ title, link, source: new URL(link).hostname, ts: Date.now() });
-      alert("Berita manual ditambahkan!");
-      openEditorPanel("news");
-    });
-    return;
-  }
-}
-function closeEditorPanel(){ document.getElementById('editorPanel').classList.remove('show'); document.getElementById('editorPanel').setAttribute('aria-hidden','true'); }
-
-</script>
+  <!-- Scripts -->
+  <script src="js/firebase-init.js"></script>
+  <script src="js/idb.js"></script>
+  <script src="js/toast.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/theme.js"></script>
+  <script src="js/menu.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/profile.js"></script>
+  <script src="js/post.js"></script>
+  <script src="js/comments.js"></script>
+  <script src="js/reviews.js"></script>
+  <script src="js/news.js"></script>
+  <script src="js/editor.js"></script>
+  <script src="js/visitors.js"></script>
 </body>
 </html>
