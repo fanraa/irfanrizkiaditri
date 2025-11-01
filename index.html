@@ -11,6 +11,7 @@
   <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/10.10.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.10.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.10.0/firebase-storage-compat.js"></script>
 </head>
 <body>
   <div class="wrapper">
@@ -193,6 +194,7 @@
   </div>
 
 <script>
+<script>
 /* ========== FIREBASE INIT ========== */
 const firebaseConfig = {
   apiKey: "AIzaSyDpPVoSzktWFsR1DhIxpYU-gUDmbvNSwHs",
@@ -205,6 +207,7 @@ const firebaseConfig = {
 };
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
+const storage = firebase.storage();
 
 /* ========== DARK MODE (SOLID) ========== */
 (function initTheme(){
@@ -219,6 +222,41 @@ document.getElementById('themeBtn').addEventListener('click', ()=>{
   localStorage.setItem("irfan_theme_v2", nxt);
   document.body.style.background = nxt === 'dark' ? "#000" : "";
 });
+
+/* ========== RESPONSIVE FIX: NO HORIZONTAL SCROLL ========== */
+document.body.style.overflowX = "hidden";
+window.addEventListener('resize', ()=>{
+  document.body.style.overflowX = "hidden";
+});
+
+/* ========== PROFILE DEFAULT ========== */
+const DEFAULT_PROFILE = {
+  name: 'Irfan Rizki Aditri',
+  role: 'S1 Fisika — Institut Teknologi Sumatera',
+  bio: 'Saya menempuh S1 Fisika di ITERA dan suka menulis serta bereksperimen.',
+  avatar: '',
+  location: 'Pulau Sumatra',
+  family: 'Anak terakhir dari 3',
+  study: 'Fisika',
+  campus: 'Itera'
+};
+
+/* ========== FIREBASE UTILS ========== */
+// Profile
+async function fbGetProfile() {
+  const doc = await db.collection("profile").doc("main").get();
+  return doc.exists ? doc.data() : DEFAULT_PROFILE;
+}
+async function fbSetProfile(profile) {
+  await db.collection("profile").doc("main").set(profile);
+}
+// Avatar upload to Firebase Storage
+async function uploadAvatar(file) {
+  const ext = file.name.split('.').pop();
+  const avatarRef = storage.ref('avatars/profile.' + ext);
+  await avatarRef.put(file);
+  return await avatarRef.getDownloadURL();
+}
 
 /* ========== KEYS & DEFAULTS ========== */
 const DEFAULT_PROFILE = {
@@ -563,7 +601,7 @@ document.getElementById('btnResetVisitors').addEventListener('click', async ()=>
   }
 });
 
-/* ========== EDITOR PANEL ========== */
+/* ========== EDITOR PANEL PROFILE: UPLOAD AVATAR STORAGE ========== */
 async function openEditorPanel(section){
   if(!isEditor()){ return alert('Silakan login sebagai editor terlebih dahulu.'); }
   const modal = document.getElementById('editorPanel'); modal.classList.add('show'); modal.setAttribute('aria-hidden','false');
@@ -571,6 +609,7 @@ async function openEditorPanel(section){
   document.getElementById('panelTitle').textContent = 'Editor — ' + section;
   if(section === 'profile'){
     let profile = await fbGetProfile();
+    let selectedAvatarFile = null;
     body.innerHTML = `<div style="display:flex;gap:12px;flex-wrap:wrap">
       <div style="min-width:120px">
         <div style="width:120px;height:120px;border-radius:10px;overflow:hidden"><img id="editorAvatarPreview" src="${profile.avatar}" style="width:100%;height:100%;object-fit:cover"></div>
@@ -591,12 +630,11 @@ async function openEditorPanel(section){
       </div>
     </div>`;
     document.getElementById('editorAvatarInput').addEventListener('change', (ev)=>{
-      const f = ev.target.files && ev.target.files[0]; if(!f) return;
-      const r = new FileReader(); r.onload = e=> {
-        profile.avatar = e.target.result;
-        document.getElementById('editorAvatarPreview').src = profile.avatar;
-        alert('Avatar preview diperbarui. Simpan untuk update!');
-      }; r.readAsDataURL(f);
+      const file = ev.target.files[0];
+      if(file){
+        selectedAvatarFile = file;
+        document.getElementById('editorAvatarPreview').src = URL.createObjectURL(file);
+      }
     });
     document.getElementById('cancelProfile').addEventListener('click', ()=> closeEditorPanel());
     document.getElementById('saveProfile').addEventListener('click', async ()=>{
@@ -607,6 +645,10 @@ async function openEditorPanel(section){
       profile.family = document.getElementById('editorFamily').value.trim() || profile.family;
       profile.study = document.getElementById('editorStudy').value.trim() || profile.study;
       profile.campus = document.getElementById('editorCampus').value.trim() || profile.campus;
+      if (selectedAvatarFile) {
+        const url = await uploadAvatar(selectedAvatarFile);
+        profile.avatar = url;
+      }
       await fbSetProfile(profile); await applyProfile(); alert('Profil diperbarui (cloud).'); closeEditorPanel();
     });
     return;
@@ -800,3 +842,4 @@ function closeEditorPanel(){ document.getElementById('editorPanel').classList.re
 </script>
 </body>
 </html>
+
