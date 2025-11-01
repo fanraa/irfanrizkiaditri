@@ -194,8 +194,7 @@
   </div>
 
 <script>
-<script>
-/* ========== FIREBASE INIT ========== */
+// FIREBASE INIT
 const firebaseConfig = {
   apiKey: "AIzaSyDpPVoSzktWFsR1DhIxpYU-gUDmbvNSwHs",
   authDomain: "irfanrizkiaditri-site.firebaseapp.com",
@@ -209,7 +208,7 @@ firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 const storage = firebase.storage();
 
-/* ========== DARK MODE (SOLID) ========== */
+// THEME
 (function initTheme(){
   const t = localStorage.getItem("irfan_theme_v2") || 'dark';
   document.documentElement.setAttribute('data-theme', t);
@@ -223,13 +222,13 @@ document.getElementById('themeBtn').addEventListener('click', ()=>{
   document.body.style.background = nxt === 'dark' ? "#000" : "";
 });
 
-/* ========== RESPONSIVE FIX: NO HORIZONTAL SCROLL ========== */
+// RESPONSIVE FIX
 document.body.style.overflowX = "hidden";
 window.addEventListener('resize', ()=>{
   document.body.style.overflowX = "hidden";
 });
 
-/* ========== PROFILE DEFAULT ========== */
+// PROFILE DEFAULT
 const DEFAULT_PROFILE = {
   name: 'Irfan Rizki Aditri',
   role: 'S1 Fisika — Institut Teknologi Sumatera',
@@ -241,8 +240,7 @@ const DEFAULT_PROFILE = {
   campus: 'Itera'
 };
 
-/* ========== FIREBASE UTILS ========== */
-// Profile
+// FIREBASE UTILS
 async function fbGetProfile() {
   const doc = await db.collection("profile").doc("main").get();
   return doc.exists ? doc.data() : DEFAULT_PROFILE;
@@ -257,29 +255,6 @@ async function uploadAvatar(file) {
   await avatarRef.put(file);
   return await avatarRef.getDownloadURL();
 }
-
-/* ========== KEYS & DEFAULTS ========== */
-const DEFAULT_PROFILE = {
-  name: 'Irfan Rizki Aditri',
-  role: 'S1 Fisika — Institut Teknologi Sumatera',
-  bio: 'Saya menempuh S1 Fisika di ITERA dan suka menulis serta bereksperimen.',
-  avatar: '',
-  location: 'Pulau Sumatra',
-  family: 'Anak terakhir dari 3',
-  study: 'Fisika',
-  campus: 'Itera'
-};
-
-/* ========== FIREBASE UTILS ========== */
-// Profile
-async function fbGetProfile() {
-  const doc = await db.collection("profile").doc("main").get();
-  return doc.exists ? doc.data() : DEFAULT_PROFILE;
-}
-async function fbSetProfile(profile) {
-  await db.collection("profile").doc("main").set(profile);
-}
-
 // Visitors
 async function fbGetVisitors() {
   const doc = await db.collection("visitors").doc("counter").get();
@@ -300,7 +275,6 @@ async function fbResetVisitors() {
   await db.collection("visitors").doc("counter").set({ count: 200 });
   return 200;
 }
-
 // Posts
 async function fbGetPosts() {
   const snap = await db.collection("posts").orderBy("ts", "desc").get();
@@ -316,7 +290,6 @@ async function fbUpdatePost(id, data) {
 async function fbDeletePost(id) {
   await db.collection("posts").doc(id).delete();
 }
-
 // Comments
 async function fbGetComments() {
   const snap = await db.collection("comments").orderBy("ts", "desc").get();
@@ -328,7 +301,6 @@ async function fbAddComment(comment) {
 async function fbDeleteComment(id) {
   await db.collection("comments").doc(id).delete();
 }
-
 // Reviews
 async function fbGetReviews() {
   const snap = await db.collection("reviews").orderBy("ts", "desc").get();
@@ -340,7 +312,6 @@ async function fbAddReview(review) {
 async function fbDeleteReview(id) {
   await db.collection("reviews").doc(id).delete();
 }
-
 // Manual News
 async function fbGetManualNews() {
   const snap = await db.collection("manual_news").orderBy("ts", "desc").get();
@@ -353,14 +324,14 @@ async function fbDeleteManualNews(id) {
   await db.collection("manual_news").doc(id).delete();
 }
 
-/* ========== VISITOR COUNTER (CLOUD) ========== */
+// VISITOR COUNTER
 async function updateVisitors() {
   const visitors = await fbIncVisitors();
   document.getElementById('visitorSmall').textContent = 'Visitors: ' + visitors;
 }
 updateVisitors();
 
-/* ========== PROFILE (CLOUD) ========== */
+// PROFILE
 async function applyProfile(){
   let profile = await fbGetProfile();
   document.getElementById('siteName').textContent = profile.name;
@@ -384,7 +355,7 @@ async function applyProfile(){
 }
 applyProfile();
 
-/* ========== POSTS (CLOUD) ========== */
+// POSTS
 async function renderPosts() {
   const container = document.getElementById('postList');
   container.innerHTML = '';
@@ -413,7 +384,7 @@ async function renderPosts() {
 }
 renderPosts();
 
-/* ========== COMMENTS (CLOUD) ========== */
+// COMMENTS
 async function renderSiteComments() {
   const list = await fbGetComments();
   const el = document.getElementById('commentList');
@@ -445,7 +416,7 @@ document.getElementById('sendComment').addEventListener('click', async () => {
 });
 renderSiteComments();
 
-/* ========== REVIEWS (CLOUD) ========== */
+// REVIEWS
 async function renderReviews() {
   const list = await fbGetReviews();
   const total = list.length;
@@ -504,7 +475,7 @@ document.getElementById('submitReview').addEventListener('click', async () => {
   renderReviews();
 });
 
-/* ========== ADS / NEWS OTOMATIS + MANUAL (CLOUD) ========== */
+// ADS / NEWS
 const NEWS_SOURCES = [
   "https://www.reuters.com/business/feed/",
   "https://www.antaranews.com/rss/terkini.xml",
@@ -555,8 +526,8 @@ async function renderNews() {
 renderNews();
 setInterval(renderNews, 60000);
 
-/* ========== EDITOR: login / session ========== */
-const EDITOR = {user:'irfanrizkiaditri', pass:'#I47r32a6'};
+// EDITOR LOGIN
+const EDITOR = {user:'irfanrizkiaditri', pass:'#I47r32a6'}; // *** DEMO ONLY! Jangan gunakan password editor langsung di client untuk produksi ***
 function isEditor(){ return sessionStorage.getItem("irfan_editor_v2") === '1'; }
 function setEditor(val){
   if(val){ sessionStorage.setItem("irfan_editor_v2", '1'); }
@@ -842,4 +813,3 @@ function closeEditorPanel(){ document.getElementById('editorPanel').classList.re
 </script>
 </body>
 </html>
-
