@@ -1,8 +1,8 @@
-/* ========== VARIABLES & RESET ========== */
 :root{
   --radius:12px; --maxw:1100px; --accent:#3ea0ff; --danger:#e05a4f;
   --muted-dark:#9fb1c8; --muted-light:#5b6c7b;
-  --bg-dark:#071019; --card-dark:rgba(255,255,255,0.03); --text-dark:#eaf6ff;
+  --bg-dark:#000; /* SOLID HITAM */
+  --card-dark:rgba(255,255,255,0.03); --text-dark:#eaf6ff;
   --bg-light:#f6fbff; --card-light:#ffffff; --text-light:#052033;
   --safe-padding:18px;
 }
@@ -13,7 +13,7 @@ html[data-theme='light']{ --bg:var(--bg-light); --card:var(--card-light); --text
 html,body{height:100%;margin:0;padding:0}
 body{
   font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial;
-  background: linear-gradient(180deg,var(--bg), rgba(0,0,0,0.03));
+  background: var(--bg); /* sekarang solid hitam di dark mode */
   color:var(--text); -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
   line-height:1.45; overflow-x:hidden;
 }
