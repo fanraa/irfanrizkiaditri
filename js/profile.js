@@ -7,6 +7,7 @@
 
 const DEFAULT_PROFILE = {
   name: 'Irfan Rizki Aditri',
+  role: '',
   bio: 'Saya Irfan Rizki Aditri, seorang mahasiswa Fisika di Institut Teknologi Sumatera, yang memiliki beragam hobi namun seringkali dihadapkan pada sifat malas, dan saya masih mencari jawaban tentang diri saya sendiri, meskipun demikian saya terus berusaha untuk berkembang dan menemukan passion saya.',
   avatar: '',
   avatarLocked: false,
