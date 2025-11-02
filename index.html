@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <title>Irfan Rizki Aditri — Personal</title>
+  <title>irfanrizkiaditri.site</title>
 
   <!-- Icons & Fonts -->
   <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
@@ -12,12 +12,12 @@
   <!-- Styles -->
   <link rel="stylesheet" href="style/main.css">
 
-<!-- Firebase SDKs (add before js/firebase-init.js) -->
-<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-storage-compat.js"></script>
+  <!-- Cloudinary config if used (optional) -->
+  <script src="js/cloud-config.js"></script>
+  <script src="js/cloudinary.js"></script>
 
+  <!-- Supabase client (UMD) -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.35.0/dist/supabase.min.js"></script>
 </head>
 <body>
 
@@ -34,6 +34,7 @@
       <ul>
         <li><a href="#" id="menuHome"><i class='bx bx-home'></i> Beranda</a></li>
         <li><a href="#" id="menuAbout"><i class='bx bx-user'></i> Tentang</a></li>
+
         <li class="menu-contact">
           <a href="#" id="menuContact">Kontak <span id="contactCaret" class="caret">&#9660;</span></a>
           <div id="contactSubmenu" class="contact-submenu" aria-hidden="true">
@@ -44,12 +45,25 @@
             <a href="https://github.com/fanraa" target="_blank" title="GitHub"><i class='bx bxl-github'></i> GitHub</a>
           </div>
         </li>
+
+        <li class="menu-tools">
+          <a href="#" id="menuTools">Tools <span id="toolsCaret" class="caret">&#9660;</span></a>
+          <div id="toolsSubmenu" class="contact-submenu" aria-hidden="true">
+            <a href="#" id="syncNow" title="Sinkronkan sekarang"><i class="bx bx-refresh"></i> Sync Now</a>
+            <a href="#" id="exportLocal" title="Export data lokal"><i class="bx bx-download"></i> Export Local Data</a>
+            <a href="#" id="clearLocal" title="Clear local cache"><i class="bx bx-trash"></i> Clear Local Cache</a>
+            </div>
+        </li>
+
       </ul>
     </nav>
   </aside>
 
   <!-- Toast container -->
   <div id="toastContainer" aria-live="polite" aria-atomic="true"></div>
+
+  <!-- Mini tooltip (used by menu.js attachHints) -->
+  <div id="miniTooltip" aria-hidden="true" style="position:fixed;left:0;top:0;padding:8px 10px;border-radius:8px;background:rgba(0,0,0,0.8);color:white;font-size:12px;pointer-events:none;opacity:0;transform:translateY(-6px);transition:opacity .12s,transform .12s;z-index:99999;"></div>
 
   <!-- About Modal -->
   <div id="aboutModal" class="modal" aria-hidden="true" role="dialog" aria-labelledby="aboutTitle">
@@ -92,17 +106,18 @@
     <header class="header" role="banner">
       <div class="brand">
         <div class="site-title">
-          <h1 id="siteName">Irfan Rizki Aditri</h1>
-          <p id="siteTag">S1 Fisika — ITERA</p>
+          <h1 id="siteName">irfanrizkiaditri.site</h1>
+          <div id="siteTag" style="font-size:0.85rem;color:var(--muted);">S1 Fisika — ITERA</div>
         </div>
       </div>
 
       <div class="top-actions" role="navigation" aria-label="Tindakan">
-        <div id="statusSmall" class="note">Status: <span id="onlineStatus">—</span></div>
-        <div id="visitorSmall" class="note">Visitors: 0</div>
-        <a class="icon-btn" id="waBtn" href="https://wa.me/6285788918217" target="_blank" title="WhatsApp"><i class='bx bxl-whatsapp'></i></a>
-        <a class="icon-btn" id="igBtn" href="https://www.instagram.com/irfanrizkiaditri" target="_blank" title="Instagram"><i class='bx bxl-instagram'></i></a>
-        <a class="icon-btn" id="liBtn" href="https://www.linkedin.com/in/irfanrizkiaditri" target="_blank" title="LinkedIn"><i class='bx bxl-linkedin'></i></a>
+       <div class="top-actions" role="navigation" aria-label="Tindakan">
+  <div id="statusSmall" class="note">Status: <span id="onlineStatus">—</span></div>
+  <div id="visitorSmall" class="note">Visitors: 0</div>
+    <!-- Live badge (visual indicator for realtime updates) -->
+  <div id="liveBadge" class="live-badge" aria-hidden="true" title="Live updates">Live</div>
+
 
         <button class="btn ghost" id="openEditor">Editor</button>
         <button class="btn" id="themeBtn">Mode</button>
@@ -117,7 +132,7 @@
     <section class="card hero" aria-labelledby="heroTitle">
       <div class="avatar"><a id="avatarLink" href="https://www.instagram.com/irfanrizkiaditri" target="_blank"><img id="mainAvatar" alt="Foto Irfan"></a></div>
       <div class="meta">
-        <div class="name" id="displayName">Irfan Rizki Aditri</div>
+        <div class="name" id="displayName">irfanrizkiaditri.site</div>
         <div class="role" id="displayRole">S1 Fisika — ITERA</div>
         <div class="bio" id="displayBio">Saya menempuh S1 Fisika di ITERA dan gemar mengeksplorasi ilmu serta menulis.</div>
         <div class="tags" id="tagsWrapper" aria-hidden="false">
@@ -127,11 +142,7 @@
           <div class="tag" data-key="campus">Itera</div>
           <div class="tag" data-key="gender">Laki-Laki</div>
         </div>
-        <div class="contact-line" aria-label="Kontak cepat">
-          <a class="icon-btn" href="mailto:irfanrizkiaditri@gmail.com" title="Email"><i class='bx bx-envelope'></i></a>
-          <a class="icon-btn" href="https://wa.me/6285788918217" target="_blank" title="WhatsApp"><i class='bx bxl-whatsapp'></i></a>
-          <a class="icon-btn" href="https://www.instagram.com/irfanrizkiaditri" target="_blank" title="Instagram"><i class='bx bxl-instagram'></i></a>
-        </div>
+       
       </div>
     </section>
 
@@ -171,8 +182,7 @@
           </div>
           <div id="adsArea" class="scroll-area" style="margin-top:12px;display:flex;flex-direction:column;gap:8px"></div>
           <div style="margin-top:12px;font-size:0.85rem;color:var(--muted);">
-            Berita diperbarui otomatis setiap 1 menit. Tambahan berita manual dapat dikelola melalui panel khusus.
-          </div>
+           Ayo baca berita hari ini agar selalu update tentang isu-isu terkini!</div>
         </aside>
       </div>
     </section>
@@ -199,9 +209,11 @@
       <div id="commentList" class="scroll-area" style="margin-top:12px"></div>
     </section>
 
-    <footer class="footer" role="contentinfo">
-      <div class="note">© 2025 Irfan Rizki Aditri • Situs Pribadi</div>
-    </footer>
+  <footer class="footer" role="contentinfo" 
+        style="display:flex;justify-content:center;align-items:center;padding:15px 0;">
+  <div class="note">© 2025 Irfan Rizki Aditri</div>
+</footer>
+
   </div>
 
   <!-- Modals & Panels (login, editor, post modal) -->
@@ -261,13 +273,19 @@
     </div>
   </div>
 
+
+  
   <!-- Scripts -->
-  <script src="js/firebase-init.js"></script>
   <script src="js/idb.js"></script>
   <script src="js/toast.js"></script>
   <script src="js/utils.js"></script>
   <script src="js/theme.js"></script>
   <script src="js/menu.js"></script>
+
+  <!-- Supabase initialization (replace placeholders inside the file) -->
+  <script src="js/supabase-init.js"></script>
+
+  <!-- App scripts (adapted to Supabase) -->
   <script src="js/auth.js"></script>
   <script src="js/profile.js"></script>
   <script src="js/post.js"></script>
@@ -276,5 +294,6 @@
   <script src="js/news.js"></script>
   <script src="js/editor.js"></script>
   <script src="js/visitors.js"></script>
+  <script src="js/realtime.js"></script>
 </body>
 </html>
