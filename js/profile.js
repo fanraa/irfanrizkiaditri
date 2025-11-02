@@ -236,5 +236,4 @@ document.addEventListener('supabaseReady', applyProfile);
 // export for other modules (editor.js, post.js, etc.)
 window.uploadAvatar = uploadAvatar;
 window.handleAvatarFileUpload = handleAvatarFileUpload;
-
 window.saveAvatarToProfile = saveAvatarToProfile;
