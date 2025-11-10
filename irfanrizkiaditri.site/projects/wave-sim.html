@@ -1,0 +1,1255 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Wave Interference — Fanra</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0d0d0f;
+      --card: #141418;
+      --text: #ffffff;
+      --accent: #4fa3ff;
+      --accent-2: #7c3aed;
+      --muted: #9da3b3;
+      --glass: rgba(255,255,255,0.06);
+      --card-border: rgba(255,255,255,0.06);
+      --success: #10b981;
+      --info: #3b82f6;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    html {
+      font-family: "Poppins", sans-serif;
+      font-size: clamp(14px, 1.6vw, 16px);
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+    
+    body {
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      transition: background 0.25s ease, color 0.25s ease;
+    }
+    
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+    
+    .container {
+      width: min(94%, 1200px);
+      margin: 0 auto;
+    }
+    
+    /* Header Styles */
+    header {
+      position: sticky;
+      top: 0;
+      left: 0;
+      width: 100%;
+      backdrop-filter: blur(12px) saturate(1.5);
+      background: linear-gradient(180deg, rgba(0,0,0,0.35), transparent);
+      border-bottom: 1px solid var(--card-border);
+      z-index: 100;
+    }
+    
+    .navbar {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 16px 0;
+    }
+    
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 700;
+      font-size: 1.15rem;
+      letter-spacing: 0.4px;
+    }
+    
+    .logo i {
+      color: var(--accent);
+      font-size: 1.2rem;
+    }
+    
+    .logo span {
+      color: var(--accent);
+    }
+    
+    .nav-links {
+      display: flex;
+      gap: 20px;
+      list-style: none;
+      margin-left: auto;
+    }
+    
+    .nav-links a {
+      padding: 6px 10px;
+      font-weight: 500;
+      border-radius: 8px;
+      position: relative;
+      transition: 0.25s;
+    }
+    
+    .nav-links a:hover,
+    .nav-links .active {
+      color: var(--accent);
+      transform: translateY(-2px);
+    }
+    
+    .nav-links a::after {
+      content: "";
+      position: absolute;
+      bottom: -2px;
+      left: 0;
+      width: 0%;
+      height: 2px;
+      background: var(--accent);
+      border-radius: 6px;
+      transition: 0.28s;
+    }
+    
+    .nav-links a:hover::after,
+    .nav-links .active::after {
+      width: 100%;
+    }
+    
+    /* Main Content */
+    .section-title {
+      text-align: center;
+      padding: 2rem 0 1.5rem;
+    }
+    
+    .section-title h2 {
+      font-size: 2.2rem;
+      margin-bottom: 0.8rem;
+      color: var(--accent);
+    }
+    
+    .section-title p {
+      color: var(--muted);
+      max-width: 700px;
+      margin: 0 auto;
+      line-height: 1.6;
+    }
+    
+    .simulation-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 24px;
+      margin: 0 auto 32px;
+      max-width: 1200px;
+    }
+    
+    .canvas-wrapper {
+      flex: 1;
+      min-width: 300px;
+      background: var(--card);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    }
+    
+    #waveCanvas {
+      width: 100%;
+      display: block;
+      background: #011025;
+    }
+    
+    .controls-panel {
+      flex: 1;
+      min-width: 300px;
+      background: var(--card);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    }
+    
+    .control-group {
+      background: var(--glass);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 16px;
+    }
+    
+    .control-group h3 {
+      margin-bottom: 16px;
+      color: var(--accent);
+      font-size: 1.2rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .control-item {
+      margin-bottom: 16px;
+    }
+    
+    .control-item:last-child {
+      margin-bottom: 0;
+    }
+    
+    .control-label {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 8px;
+      font-weight: 500;
+    }
+    
+    .slider-container {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    .slider {
+      flex: 1;
+      height: 6px;
+      -webkit-appearance: none;
+      background: var(--card-border);
+      border-radius: 3px;
+      outline: none;
+    }
+    
+    .slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: var(--accent);
+      cursor: pointer;
+      box-shadow: 0 0 8px rgba(79, 163, 255, 0.5);
+    }
+    
+    .slider::-moz-range-thumb {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: var(--accent);
+      cursor: pointer;
+      border: none;
+      box-shadow: 0 0 8px rgba(79, 163, 255, 0.5);
+    }
+    
+    .btn-group {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    
+    .btn {
+      padding: 10px 16px;
+      border-radius: 10px;
+      font-weight: 600;
+      font-family: "Poppins", sans-serif;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border: none;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .btn-primary {
+      background: var(--accent);
+      color: #051022;
+    }
+    
+    .btn-primary:hover {
+      background: #60a5fa;
+      transform: translateY(-2px);
+    }
+    
+    .btn-secondary {
+      background: var(--glass);
+      color: var(--text);
+      border: 1px solid var(--card-border);
+    }
+    
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+    
+    .btn-success {
+      background: var(--success);
+      color: #051022;
+    }
+    
+    .btn-success:hover {
+      background: #34d399;
+    }
+    
+    .btn-info {
+      background: var(--info);
+      color: #ffffff;
+    }
+    
+    .btn-info:hover {
+      background: #60a5fa;
+    }
+    
+    /* Visualization Options */
+    .visualization-options {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 8px;
+    }
+    
+    .vis-option {
+      padding: 6px 10px;
+      background: var(--glass);
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      transition: all 0.2s ease;
+    }
+    
+    .vis-option.active {
+      background: var(--accent);
+      color: #051022;
+      border-color: var(--accent);
+    }
+    
+    /* Info Panel */
+    .info-panel {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 16px;
+      margin-top: 16px;
+    }
+    
+    .info-card {
+      background: var(--glass);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 16px;
+      text-align: center;
+    }
+    
+    .info-value {
+      font-size: 1.8rem;
+      font-weight: 700;
+      margin: 8px 0;
+      color: var(--accent);
+    }
+    
+    .info-label {
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+    
+    /* Educational Content */
+    .educational-content {
+      background: var(--card);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 24px;
+      margin: 32px 0;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    }
+    
+    .content-section {
+      margin-bottom: 24px;
+    }
+    
+    .content-section:last-child {
+      margin-bottom: 0;
+    }
+    
+    .content-section h3 {
+      font-size: 1.5rem;
+      margin-bottom: 16px;
+      color: var(--accent);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .content-section p {
+      margin-bottom: 16px;
+      line-height: 1.6;
+      color: var(--muted);
+    }
+    
+    .formula {
+      background: var(--glass);
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      padding: 16px;
+      margin: 16px 0;
+      font-family: monospace;
+      font-size: 1.1rem;
+      text-align: center;
+    }
+    
+    .example-problem {
+      background: rgba(59, 130, 246, 0.1);
+      border: 1px solid rgba(59, 130, 246, 0.3);
+      border-radius: 12px;
+      padding: 20px;
+      margin: 20px 0;
+    }
+    
+    .example-problem h4 {
+      color: var(--info);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .solution {
+      background: rgba(16, 185, 129, 0.1);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      border-radius: 12px;
+      padding: 16px;
+      margin-top: 12px;
+    }
+    
+    .solution h4 {
+      color: var(--success);
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    /* Footer */
+    footer {
+      text-align: center;
+      padding: 28px 0;
+      color: var(--muted);
+      margin-top: 30px;
+      font-size: 0.95rem;
+    }
+    
+    /* Responsive Design */
+    @media (max-width: 900px) {
+      .simulation-container {
+        flex-direction: column;
+      }
+    }
+    
+    @media (max-width: 600px) {
+      .btn-group {
+        flex-direction: column;
+      }
+      
+      .btn {
+        width: 100%;
+        justify-content: center;
+      }
+      
+      .section-title h2 {
+        font-size: 1.8rem;
+      }
+      
+      .info-panel {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container">
+      <nav class="navbar">
+        <a href="#" class="logo"><i class="fas fa-feather-alt"></i> Fanra<span>.</span>Physics</a>
+        <ul class="nav-links">
+          <li><a href="#" class="active">Home</a></li>
+          <li><a href="#">Projects</a></li>
+          <li><a href="#">Articles</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="section-title">
+      <h2>Interferensi Gelombang</h2>
+      <p>Simulasi interaktif untuk mempelajari interferensi gelombang dari dua sumber koheren. Pelajari pola interferensi konstruktif dan destruktif, prinsip superposisi, serta aplikasi dalam kehidupan nyata.</p>
+    </section>
+
+    <div class="container">
+      <div class="simulation-container">
+        <div class="canvas-wrapper">
+          <canvas id="waveCanvas" width="800" height="500"></canvas>
+        </div>
+        
+        <div class="controls-panel">
+          <div class="control-group">
+            <h3><i class="fas fa-sliders-h"></i> Parameter Gelombang</h3>
+            
+            <div class="control-item">
+              <div class="control-label">
+                <span>Frekuensi (f): <span id="freqValue">2.0</span> Hz</span>
+              </div>
+              <div class="slider-container">
+                <input type="range" min="0.5" max="6" step="0.1" value="2" class="slider" id="freq">
+              </div>
+            </div>
+            
+            <div class="control-item">
+              <div class="control-label">
+                <span>Panjang Gelombang (λ): <span id="lambdaValue">80</span> px</span>
+              </div>
+              <div class="slider-container">
+                <input type="range" min="20" max="160" step="2" value="80" class="slider" id="lambda">
+              </div>
+            </div>
+            
+            <div class="control-item">
+              <div class="control-label">
+                <span>Jarak Sumber: <span id="distanceValue">140</span> px</span>
+              </div>
+              <div class="slider-container">
+                <input type="range" min="40" max="200" step="10" value="140" class="slider" id="distance">
+              </div>
+            </div>
+            
+            <div class="control-item">
+              <div class="control-label">
+                <span>Fase Relatif: <span id="phaseValue">0</span>°</span>
+              </div>
+              <div class="slider-container">
+                <input type="range" min="0" max="360" step="10" value="0" class="slider" id="phase">
+              </div>
+            </div>
+          </div>
+          
+          <div class="control-group">
+            <h3><i class="fas fa-chart-line"></i> Visualisasi & Tampilan</h3>
+            
+            <div class="control-item">
+              <div class="control-label">
+                <span>Resolusi Simulasi</span>
+              </div>
+              <div class="btn-group">
+                <button class="btn btn-secondary" id="lowRes">Rendah</button>
+                <button class="btn btn-secondary active" id="medRes">Sedang</button>
+                <button class="btn btn-secondary" id="highRes">Tinggi</button>
+              </div>
+            </div>
+            
+            <div class="control-item">
+              <div class="control-label">
+                <span>Mode Tampilan</span>
+              </div>
+              <div class="visualization-options">
+                <div class="vis-option active" data-option="interference">Interferensi</div>
+                <div class="vis-option" data-option="sources">Sumber Gelombang</div>
+                <div class="vis-option" data-option="waves">Gelombang Terpisah</div>
+                <div class="vis-option" data-option="nodes">Titik Nodal</div>
+              </div>
+            </div>
+            
+            <div class="control-item">
+              <div class="control-label">
+                <span>Tampilkan</span>
+              </div>
+              <div class="visualization-options">
+                <div class="vis-option active" data-option="grid">Kisi</div>
+                <div class="vis-option" data-option="measure">Pengukuran</div>
+                <div class="vis-option active" data-option="legend">Legenda</div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="control-group">
+            <h3><i class="fas fa-bolt"></i> Aksi</h3>
+            <div class="btn-group">
+              <button class="btn btn-primary" id="resetBtn">
+                <i class="fas fa-redo"></i> Reset
+              </button>
+              <button class="btn btn-info" id="playPauseBtn">
+                <i class="fas fa-pause"></i> Jeda
+              </button>
+              <button class="btn btn-success" id="snapshotBtn">
+                <i class="fas fa-camera"></i> Ambil Snapshot
+              </button>
+            </div>
+          </div>
+          
+          <div class="info-panel">
+            <div class="info-card">
+              <div class="info-label">Kecepatan Gelombang</div>
+              <div class="info-value" id="velocityValue">160 px/s</div>
+            </div>
+            <div class="info-card">
+              <div class="info-label">Amplitudo Maks</div>
+              <div class="info-value" id="amplitudeValue">2.0</div>
+            </div>
+            <div class="info-card">
+              <div class="info-label">Pola Interferensi</div>
+              <div class="info-value" id="patternValue">Konstruktif</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="container">
+      <div class="educational-content">
+        <div class="content-section">
+          <h3><i class="fas fa-book"></i> Konsep Interferensi Gelombang</h3>
+          <p>Interferensi gelombang terjadi ketika dua atau lebih gelombang bertemu dan berinteraksi satu sama lain. Prinsip superposisi menyatakan bahwa perpindahan total pada setiap titik adalah jumlah aljabar dari perpindahan yang disebabkan oleh masing-masing gelombang.</p>
+          
+          <div class="formula">
+            y<sub>total</sub> = y<sub>1</sub> + y<sub>2</sub> = A<sub>1</sub>sin(kx - ωt + φ<sub>1</sub>) + A<sub>2</sub>sin(kx - ωt + φ<sub>2</sub>)
+          </div>
+          
+          <p>Interferensi dapat bersifat <strong>konstruktif</strong> (amplitudo bertambah) atau <strong>destruktif</strong> (amplitudo berkurang) tergantung pada beda fase antara gelombang-gelombang tersebut.</p>
+        </div>
+        
+        <div class="content-section">
+          <h3><i class="fas fa-calculator"></i> Kondisi Interferensi</h3>
+          <p><strong>Interferensi Konstruktif</strong> terjadi ketika beda fase antara dua gelombang merupakan kelipatan genap dari π, atau beda lintasan merupakan kelipatan bulat dari panjang gelombang:</p>
+          
+          <div class="formula">
+            Δφ = 2nπ &nbsp; atau &nbsp; Δx = nλ &nbsp; (n = 0, 1, 2, ...)
+          </div>
+          
+          <p><strong>Interferensi Destruktif</strong> terjadi ketika beda fase merupakan kelipatan ganjil dari π, atau beda lintasan merupakan kelipatan setengah ganjil dari panjang gelombang:</p>
+          
+          <div class="formula">
+            Δφ = (2n+1)π &nbsp; atau &nbsp; Δx = (n + ½)λ &nbsp; (n = 0, 1, 2, ...)
+          </div>
+        </div>
+        
+        <div class="content-section">
+          <h3><i class="fas fa-lightbulb"></i> Aplikasi dalam Kehidupan Nyata</h3>
+          <p>Prinsip interferensi gelombang memiliki banyak aplikasi penting:</p>
+          <ul style="padding-left: 20px; margin: 12px 0; color: var(--muted);">
+            <li><strong>Antena Gelombang Radio:</strong> Pola radiasi diatur menggunakan interferensi untuk mengoptimalkan penerimaan sinyal.</li>
+            <li><strong>Holografi:</strong> Merekam pola interferensi cahaya untuk membuat gambar 3D.</li>
+            <li><strong>Interferometer:</strong> Alat presisi tinggi untuk mengukur panjang gelombang, indeks bias, dan deformasi permukaan.</li>
+            <li><strong>Optika Lapisan Tipis:</strong> Warna-warni pada gelembung sabun disebabkan oleh interferensi cahaya yang dipantulkan.</li>
+            <li><strong>Kristalografi Sinar-X:</strong> Menggunakan pola interferensi untuk menentukan struktur kristal.</li>
+          </ul>
+        </div>
+        
+        <div class="content-section">
+          <div class="example-problem">
+            <h4><i class="fas fa-question-circle"></i> Contoh Soal</h4>
+            <p>Dua sumber gelombang koheren berjarak 1,5 m satu sama lain. Mereka menghasilkan gelombang dengan panjang gelombang 0,5 m. Tentukan posisi titik-titik interferensi konstruktif pertama dan kedua pada layar yang berjarak 10 m dari sumber-sumber tersebut.</p>
+            
+            <div class="solution">
+              <h4><i class="fas fa-check-circle"></i> Penyelesaian</h4>
+              <p>Untuk interferensi konstruktif, beda lintasan harus memenuhi:</p>
+              <div class="formula">
+                d sin θ = nλ
+              </div>
+              <p>Dengan d = 1,5 m, λ = 0,5 m, dan jarak ke layar L = 10 m.</p>
+              <p>Untuk titik pertama (n=1):</p>
+              <div class="formula">
+                sin θ<sub>1</sub> = λ/d = 0,5/1,5 = 1/3 → θ<sub>1</sub> ≈ 19,47°
+              </div>
+              <p>Jarak dari pusat ke titik pertama:</p>
+              <div class="formula">
+                y<sub>1</sub> = L tan θ<sub>1</sub> ≈ 10 × tan(19,47°) ≈ 3,54 m
+              </div>
+              <p>Untuk titik kedua (n=2):</p>
+              <div class="formula">
+                sin θ<sub>2</sub> = 2λ/d = 1 → θ<sub>2</sub> = 90°
+              </div>
+              <p>Karena θ<sub>2</sub> = 90°, titik kedua berada di tak hingga. Dalam praktiknya, hanya satu titik interferensi konstruktif yang dapat diamati pada layar.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <div class="container">
+      <p>&copy; 2025 Fanra (Irfan Rizki Aditri). Simulasi Interferensi Gelombang v1.2</p>
+      <p>Berdasarkan prinsip fisika nyata dengan perhitungan akurat</p>
+    </div>
+  </footer>
+
+  <script>
+    (function() {
+      // Canvas setup
+      const canvas = document.getElementById('waveCanvas');
+      const ctx = canvas.getContext('2d');
+      const dpr = window.devicePixelRatio || 1;
+      
+      // Set canvas to actual pixel size
+      const container = canvas.parentElement;
+      canvas.width = container.clientWidth * dpr;
+      canvas.height = container.clientHeight * dpr;
+      ctx.scale(dpr, dpr);
+      
+      // Physics parameters
+      const params = {
+        freq: 2.0,          // Frequency in Hz
+        lambda: 80,         // Wavelength in pixels
+        distance: 140,      // Distance between sources in pixels
+        phase: 0,           // Phase difference in degrees
+        resolution: 'medium', // 'low', 'medium', 'high'
+        mode: 'interference', // 'interference', 'sources', 'waves', 'nodes'
+        showGrid: true,
+        showMeasure: false,
+        showLegend: true,
+        isPlaying: true
+      };
+      
+      // Sources
+      let sources = [
+        {x: canvas.width / dpr / 2 - 70, y: canvas.height / dpr / 2},
+        {x: canvas.width / dpr / 2 + 70, y: canvas.height / dpr / 2}
+      ];
+      
+      // Simulation time
+      let t = 0;
+      
+      // DOM Elements
+      const freqSlider = document.getElementById('freq');
+      const lambdaSlider = document.getElementById('lambda');
+      const distanceSlider = document.getElementById('distance');
+      const phaseSlider = document.getElementById('phase');
+      const freqValue = document.getElementById('freqValue');
+      const lambdaValue = document.getElementById('lambdaValue');
+      const distanceValue = document.getElementById('distanceValue');
+      const phaseValue = document.getElementById('phaseValue');
+      const velocityValue = document.getElementById('velocityValue');
+      const amplitudeValue = document.getElementById('amplitudeValue');
+      const patternValue = document.getElementById('patternValue');
+      const resetBtn = document.getElementById('resetBtn');
+      const playPauseBtn = document.getElementById('playPauseBtn');
+      const snapshotBtn = document.getElementById('snapshotBtn');
+      const lowResBtn = document.getElementById('lowRes');
+      const medResBtn = document.getElementById('medRes');
+      const highResBtn = document.getElementById('highRes');
+      const visOptions = document.querySelectorAll('.vis-option');
+      
+      // Update DOM values
+      function updateDOMValues() {
+        freqValue.textContent = params.freq.toFixed(1);
+        lambdaValue.textContent = params.lambda;
+        distanceValue.textContent = params.distance;
+        phaseValue.textContent = params.phase;
+        
+        // Calculate wave velocity
+        const velocity = params.freq * params.lambda;
+        velocityValue.textContent = velocity.toFixed(0) + ' px/s';
+        
+        // Amplitude is always 2 (sum of two waves with amplitude 1)
+        amplitudeValue.textContent = '2.0';
+        
+        // Determine interference pattern at center
+        const centerDiff = params.distance * Math.sin(0);
+        const pathDiff = Math.abs(centerDiff);
+        const n = pathDiff / params.lambda;
+        patternValue.textContent = (Math.abs(n - Math.round(n)) < 0.1) ? 'Konstruktif' : 'Destruktif';
+      }
+      
+      // Initialize simulation
+      function init() {
+        // Set up sliders
+        freqSlider.value = params.freq;
+        lambdaSlider.value = params.lambda;
+        distanceSlider.value = params.distance;
+        phaseSlider.value = params.phase;
+        
+        // Update displayed values
+        updateDOMValues();
+        
+        // Set up event listeners
+        setupEventListeners();
+        
+        // Start animation loop
+        requestAnimationFrame(animate);
+      }
+      
+      // Event listeners
+      function setupEventListeners() {
+        // Sliders
+        freqSlider.addEventListener('input', () => {
+          params.freq = parseFloat(freqSlider.value);
+          updateDOMValues();
+        });
+        
+        lambdaSlider.addEventListener('input', () => {
+          params.lambda = parseInt(lambdaSlider.value);
+          sources = [
+            {x: canvas.width / dpr / 2 - params.distance/2, y: canvas.height / dpr / 2},
+            {x: canvas.width / dpr / 2 + params.distance/2, y: canvas.height / dpr / 2}
+          ];
+          updateDOMValues();
+        });
+        
+        distanceSlider.addEventListener('input', () => {
+          params.distance = parseInt(distanceSlider.value);
+          sources = [
+            {x: canvas.width / dpr / 2 - params.distance/2, y: canvas.height / dpr / 2},
+            {x: canvas.width / dpr / 2 + params.distance/2, y: canvas.height / dpr / 2}
+          ];
+          updateDOMValues();
+        });
+        
+        phaseSlider.addEventListener('input', () => {
+          params.phase = parseInt(phaseSlider.value);
+          updateDOMValues();
+        });
+        
+        // Buttons
+        resetBtn.addEventListener('click', resetSimulation);
+        playPauseBtn.addEventListener('click', togglePlayPause);
+        snapshotBtn.addEventListener('click', takeSnapshot);
+        
+        // Resolution buttons
+        lowResBtn.addEventListener('click', () => setResolution('low'));
+        medResBtn.addEventListener('click', () => setResolution('medium'));
+        highResBtn.addEventListener('click', () => setResolution('high'));
+        
+        // Visualization options
+        visOptions.forEach(option => {
+          option.addEventListener('click', () => {
+            const optionType = option.dataset.option;
+            
+            // Handle mutually exclusive options
+            if (['interference', 'sources', 'waves', 'nodes'].includes(optionType)) {
+              // Remove active class from all visualization options in this group
+              document.querySelectorAll('.vis-option[data-option="interference"], .vis-option[data-option="sources"], .vis-option[data-option="waves"], .vis-option[data-option="nodes"]')
+                .forEach(el => el.classList.remove('active'));
+              
+              // Set the new mode
+              params.mode = optionType;
+              option.classList.add('active');
+            } else {
+              // Toggle other options
+              option.classList.toggle('active');
+              params[optionType] = option.classList.contains('active');
+            }
+          });
+        });
+        
+        // Canvas interaction
+        canvas.addEventListener('click', (e) => {
+          if (!params.isPlaying) return;
+          
+          const rect = canvas.getBoundingClientRect();
+          const scaleX = canvas.width / rect.width;
+          const scaleY = canvas.height / rect.height;
+          
+          const mx = (e.clientX - rect.left) * scaleX;
+          const my = (e.clientY - rect.top) * scaleY;
+          
+          // Calculate amplitude at clicked point
+          let amp = 0;
+          const k = 2 * Math.PI / params.lambda;
+          const w = 2 * Math.PI * params.freq;
+          const phaseRad = params.phase * Math.PI / 180;
+          
+          for (let i = 0; i < sources.length; i++) {
+            const s = sources[i];
+            const r = Math.hypot(mx - s.x, my - s.y);
+            const phaseOffset = (i === 1) ? phaseRad : 0;
+            amp += Math.sin(k * r - w * t + phaseOffset) / (1 + r * 0.005);
+          }
+          
+          // Show amplitude and phase
+          const amplitude = amp.toFixed(3);
+          const intensity = Math.tanh(amp/1.5);
+          const color = ampToColor(intensity);
+          
+          // Create info box
+          const infoBox = document.createElement('div');
+          infoBox.style.position = 'absolute';
+          infoBox.style.left = (e.clientX + 10) + 'px';
+          infoBox.style.top = (e.clientY + 10) + 'px';
+          infoBox.style.background = 'var(--card)';
+          infoBox.style.border = '1px solid var(--card-border)';
+          infoBox.style.borderRadius = '8px';
+          infoBox.style.padding = '12px';
+          infoBox.style.zIndex = '1000';
+          infoBox.style.fontFamily = '"Poppins", sans-serif';
+          infoBox.style.fontSize = '0.9rem';
+          infoBox.style.boxShadow = '0 4px 12px rgba(0,0,0,0.3)';
+          
+          infoBox.innerHTML = `
+            <div style="margin-bottom: 8px;"><strong>Titik Terpilih</strong></div>
+            <div>Koordinat: (${Math.round(mx)}, ${Math.round(my)})</div>
+            <div>Amplitudo: ${amplitude}</div>
+            <div>Intensitas: ${(intensity * 100).toFixed(1)}%</div>
+            <div style="margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--card-border);">
+              Warna: <span style="display: inline-block; width: 20px; height: 20px; background: ${color}; border-radius: 4px; vertical-align: middle;"></span>
+            </div>
+          `;
+          
+          document.body.appendChild(infoBox);
+          
+          // Remove after 3 seconds
+          setTimeout(() => {
+            if (infoBox.parentNode) {
+              infoBox.parentNode.removeChild(infoBox);
+            }
+          }, 3000);
+        });
+        
+        // Window resize
+        window.addEventListener('resize', () => {
+          canvas.width = container.clientWidth * dpr;
+          canvas.height = container.clientHeight * dpr;
+          ctx.scale(dpr, dpr);
+          sources = [
+            {x: canvas.width / dpr / 2 - params.distance/2, y: canvas.height / dpr / 2},
+            {x: canvas.width / dpr / 2 + params.distance/2, y: canvas.height / dpr / 2}
+          ];
+        });
+      }
+      
+      // Set resolution
+      function setResolution(res) {
+        params.resolution = res;
+        
+        // Update button states
+        lowResBtn.classList.toggle('active', res === 'low');
+        medResBtn.classList.toggle('active', res === 'medium');
+        highResBtn.classList.toggle('active', res === 'high');
+        
+        // Adjust step size for simulation
+        let step = 8;
+        if (res === 'medium') step = 6;
+        if (res === 'high') step = 4;
+        
+        // Store step for drawing
+        params.step = step;
+      }
+      
+      // Reset simulation
+      function resetSimulation() {
+        params.freq = 2.0;
+        params.lambda = 80;
+        params.distance = 140;
+        params.phase = 0;
+        t = 0;
+        
+        // Update sliders and values
+        freqSlider.value = params.freq;
+        lambdaSlider.value = params.lambda;
+        distanceSlider.value = params.distance;
+        phaseSlider.value = params.phase;
+        
+        updateDOMValues();
+        
+        // Reset sources
+        sources = [
+          {x: canvas.width / dpr / 2 - params.distance/2, y: canvas.height / dpr / 2},
+          {x: canvas.width / dpr / 2 + params.distance/2, y: canvas.height / dpr / 2}
+        ];
+      }
+      
+      // Toggle play/pause
+      function togglePlayPause() {
+        params.isPlaying = !params.isPlaying;
+        playPauseBtn.innerHTML = params.isPlaying ? 
+          '<i class="fas fa-pause"></i> Jeda' : 
+          '<i class="fas fa-play"></i> Mainkan';
+      }
+      
+      // Take snapshot
+      function takeSnapshot() {
+        // In a real implementation, this would download the canvas as an image
+        alert('Fitur mengambil snapshot akan mengunduh gambar simulasi saat ini. Dalam demo ini, fitur ini hanya menampilkan pesan.');
+      }
+      
+      // Physics calculations
+      function updatePhysics() {
+        if (!params.isPlaying) return;
+        t += 0.02;
+      }
+      
+      // Rendering
+      function draw() {
+        // Clear canvas with background color
+        ctx.fillStyle = '#011025';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        // Draw grid if enabled
+        if (params.showGrid) {
+          drawGrid();
+        }
+        
+        // Calculate step based on resolution
+        let step = 8;
+        if (params.resolution === 'medium') step = 6;
+        if (params.resolution === 'high') step = 4;
+        
+        // Draw waves based on mode
+        if (params.mode === 'interference') {
+          drawInterference(step);
+        } else if (params.mode === 'sources') {
+          drawSourcesOnly();
+        } else if (params.mode === 'waves') {
+          drawWavesSeparately(step);
+        } else if (params.mode === 'nodes') {
+          drawNodalLines(step);
+        }
+        
+        // Draw sources
+        for (let s of sources) {
+          ctx.fillStyle = '#f59e0b';
+          ctx.beginPath();
+          ctx.arc(s.x, s.y, 6, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        
+        // Draw measurement lines if enabled
+        if (params.showMeasure) {
+          drawMeasurements();
+        }
+        
+        // Draw legend if enabled
+        if (params.showLegend) {
+          drawLegend();
+        }
+      }
+      
+      function drawGrid() {
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
+        ctx.lineWidth = 1;
+        
+        // Vertical lines
+        for (let x = 0; x < canvas.width; x += 50) {
+          ctx.beginPath();
+          ctx.moveTo(x, 0);
+          ctx.lineTo(x, canvas.height);
+          ctx.stroke();
+        }
+        
+        // Horizontal lines
+        for (let y = 0; y < canvas.height; y += 50) {
+          ctx.beginPath();
+          ctx.moveTo(0, y);
+          ctx.lineTo(canvas.width, y);
+          ctx.stroke();
+        }
+      }
+      
+      function drawInterference(step) {
+        const k = 2 * Math.PI / params.lambda;
+        const w = 2 * Math.PI * params.freq;
+        const phaseRad = params.phase * Math.PI / 180;
+        
+        for (let y = 0; y < canvas.height; y += step) {
+          for (let x = 0; x < canvas.width; x += step) {
+            let amp = 0;
+            for (let i = 0; i < sources.length; i++) {
+              const s = sources[i];
+              const r = Math.hypot(x - s.x, y - s.y);
+              const phaseOffset = (i === 1) ? phaseRad : 0;
+              amp += Math.sin(k * r - w * t + phaseOffset) / (1 + r * 0.005);
+            }
+            
+            const intensity = Math.tanh(amp / 1.5);
+            const color = ampToColor(intensity);
+            ctx.fillStyle = color;
+            ctx.fillRect(x, y, step, step);
+          }
+        }
+      }
+      
+      function drawSourcesOnly() {
+        // Draw each source individually with different colors
+        const k = 2 * Math.PI / params.lambda;
+        const w = 2 * Math.PI * params.freq;
+        const colors = ['#4fa3ff', '#7c3aed'];
+        
+        for (let i = 0; i < sources.length; i++) {
+          const s = sources[i];
+          const color = colors[i];
+          
+          for (let y = 0; y < canvas.height; y += 8) {
+            for (let x = 0; x < canvas.width; x += 8) {
+              const r = Math.hypot(x - s.x, y - s.y);
+              const amp = Math.sin(k * r - w * t) / (1 + r * 0.008);
+              const intensity = Math.abs(amp);
+              
+              // Create semi-transparent color
+              const alpha = intensity * 0.6;
+              ctx.fillStyle = color + Math.floor(alpha * 255).toString(16).padStart(2, '0');
+              ctx.fillRect(x, y, 8, 8);
+            }
+          }
+        }
+      }
+      
+      function drawWavesSeparately(step) {
+        // Draw interference pattern with source indicators
+        drawInterference(step);
+        
+        // Add source indicators
+        ctx.strokeStyle = '#4fa3ff';
+        ctx.lineWidth = 2;
+        ctx.setLineDash([5, 5]);
+        ctx.beginPath();
+        ctx.arc(sources[0].x, sources[0].y, params.lambda/2, 0, Math.PI * 2);
+        ctx.stroke();
+        
+        ctx.strokeStyle = '#7c3aed';
+        ctx.beginPath();
+        ctx.arc(sources[1].x, sources[1].y, params.lambda/2, 0, Math.PI * 2);
+        ctx.stroke();
+        
+        ctx.setLineDash([]);
+      }
+      
+      function drawNodalLines(step) {
+        // Draw interference pattern
+        drawInterference(step);
+        
+        // Overlay nodal lines (destructive interference)
+        ctx.strokeStyle = 'rgba(239, 68, 68, 0.7)';
+        ctx.lineWidth = 2;
+        
+        // Calculate and draw nodal lines
+        const k = 2 * Math.PI / params.lambda;
+        const phaseRad = params.phase * Math.PI / 180;
+        
+        for (let y = 0; y < canvas.height; y += 10) {
+          for (let x = 0; x < canvas.width; x += 10) {
+            let amp = 0;
+            for (let i = 0; i < sources.length; i++) {
+              const s = sources[i];
+              const r = Math.hypot(x - s.x, y - s.y);
+              const phaseOffset = (i === 1) ? phaseRad : 0;
+              amp += Math.sin(k * r - phaseOffset); // Static for nodal lines
+            }
+            
+            if (Math.abs(amp) < 0.1) {
+              ctx.beginPath();
+              ctx.arc(x, y, 2, 0, Math.PI * 2);
+              ctx.stroke();
+            }
+          }
+        }
+      }
+      
+      function drawMeasurements() {
+        // Draw distance between sources
+        ctx.strokeStyle = 'rgba(245, 158, 11, 0.8)';
+        ctx.lineWidth = 2;
+        ctx.setLineDash([5, 5]);
+        ctx.beginPath();
+        ctx.moveTo(sources[0].x, sources[0].y + 20);
+        ctx.lineTo(sources[1].x, sources[1].y + 20);
+        ctx.stroke();
+        ctx.setLineDash([]);
+        
+        // Draw distance label
+        ctx.fillStyle = 'rgba(245, 158, 11, 0.9)';
+        ctx.font = '14px Poppins';
+        ctx.textAlign = 'center';
+        ctx.fillText(`${params.distance} px`, (sources[0].x + sources[1].x) / 2, sources[0].y + 40);
+        
+        // Draw wavelength indicator
+        const midX = (sources[0].x + sources[1].x) / 2;
+        const midY = (sources[0].y + sources[1].y) / 2;
+        
+        ctx.strokeStyle = 'rgba(16, 185, 129, 0.8)';
+        ctx.setLineDash([5, 5]);
+        ctx.beginPath();
+        ctx.moveTo(midX - params.lambda/2, midY + 60);
+        ctx.lineTo(midX + params.lambda/2, midY + 60);
+        ctx.stroke();
+        ctx.setLineDash([]);
+        
+        // Draw wavelength label
+        ctx.fillStyle = 'rgba(16, 185, 129, 0.9)';
+        ctx.fillText(`λ = ${params.lambda} px`, midX, midY + 80);
+      }
+      
+      function drawLegend() {
+        // Draw legend box
+        const legendX = 20;
+        const legendY = canvas.height - 120;
+        const boxWidth = 200;
+        const boxHeight = 100;
+        
+        ctx.fillStyle = 'rgba(20, 20, 24, 0.8)';
+        ctx.fillRect(legendX, legendY, boxWidth, boxHeight);
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+        ctx.strokeRect(legendX, legendY, boxWidth, boxHeight);
+        
+        // Draw color scale
+        const scaleWidth = 160;
+        const scaleHeight = 20;
+        const scaleX = legendX + 20;
+        const scaleY = legendY + 20;
+        
+        for (let i = 0; i <= 100; i++) {
+          const x = scaleX + (i / 100) * scaleWidth;
+          const intensity = (i / 50) - 1; // -1 to 1
+          const color = ampToColor(intensity);
+          ctx.fillStyle = color;
+          ctx.fillRect(x, scaleY, 2, scaleHeight);
+        }
+        
+        // Draw labels
+        ctx.fillStyle = '#ffffff';
+        ctx.font = '12px Poppins';
+        ctx.textAlign = 'center';
+        ctx.fillText('Interferensi Destruktif', scaleX, scaleY + 35);
+        ctx.fillText('Netral', scaleX + scaleWidth/2, scaleY + 35);
+        ctx.fillText('Interferensi Konstruktif', scaleX + scaleWidth, scaleY + 35);
+        
+        // Draw mode indicator
+        ctx.textAlign = 'left';
+        ctx.fillText(`Mode: ${params.mode === 'interference' ? 'Interferensi' : 
+                      params.mode === 'sources' ? 'Sumber Gelombang' : 
+                      params.mode === 'waves' ? 'Gelombang Terpisah' : 'Titik Nodal'}`, 
+                    legendX + 10, legendY + 70);
+      }
+      
+      function ampToColor(a) {
+        // a in [-1,1] -> map to bluish/white/red
+        const v = (a + 1) / 2; // 0..1
+        const r = Math.floor(20 + 235 * v);
+        const g = Math.floor(20 + 235 * (1 - Math.abs(a)));
+        const b = Math.floor(80 + 175 * (1 - v));
+        return `rgb(${r}, ${g}, ${b})`;
+      }
+      
+      // Animation loop
+      let lastTime = 0;
+      function animate(timestamp) {
+        if (!lastTime) lastTime = timestamp;
+        const dt = Math.min(0.03, (timestamp - lastTime) / 1000);
+        lastTime = timestamp;
+        
+        updatePhysics();
+        draw();
+        
+        requestAnimationFrame(animate);
+      }
+      
+      // Initialize the simulation
+      setResolution('medium');
+      init();
+    })();
+  </script>
+</body>
+</html>
+
