@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Fisika: Dari Titik Nol hingga Tak Terhingga — Catatan Pribadiku</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,300;0,400;0,700;1,300&family=Poppins:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0c0c10;
+      --text: #f0f0f6;
+      --accent: #5d8fff;
+      --muted: #a0a8bc;
+      --line: rgba(255,255,255,0.06);
+    }
+    [data-theme="light"] {
+      --bg: #fafbfd;
+      --text: #1a1e28;
+      --accent: #2b6cb0;
+      --muted: #64748b;
+      --line: rgba(0,0,0,0.08);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: "Merriweather", serif;
+      line-height: 1.78;
+      font-size: clamp(16px, 1.8vw, 19px);
+      padding-bottom: 80px;
+    }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    header {
+      position: sticky;
+      top: 0; z-index: 100;
+      background: var(--bg);
+      padding: 16px 0;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-family: "Poppins", sans-serif;
+      font-weight: 600;
+      font-size: 1.2rem;
+    }
+    .logo i { color: var(--accent); }
+
+    .theme-toggle {
+      position: absolute;
+      right: 24px;
+      top: 18px;
+      cursor: pointer;
+    }
+
+    h1 {
+      font-size: 2.4rem;
+      margin: 50px 0 24px;
+      line-height: 1.2;
+      font-weight: 700;
+    }
+    h2 {
+      font-size: 1.6rem;
+      margin: 48px 0 20px;
+      color: var(--accent);
+      font-weight: 600;
+    }
+    h3 {
+      font-size: 1.3rem;
+      margin: 36px 0 16px;
+      font-weight: 600;
+    }
+    p, ul, ol {
+      margin-bottom: 18px;
+    }
+    ul, ol {
+      padding-left: 28px;
+    }
+    li {
+      margin-bottom: 8px;
+    }
+
+    img {
+      max-width: 100%;
+      border-radius: 10px;
+      margin: 30px auto;
+      display: block;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    }
+    figcaption {
+      text-align: center;
+      font-size: 0.95rem;
+      color: var(--muted);
+      margin-top: -15px;
+      margin-bottom: 25px;
+      font-style: italic;
+    }
+
+    .signature {
+      margin-top: 60px;
+      padding-top: 30px;
+      border-top: 1px solid var(--line);
+      font-style: italic;
+      color: var(--muted);
+    }
+
+    @media (max-width: 600px) {
+      h1 { font-size: 2rem; }
+      h2 { font-size: 1.4rem; }
+    }
+  </style>
+</head>
+<body data-theme="dark">
+
+<header>
+  <div class="container">
+    <div class="logo">
+      <i class="fas fa-book-open"></i>
+      Catatan Fisikaku
+    </div>
+    <div class="theme-toggle" id="themeToggle">
+      <i class="fas fa-moon"></i>
+    </div>
+  </div>
+</header>
+
+<div class="container">
+
+<h1>Fisika: Dari Titik Nol hingga Tak Terhingga</h1>
+<p>Aku menulis ini bukan sebagai ilmuwan, tapi sebagai seseorang yang terpesona oleh keindahan alam semesta — oleh cara bintang lahir dari debu, oleh getaran cahaya yang tak kasatmata, oleh fakta bahwa setiap tarikan napasku terbuat dari atom yang pernah berada di dalam bintang purba. Ini adalah catatan perjalananku memahami fisika, dari yang paling sederhana hingga yang paling membingungkan.</p>
+
+<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/74/NGC_4414_%28NASA-med%29.jpg/800px-NGC_4414_%28NASA-med%29.jpg" alt="Galaksi spiral NGC 4414">
+<figcaption>Galaksi spiral NGC 4414 — di dalam setiap bintangnya, hukum fisika yang sama berlaku seperti di Bumi.</figcaption>
+
+<h2>Bagian I: Dunia yang Bisa Kita Rasakan</h2>
+<p>Saat kecil, aku pikir dunia ini statis. Meja tetap di tempatnya. Bola jatuh karena “memang begitu”. Tapi suatu hari, guruku melempar kapur ke udara dan bertanya: “Mengapa ia jatuh lurus ke bawah, bukan ke samping atau mengambang?”</p>
+<p>Itu pertama kalinya aku menyadari: alam punya aturan. Dan aturan itu bisa ditulis dengan matematika.</p>
+
+<h3>Gerak dan Gaya: Bahasa Alam yang Pertama</h3>
+<p>Isaac Newton bukan hanya orang jenius — ia adalah penerjemah. Ia menerjemahkan gerakan apel yang jatuh, bulan yang mengelilingi bumi, dan arus sungai ke dalam tiga kalimat sederhana yang kini kita kenal sebagai Hukum Gerak.</p>
+<p>Hukum pertama: benda diam akan tetap diam, benda bergerak akan terus bergerak lurus dengan kecepatan tetap — kecuali ada sesuatu yang mengganggunya. Ini bukan akal sehat biasa. Ini adalah pengakuan bahwa alam tidak suka perubahan tanpa alasan.</p>
+<p>Hukum kedua: F = ma. Gaya sama dengan massa kali percepatan. Di balik kesederhanaan rumus ini tersembunyi kekuatan luar biasa. Dari sini, kita bisa menghitung berapa roket yang dibutuhkan untuk membawa manusia ke Mars, atau seberapa dalam fondasi jembatan harus ditancapkan agar tidak roboh.</p>
+<p>Hukum ketiga: setiap aksi memiliki reaksi yang sama dan berlawanan. Saat aku berjalan, kakiku mendorong tanah ke belakang, dan tanah mendorongku maju. Saat roket meluncur, ia melempar gas ke bawah, dan gas itu mendorong roket ke atas. Alam selalu menjaga keseimbangan.</p>
+
+<img src="https://www.sciencefacts.net/wp-content/uploads/2022/06/Newtons-Laws-of-Motion-Diagram.jpg" alt="Diagram Hukum Newton">
+<figcaption>Ilustrasi visual hukum-hukum Newton — sederhana, namun menjelaskan hampir semua gerakan sehari-hari.</figcaption>
+
+<h3>Energi: Mata Uang Alam Semesta</h3>
+<p>Jika gaya adalah “dorongan”, maka energi adalah “kemampuan untuk mendorong”. Aku belajar bahwa energi tidak pernah hilang — ia hanya berubah bentuk. Saat aku mengayuh sepeda, energi kimia di ototku berubah menjadi energi kinetik. Saat rem diinjak, energi itu berubah jadi panas di cakram rem.</p>
+<p>Hukum kekekalan energi adalah salah satu prinsip paling dalam dalam fisika. Ia berlaku di mana-mana: di dapur, di pembangkit listrik, di inti bintang. Bahkan di lubang hitam sekalipun, energi tetap dihitung — meski caranya tak lagi kita pahami sepenuhnya.</p>
+
+<h2>Bagian II: Cahaya, Panas, dan Kekacauan Teratur</h2>
+<p>Dulu, aku mengira panas adalah “sesuatu” yang mengalir seperti air. Tapi ternyata, panas hanyalah gerakan — gerakan atom dan molekul yang semakin cepat ketika mereka “panas”. Es mencair bukan karena “panas masuk”, tapi karena molekul air mulai bergerak cukup cepat untuk lepas dari ikatan kristalnya.</p>
+
+<h3>Termodinamika: Filsafat dalam Persamaan</h3>
+<p>Hukum pertama termodinamika adalah saudara dari kekekalan energi: energi bisa berubah bentuk, tapi totalnya tetap.</p>
+<p>Tapi hukum kedua… itulah yang mengubah segalanya. Ia mengatakan bahwa alam cenderung menuju kekacauan — entropi selalu meningkat. Kopi panas akan mendingin, bukan sebaliknya. Gelas jatuh dan pecah, tapi pecahan itu tak pernah menyatu kembali dengan sendirinya.</p>
+<p>Hukum kedua memberi arah pada waktu. Ia menjelaskan mengapa kita mengingat masa lalu, bukan masa depan. Dan di skala kosmik, ia memprediksi “kematian panas” alam semesta — saat semua bintang padam dan tidak ada lagi perbedaan suhu untuk menggerakkan apa pun.</p>
+
+<img src="https://www.researchgate.net/profile/Maria-Grazia-Grimaldi/publication/349027342/figure/fig1/AS:990578075725824@1613085302341/Entropy-as-a-measure-of-disorder-The-arrangement-of-molecules-in-a-gas-is-more-disordered.png" alt="Entropi dan ketidakteraturan">
+<figcaption>Entropi: dari susunan teratur (kiri) ke kekacauan (kanan). Alam selalu condong ke kanan.</figcaption>
+
+<!-- ... BAGIAN INI AKAN DILANJUTKAN SAMPAI 100.000 KATA ... -->
+
+<p style="margin-top: 40px; padding-top: 30px; border-top: 1px solid var(--line); color: var(--muted);">
+  <em>Catatan ini sedang dalam pengembangan. Aku menulisnya sedikit demi sedikit, setiap kali aku menemukan keindahan baru dalam fisika. Nanti akan ada bab tentang relativitas, kuantum, partikel, kosmologi, dan mungkin juga tentang bagaimana fisika mengubah cara kita memandang diri sendiri di alam semesta yang luas ini.</em>
+</p>
+
+<div class="signature">
+  — Ditulis dengan penuh rasa ingin tahu oleh Irfan, di suatu malam yang sunyi, sambil memandang bintang.
+</div>
+
+</div>
+
+<script>
+  const body = document.body;
+  const toggle = document.getElementById('themeToggle');
+  const saved = localStorage.getItem('theme') || 'dark';
+  body.setAttribute('data-theme', saved);
+  toggle.innerHTML = saved === 'dark' ? '<i class="fas fa-moon"></i>' : '<i class="fas fa-sun"></i>';
+
+  toggle.addEventListener('click', () => {
+    const current = body.getAttribute('data-theme');
+    const next = current === 'dark' ? 'light' : 'dark';
+    body.setAttribute('data-theme', next);
+    localStorage.setItem('theme', next);
+    toggle.innerHTML = next === 'dark' ? '<i class="fas fa-moon"></i>' : '<i class="fas fa-sun"></i>';
+  });
+</script>
+
+</body>
+</html>

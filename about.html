@@ -1,0 +1,150 @@
+<!-- ABOUT POPUP (template, bisa disisipkan di file mana pun) -->
+<div class="about-popup-overlay" id="aboutOverlay" style="display:none;">
+  <div class="about-popup">
+    <button class="about-close" title="Tutup" id="aboutCloseBtn"><i class="fas fa-times"></i></button>
+    <div class="about-popup-content">
+      <div class="about-avatar"><i class="fa-solid fa-user-astronaut"></i></div>
+      <h3>About Me</h3>
+      <p>Isi bio atau deskripsi di sini. Bebas diedit sesuai kebutuhan.</p>
+      <ul>
+        <li>Nama: <strong>Irfan Rizki Aditri</strong></li>
+        <li>Mahasiswa ITERA</li>
+        <li>Pecinta web, code, dan eksperimen</li>
+        <li><span style="color:var(--accent);">Single ☺️</span></li>
+      </ul>
+      <!-- Tambah info/link apapun -->
+      <div class="about-popup-social">
+        <a href="#" class="about-popup-social-link" title="GitHub"><i class="fab fa-github"></i></a>
+        <a href="#" class="about-popup-social-link" title="Instagram"><i class="fab fa-instagram"></i></a>
+        <a href="#" class="about-popup-social-link" title="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+.about-popup-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(27,34,46,.56);
+  z-index: 2400;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(8px) brightness(1.1);
+  animation: aboutOverlayFadeIn .28s cubic-bezier(.22,.6,.18,1);
+}
+@keyframes aboutOverlayFadeIn {
+  from{opacity:0;backdrop-filter:blur(0px);}
+  to{opacity:1;backdrop-filter:blur(8px);}
+}
+.about-popup {
+  background: var(--card, #141418);
+  color: var(--text, #fff);
+  border-radius: 22px;
+  border: 2px solid var(--card-border, #2b2b40);
+  box-shadow: 0 24px 74px rgba(43,44,70,0.20);
+  padding: 38px 23px;
+  max-width: 375px;
+  min-width: 280px;
+  width: 94vw;
+  position: relative;
+  animation: aboutPopupAppear .38s cubic-bezier(.22,.66,.19,1);
+}
+@keyframes aboutPopupAppear {
+  from{opacity:0;transform:scale(.92) translateY(40px);}
+  to{opacity:1;transform:scale(1) translateY(0);}
+}
+.about-close {
+  position: absolute; top: 13px; right: 18px;
+  background: none; border: none;
+  color: var(--muted, #9da3b3); font-size: 1.45em;
+  cursor: pointer; transition:color .19s;
+  z-index: 1;
+}
+.about-close:hover { color: var(--accent,#4fa3ff);}
+.about-popup-content {
+  text-align: center;
+  animation: fadeInUp .39s .16s both;
+}
+.about-avatar {
+  margin:0 auto 11px auto; background:var(--accent-2,#7c3aed);
+  border-radius:14px; width:74px; height:74px; display:flex;
+  align-items:center; justify-content:center; color:#fff;
+  font-size:2.6rem; box-shadow:0 2px 13px rgba(140,70,250,0.09);
+  margin-bottom:14px;
+  animation: iconBounce .42s .13s both;
+}
+@keyframes fadeInUp {
+  from{opacity:0;transform:translateY(23px);}
+  to{opacity:1;transform:translateY(0);}
+}
+@keyframes iconBounce{
+  0%{transform:scale(0.83);}
+  54%{transform:scale(1.12);}
+  79%{transform:scale(.96);}
+  100%{transform:scale(1);}
+}
+.about-popup-content h3{
+  margin:4px 0 10px;
+  font-size:1.13rem;font-weight:600; color:var(--accent);
+}
+.about-popup-content p {
+  color: var(--muted);
+  margin-bottom:16px;
+}
+.about-popup-content ul {
+  color:var(--muted);
+  margin:0 auto 12px auto;
+  text-align:left;
+  display:inline-block;
+  font-size:.97em;
+  list-style:none;
+  padding: 0 8px;
+}
+.about-popup-content ul li {
+  margin-bottom:6px;
+}
+.about-popup-social {
+  display: flex; gap:16px; justify-content:center; margin-top:11px;
+}
+.about-popup-social-link {
+  display:inline-flex;align-items:center;justify-content:center;
+  background: var(--glass,rgba(255,255,255,0.06)); border-radius:8px;
+  border: 1px solid var(--card-border,#22223a); padding:10px; color:var(--accent-2); font-size:1.23em; transition:.2s;
+}
+.about-popup-social-link:hover {
+  background: var(--accent-2); color: #fff; border:1.5px solid var(--accent); 
+  box-shadow:0 6px 18px rgba(124,58,237,0.16);
+  transform: scale(1.15);
+}
+/* Responsive */
+@media(max-width:480px){
+  .about-popup{max-width:98vw;min-width:0;padding:19px 3vw;}
+}
+</style>
+
+<script>
+// popup logic
+const aboutOverlay = document.getElementById('aboutOverlay');
+const aboutCloseBtn = document.getElementById('aboutCloseBtn');
+function showAboutPopup() { aboutOverlay.style.display = 'flex'; }
+function hideAboutPopup() { aboutOverlay.style.display = 'none'; }
+aboutCloseBtn.addEventListener('click', hideAboutPopup);
+// Klik luar popup untuk close
+aboutOverlay.addEventListener('click', function(e){
+  if(e.target === aboutOverlay) hideAboutPopup();
+});
+// Toggle via button/menu 'About'
+const aboutTriggerBtn = document.getElementById('aboutTrigger');
+if(aboutTriggerBtn){
+  aboutTriggerBtn.addEventListener('click', function(e){
+    e.preventDefault();
+    showAboutPopup();
+  });
+}
+// Esc untuk tutup
+window.addEventListener('keydown',function(e){
+  if(e.key==="Escape" && aboutOverlay.style.display==="flex") hideAboutPopup();
+});
+</script>
