@@ -1,0 +1,982 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <title>irfanrizkiaditri</title>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    /* ... (SEMUA CSS LAMA DARI index.html KAMU ADA DI SINI) ... */
+    /* (Ini adalah 400+ baris CSS yang sudah kamu punya, saya tidak mengubahnya) */
+    :root{
+      --bg:#0d0d0f;
+      --card:#141418;
+      --text:#ffffff;
+      --accent:#4fa3ff;
+      --accent-2:#7c3aed;
+      --muted:#9da3b3;
+      --glass:rgba(255,255,255,0.06);
+      --card-border:rgba(255,255,255,0.06);
+    }
+    [data-theme="light"]{
+      --bg:#f6f8fb;
+      --card:#ffffff;
+      --text:#0b1220;
+      --accent:#2563eb;
+      --accent-2:#7c3aed;
+      --muted:#6b7280;
+      --glass:rgba(0,0,0,0.05);
+      --card-border:rgba(0,0,0,0.08);
+    }
+    html{
+      font-family:"Poppins",sans-serif;
+      font-size:clamp(14px,1.6vw,16px);
+      -webkit-font-smoothing: antialiased;
+      overflow-x:hidden;
+    }
+    *{ margin:0; padding:0; box-sizing:border-box; }
+    body{
+      background:var(--bg);
+      color:var(--text);
+      min-height:100vh;
+      transition:background .25s ease, color .25s ease;
+    }
+    a{ text-decoration:none; color:inherit; }
+    .container{
+      width:min(94%,1200px);
+      margin:0 auto;
+    }
+    header{
+      position:sticky;
+      top:0; left:0; width:100%;
+      backdrop-filter:blur(12px) saturate(1.5);
+      background:linear-gradient(180deg,rgba(0,0,0,0.35),transparent);
+      border-bottom:1px solid var(--card-border);
+      z-index:1500;
+      animation:headerDrop .55s cubic-bezier(.2,.9,.2,1);
+    }
+    @keyframes headerDrop{
+      from{ transform:translateY(-20px); opacity:0; }
+      to{ transform:translateY(0); opacity:1; }
+    }
+    .navbar{
+      display:flex; align-items:center;
+      gap:16px;
+      padding:16px 0;
+    }
+    .logo{
+      display:flex; align-items:center; gap:10px;
+      font-weight:700; font-size:1.15rem;
+      letter-spacing:.4px;
+    }
+    .logo i{ color:var(--accent); font-size:1.2rem; }
+    .logo span{ color:var(--accent); }
+    .nav-wrap{
+      margin-left:auto;
+      display:flex; align-items:center; gap:14px;
+    }
+    .nav-links{
+      display:flex; gap:20px;
+      list-style:none;
+    }
+    .nav-links a{
+      padding:6px 10px;
+      font-weight:500;
+      border-radius:8px;
+      position:relative;
+      transition:.25s;
+    }
+    .nav-links a:hover,
+    .nav-links .active{
+      color:var(--accent);
+      transform:translateY(-2px);
+    }
+    .nav-links a::after{
+      content:"";
+      position:absolute;
+      bottom:-2px; left:0;
+      width:0%; height:2px;
+      background:var(--accent);
+      border-radius:6px;
+      transition:.28s;
+    }
+    .nav-links a:hover::after,
+    .nav-links .active::after{
+      width:100%;
+    }
+    .theme-toggle{
+      cursor:pointer; display:flex; align-items:center;
+    }
+    .switch{
+      width:46px; height:26px;
+      background:var(--glass);
+      border:1px solid var(--card-border);
+      border-radius:20px;
+      position:relative; padding:3px;
+      backdrop-filter:blur(5px);
+    }
+    .knob{
+      width:20px; height:20px;
+      background:#fff; border-radius:50%;
+      position:absolute; top:3px; left:3px;
+      box-shadow:0 4px 12px rgba(0,0,0,0.3);
+      transition:.25s;
+    }
+    [data-theme="light"] .switch{
+      background:linear-gradient(90deg,var(--accent),var(--accent-2));
+    }
+    [data-theme="light"] .knob{ left:23px; }
+    .hamburger{
+      display:none;
+      background:none;
+      border:0;
+      font-size:1.25rem;
+      color:var(--text);
+      padding:6px;
+    }
+    .mobile-menu{
+      display:none;
+      position:absolute;
+      right:14px;
+      top:72px;
+      background:var(--card);
+      border:1px solid var(--card-border);
+      border-radius:14px;
+      min-width:220px;
+      padding:12px;
+      box-shadow:0 14px 28px rgba(0,0,0,0.5);
+      animation:fadeMenu .3s ease;
+    }
+    @keyframes fadeMenu{
+      from{ opacity:0; transform:translateY(-6px); }
+      to{ opacity:1; transform:translateY(0); }
+    }
+    .mobile-menu a{
+      display:block;
+      padding:10px;
+      border-radius:8px;
+      transition:.25s;
+      font-weight:500;
+    }
+    .mobile-menu a:hover{
+      background:rgba(255,255,255,0.06);
+    }
+    .mobile-menu.open{
+      display:block;
+    }
+    @media (max-width:700px){
+      .nav-links{ display:none; }
+      .hamburger{ display:inline-flex; }
+    }
+    .hero{ padding:44px 0 18px; animation:fadeInUp .7s cubic-bezier(.21,.66,.19,1); }
+    @keyframes fadeInUp{
+      from{ opacity:0; transform:translateY(26px);}
+      to{ opacity:1; transform:translateY(0);}
+    }
+    @keyframes fadeInRight{
+      from{ opacity:0; transform:translateX(42px);}
+      to{ opacity:1; transform:translateX(0);}
+    }
+    @keyframes fadeInLeft{
+      from{ opacity:0; transform:translateX(-42px);}
+      to{ opacity:1; transform:translateX(0);}
+    }
+    .hero-grid{ display:flex; gap:28px; align-items:flex-start; }
+    aside{ width:100%; max-width:320px; flex-shrink:0; animation:fadeInLeft .6s cubic-bezier(.22,.89,.32,.1); }
+    .hero-card{ flex:1; background:var(--card); padding:22px; border-radius:12px; border:1px solid var(--card-border); animation:fadeInRight .6s cubic-bezier(.22,.89,.32,.1); }
+    .profile-panel{ padding:18px; border-radius:12px; background:var(--card); border:1px solid var(--card-border); text-align:center; }
+    .project-preview, .article-preview{
+      opacity:0;
+      animation:cardAppear .75s forwards;
+    }
+    .project-preview:nth-child(1){ animation-delay:.08s;}
+    .project-preview:nth-child(2){ animation-delay:.22s;}
+    .project-preview:nth-child(3){ animation-delay:.36s;}
+    .article-preview:nth-child(1){ animation-delay:.14s;}
+    .article-preview:nth-child(2){ animation-delay:.32s;}
+    @keyframes cardAppear{
+      from{ opacity:0; transform:scale(.93) translateY(34px);}
+      to{ opacity:1; transform:scale(1) translateY(0);}
+    }
+    .profile-avatar{ width:96px; height:96px; border-radius:12px; background:linear-gradient(135deg,var(--accent),#60a5fa); display:inline-grid; place-items:center; color:#051022; font-size:40px; margin:0 auto 12px; overflow:hidden; }
+    .profile-avatar img{ width:100%; height:100%; object-fit:cover; display:block; }
+    .kicker{ font-size:.78rem; color:var(--muted); text-transform:uppercase; letter-spacing:1px; }
+    .hero-card h1{ font-size: clamp(1.25rem, 2.6vw, 2rem); margin:6px 0 8px; font-weight:700; line-height:1.08; }
+    .lead{ color:var(--muted); margin-bottom:12px; line-height:1.5; }
+    .hero-stats{ display:flex; gap:12px; margin-top:12px; flex-wrap:wrap; }
+    .stat{ padding:8px 10px; border-radius:8px; border:1px solid var(--card-border); background:transparent; font-weight:600; color:var(--muted);}
+    .stat-num{ color:var(--accent); font-weight:700; }
+    .section{ padding:28px 0; animation:fadeInUp .8s cubic-bezier(.21,.66,.19,1); }
+    .section-title{ text-align:center; margin-bottom:20px; animation:fadeInUp .7s cubic-bezier(.21,.66,.19,1); }
+    .cards-grid{ display:grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap:18px; }
+    .card{ background:var(--card); padding:18px; border-radius:12px; border:1px solid var(--card-border);}
+    .card-head{ display:flex; gap:12px; align-items:flex-start; margin-bottom:8px;}
+    .card-icon{ font-size:1.6rem; color:var(--accent); min-width:44px; display:flex; align-items:center; justify-content:center; }
+    .card-actions{ margin-top:12px; display:flex; gap:10px; flex-wrap:wrap;}
+    .btn{ background:var(--accent); color:#ffffff; padding:10px 14px; border-radius:10px; font-weight:600; transition:.22s transform;}
+    .btn:hover{ background:var(--accent-2); transform:scale(1.08);}
+    .btn-sm{ padding:8px 12px; border-radius:8px; background:var(--accent); color:#ffffff; font-weight:600;}
+    .btn-outline{ background:transparent; border:1px solid var(--card-border); padding:8px 12px; border-radius:8px; color:var(--text); }
+    #contact.section{
+      animation:fadeInUp .95s cubic-bezier(.21,.66,.19,1);
+    }
+    .animated-contact-grid {
+      display:flex;
+      gap:24px;
+      flex-wrap:wrap;
+      margin-top:22px;
+      justify-content:center;
+    }
+    .animated-contact-info,
+    .animated-contact-form {
+      flex:1 1 320px;
+      background: var(--card);
+      border-radius: 16px;
+      border: 1.5px solid var(--card-border);
+      box-shadow: 0 10px 36px rgba(0,0,0,0.10),0 1.5px 4px var(--glass);
+      padding: 32px 22px;
+      animation:fadeInLeft .70s cubic-bezier(.21,.66,.19,1);
+    }
+    .animated-contact-form {
+      animation:fadeInRight .70s cubic-bezier(.21,.66,.19,1);
+    }
+    .animated-contact-info h3,
+    .animated-contact-form h3 {
+      font-size:1.22rem;
+      margin-bottom:16px;
+      font-weight:700;
+      letter-spacing:0.3px;
+      color:var(--accent);
+    }
+    .contact-row-list {
+      margin-bottom:24px;
+    }
+    .contact-row-list strong {
+      color:var(--muted);
+      display:block;
+      margin-bottom:6px;
+    }
+    .contact-social-icons {
+      display: flex;
+      gap:15px;
+      margin-top:10px;
+      flex-wrap:wrap;
+    }
+    .contact-social-icon-link {
+      display: flex;
+      align-items: center;
+      gap:8px;
+      color: var(--muted);
+      background: var(--glass);
+      border-radius:10px;
+      padding:8px 13px;
+      font-size:1rem;
+      font-weight:500;
+      border: 1px solid var(--card-border);
+      transition: .21s;
+      text-decoration: none;
+      box-shadow: 0 5px 22px rgba(0,0,0,0.07);
+      will-change: transform;
+      animation:iconBounce .36s;
+    }
+    .contact-social-icon-link:hover {
+      color: var(--accent);
+      background: var(--accent-2);
+      border: 1.5px solid var(--accent);
+      transform: scale(1.07);
+    }
+    .contact-social-icon-link i {
+      font-size:1.25em;
+    }
+    @keyframes iconBounce{
+      0%{transform:scale(.82);}
+      60%{transform:scale(1.18);}
+      80%{transform:scale(0.97);}
+      100%{transform:scale(1);}
+    }
+    @keyframes shakeField {
+      0%,100%{ transform:translateX(0);}
+      28%{ transform:translateX(-6px);}
+      44%{ transform:translateX(10px);}
+      72%{ transform:translateX(-5px);}
+    }
+    .animated-contact-form form {
+      display: flex;
+      flex-direction: column;
+      gap: 13px;
+      margin-top:8px;
+    }
+    .form-control {
+      padding:12px;
+      border-radius:9px;
+      border: 1.4px solid var(--card-border);
+      background: var(--glass);
+      color: var(--text);
+      font-size:1.01em;
+      transition:.24s;
+      box-shadow: 0 2px 5px rgba(124,58,237,.04);
+      will-change:box-shadow;
+    }
+    .form-control:focus {
+      border-color: var(--accent);
+      outline: none;
+      box-shadow:0 8px 22px rgba(79,163,255,0.14);
+    }
+    .form-control.error {
+      border-color: #d60036;
+      animation:shakeField .32s;
+      background:#2c0010;
+      color:#ffd7e2;
+    }
+    .contact-form-message {
+      padding:10px 0;
+      font-size:1em;
+      color:var(--accent-2);
+      opacity:0;
+      animation:fadeInUp .6s forwards;
+      animation-delay:.18s;
+    }
+    .btn-send {
+      background:linear-gradient(90deg,var(--accent),var(--accent-2));
+      color:var(--text);
+      font-size:1.06em;
+      font-weight:600;
+      border:none;
+      border-radius:9px;
+      padding:12px 0;
+      margin-top:2px;
+      box-shadow:0 4px 22px rgba(36,64,124,0.12);
+      cursor:pointer;
+      transition:.22s;
+      letter-spacing:.6px;
+    }
+    .btn-send:hover {
+      background:var(--accent-2);
+      color:#fff;
+      transform:scale(1.05);
+      box-shadow:0 12px 22px rgba(79,163,255,0.11);
+    }
+    footer{ text-align:center; padding:28px 0; color:var(--muted); margin-top:30px; font-size:.95rem; animation:fadeInUp .7s cubic-bezier(.21,.66,.19,1); }
+    #backToTop{ position: fixed; bottom:28px; right:20px; background:var(--accent); color:#000; padding:10px 12px; border-radius:50%; display:none; z-index:1200; box-shadow:0 8px 24px rgba(0,0,0,0.35); animation:fadeInUp .7s cubic-bezier(.21,.66,.19,1); }
+    @media (max-width: 900px){
+      .hero-grid{ flex-direction:column; }
+      aside{ max-width:100%; }
+      .animated-contact-grid { flex-direction:column;}
+    }
+    @media (max-width: 560px){
+      .nav-links{ display:none; }
+      .hamburger{ display:inline-flex; }
+      .mobile-menu{ display:none; }
+      .hero{ padding:26px 0 14px; }
+      .profile-avatar{ width:80px; height:80px; }
+      .hero-card{ padding:16px; }
+      .card{ padding:14px; }
+      .section{ padding:18px 0; }
+      .logo{ font-size:1rem; }
+      aside{ order:0; }
+      .hero-card{ order:1; }
+      .hero-stats{ gap:6px; }
+      .animated-contact-info, .animated-contact-form{
+        padding:18px 8px;
+      }
+    }
+    @media (max-width: 380px){
+      html{ font-size: clamp(13px, 3.2vw, 15px); }
+      .hero-card h1{ font-size:1.25rem; }
+      .profile-avatar{ width:72px; height:72px; }
+      .card-icon{ min-width:38px; }
+      .btn-send{padding:9px 0;}
+    }
+    a:focus, button:focus, input:focus, textarea:focus { outline: 3px solid rgba(79,163,255,0.15); outline-offset:2px; border-radius:8px; }
+    .contact-popup {
+      position: absolute;
+      top: 68px;
+      right: 90px;
+      background: var(--card);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 14px;
+      display: none;
+      z-index: 2000;
+      animation: popupFade .22s ease;
+      box-shadow: 0 18px 38px rgba(0,0,0,0.4);
+      backdrop-filter: blur(14px) saturate(1.4);
+    }
+    @keyframes popupFade {
+      from { opacity: 0; transform: scale(.92) translateY(-4px); }
+      to   { opacity: 1; transform: scale(1) translateY(0); }
+    }
+    .contact-grid-popup {
+      display: grid;
+      grid-template-columns: repeat(3, 85px);
+      gap: 14px;
+    }
+    .contact-item {
+      background: var(--glass);
+      border: 1px solid var(--card-border);
+      padding: 10px;
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      color: var(--text);
+      transition: .25s;
+      font-size: .85rem;
+    }
+    .contact-item i {
+      font-size: 1.4rem;
+      margin-bottom: 6px;
+      color: var(--accent);
+    }
+    .contact-item:hover {
+      transform: translateY(-4px) scale(1.05);
+      background: rgba(255,255,255,0.08);
+    }
+    @media (max-width:700px){
+      .contact-popup {
+        right: 20px;
+      }
+      .contact-grid-popup {
+        grid-template-columns: repeat(3, 80px);
+      }
+    }
+    @media (max-width:480px){
+      .contact-grid-popup {
+        grid-template-columns: repeat(2, 100px);
+        gap: 16px;
+      }
+    }
+    .about-popup-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(10px);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 3000;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s ease, visibility 0.3s ease;
+    }
+    .about-popup-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+    .about-popup {
+      background: var(--card);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      width: 90%;
+      max-width: 800px;
+      max-height: 80vh;
+      overflow-y: auto;
+      padding: 30px;
+      position: relative;
+      transform: translateY(20px);
+      transition: transform 0.3s ease;
+    }
+    .about-popup-overlay.active .about-popup {
+      transform: translateY(0);
+    }
+    .about-popup-close {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      background: var(--glass);
+      border: 1px solid var(--card-border);
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .about-popup-close:hover {
+      background: var(--accent-2);
+      transform: rotate(90deg);
+    }
+    .about-popup h2 {
+      font-size: 1.8rem;
+      margin-bottom: 20px;
+      color: var(--accent);
+      text-align: center;
+    }
+    .about-popup-content {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 20px;
+    }
+    .about-text {
+      line-height: 1.6;
+      color: var(--text);
+    }
+    .about-text p {
+      margin-bottom: 15px;
+    }
+    .about-skills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 15px;
+    }
+    .skill-tag {
+      background: var(--glass);
+      border: 1px solid var(--card-border);
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 0.9rem;
+    }
+    @media (max-width: 600px) {
+      .about-popup {
+        width: 95%;
+        padding: 20px;
+      }
+      .about-popup h2 {
+        font-size: 1.5rem;
+      }
+    }
+  </style>
+</head>
+<body data-theme="dark">
+  
+  <header>
+    <div class="container">
+      <nav class="navbar" aria-label="Main navigation">
+        <a class="logo" href="index.html"><i class="fas fa-feather-alt"></i> irfanrizkiaditri<span>.</span>site</a>
+        <div class="nav-wrap" role="navigation">
+          <ul class="nav-links" id="navLinks" aria-hidden="false">
+            <li><a href="index.html" class="active" aria-current="page">Home</a></li>
+            <li><a href="artikel.html">Articles</a></li>
+            <li><a href="projects.html">Projects</a></li>
+            <li><a href="uses.html">Uses</a></li>
+            <li><a href="komentar.html">Comment</a></li> 
+            <li><a href="#" id="aboutTrigger" class="about-trigger">About</a></li>
+            <li><a href="#" id="contactTrigger" class="contact-trigger">Contact <i class="fas fa-chevron-down" style="font-size:10px;"></i></a></li>
+          </ul>
+          <button class="hamburger" id="hamburger" aria-label="Buka menu" aria-expanded="false"><i class="fas fa-bars"></i></button>
+          <div class="theme-toggle" id="themeToggle" role="button" aria-pressed="false" tabindex="0" title="Toggle theme">
+            <div class="switch" aria-hidden="true"><div class="knob"></div></div>
+          </div>
+          <div class="mobile-menu" id="mobileMenu" aria-hidden="true">
+            <a href="index.html" style="display:block;padding:8px;border-radius:8px;">Home</a>
+            <a href="artikel.html" style="display:block;padding:8px;border-radius:8px;">Articles</a>
+            <a href="projects.html" style="display:block;padding:8px;border-radius:8px;">Projects</a>
+            <a href="uses.html" style="display:block;padding:8px;border-radius:8px;">Uses</a>
+            <a href="komentar.html" style="display:block;padding:8px;border-radius:8px;">Comment</a>
+            <a href="#" id="mobileAboutTrigger" style="display:block;padding:8px;border-radius:8px;">About</a>
+            <a href="#contact" style="display:block;padding:8px;border-radius:8px;">Contact</a>
+          </div>
+          
+          <div class="contact-popup" id="contactPopup" aria-hidden="true">
+            <div class="contact-grid-popup">
+              <a href="https://wa.me/6285788918217" target="_blank" class="contact-item">
+                <i class="fab fa-whatsapp"></i><span>WhatsApp</span>
+              </a>
+              <a href="#" target="_blank" class="contact-item">
+                <i class="fab fa-instagram"></i><span>Instagram</span>
+              </a>
+              <a href="#" target="_blank" class="contact-item">
+                <i class="fab fa-github"></i><span>GitHub</span>
+              </a>
+              <a href="#" target="_blank" class="contact-item">
+                <i class="fab fa-linkedin-in"></i><span>LinkedIn</span>
+              </a>
+              <a href="mailto:irfanrizkiaditri@gmail.com" class="contact-item">
+                <i class="fas fa-envelope"></i><span>Email</span>
+              </a>
+              <a href="#" class="contact-item">
+                <i class="fab fa-discord"></i><span>Discord</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <div class="about-popup-overlay" id="aboutPopup">
+    <div class="about-popup">
+      <button class="about-popup-close" id="aboutClose">
+        <i class="fas fa-times"></i>
+      </button>
+      <h2>About Me</h2>
+      <div class="about-popup-content">
+        <div class="about-text">
+          <p>Hello! I'm Irfan Rizki Aditri, but you can call me Fanra. I'm currently a Physics student at Institut Teknologi Sumatera (ITERA).</p>
+          <p>I have a deep passion for both physics and web development. I enjoy creating interactive simulations to visualize complex physics concepts and building games to apply my programming knowledge.</p>
+          <p>When I'm not studying or coding, you can find me exploring new technologies, reading about scientific discoveries, or experimenting with creative projects.</p>
+          <p>My goal is to bridge the gap between physics and technology by creating educational tools that make learning physics more engaging and accessible.</p>
+        </div>
+        <div>
+          <h3>Skills & Interests</h3>
+          <div class="about-skills">
+            <span class="skill-tag">Web Development</span>
+            <span class="skill-tag">Physics Simulations</span>
+            <span class="skill-tag">Game Development</span>
+            <span class="skill-tag">JavaScript</span>
+            <span class="skill-tag">Canvas API</span>
+            <span class="skill-tag">HTML/CSS</span>
+            <span class="skill-tag">Problem Solving</span>
+            <span class="skill-tag">Creative Coding</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <main>
+    <section class="hero">
+      <div class="container">
+        <div class="hero-grid">
+          <aside>
+            <div class="profile-panel">
+              <div class="profile-avatar" aria-hidden="true">
+                <img src="asset/profil.jpg.jpg" alt="Foto Irfan" onerror="this.style.display='none'">
+              </div>
+              <h3 style="margin:6px 0 4px;">Fanra</h3>
+              <div class="mini-links" style="justify-content:center;margin-top:8px;display:flex;gap:8px;flex-wrap:wrap;">
+                <a href="projects.html" class="chip" style="text-decoration:none;color:var(--muted);border:1px solid var(--card-border);padding:8px 10px;border-radius:8px;"><i class="fas fa-gamepad" style="margin-right:6px;"></i>Projects</a>
+                <a href="artikel.html" class="chip" style="text-decoration:none;color:var(--muted);border:1px solid var(--card-border);padding:8px 10px;border-radius:8px;"><i class="fas fa-book" style="margin-right:6px;"></i>Articles</a>
+              </div>
+              <br>
+              <div class="social" style="margin-top:12px; display:flex; justify-content:center; gap:12px;">
+                <a href="#" title="GitHub" style="color:var(--muted);"><i class="fab fa-github"></i></a>
+                <a href="#" title="Instagram" style="color:var(--muted);"><i class="fab fa-instagram"></i></a>
+                <a href="#" title="LinkedIn" style="color:var(--muted);"><i class="fab fa-linkedin-in"></i></a>
+              </div>
+            </div>
+          </aside>
+          <div class="hero-card" role="article" aria-labelledby="heroTitle">
+            <div class="kicker">Hello, I'm</div>
+            <h1 id="heroTitle">Irfan Rizki Aditri <span style="color:var(--accent)">(Fanra)</span></h1>
+            <p class="lead">Kenapa dipanggil Fanra? mau tau? tebak aja hehe. Gw merupakan mahasiswa di Institut Teknologi Sumatera dengan program studi Fisika. Dan mau tau kenapa gw memilih fisika? tebak aja lagi, hehe. </p>
+            <p class="lead">Jalanin aja dulu, siapa tahu ini jalan terbaik dari Tuhan. <strong>btw gw masih single T_T.</strong></p>
+            <div class="hero-stats" aria-hidden="true" style="margin-top:14px;">
+              <div class="stat"><div class="stat-num">Mahasiswa</div></div>
+              <div class="stat"><div class="stat-num">ITERA</div></div>
+              <div class="stat"><div class="stat-num">Creator</div></div>
+              <div class="stat"><div class="stat-num">Single</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="featured-projects">
+      <div class="container">
+        <div class="section-title">
+          <h2 id="featured-projects">Featured Projects</h2>
+          <p>Ringkasan singkat — klik untuk demo atau lihat semua projects.</p>
+        </div>
+        <div class="cards-grid" id="projectsPreview">
+          <article class="card project-preview">
+            <div class="card-head">
+              <div class="card-icon"><i class="fas fa-gamepad"></i></div>
+              <div>
+                <h3 style="margin:0;">Arcade Escape</h3>
+                <p style="color:var(--muted);margin-top:6px;">Game canvas: hindari obstacle, lawan bos dan kumpulkan poin.</p>
+              </div>
+            </div>
+            <br>
+            <div class="card-actions">
+              <a href="projects/awesome-game.html" class="btn btn-sm" role="button">Lihat</a>
+            </div>
+          </article>
+          <article class="card project-preview">
+            <div class="card-head">
+              <div class="card-icon"><i class="fas fa-calculator"></i></div>
+              <div>
+                <h3 style="margin:0;">Smart Calculator</h3>
+                <p style="color:var(--muted);margin-top:6px;">Kalkulator standar & fungsi ilmiah serta konversi mata uang.</p>
+              </div>
+            </div>
+            <br>
+            <div class="card-actions">
+              <a href="projects/smart-calculator.html" class="btn btn-sm" role="button">Lihat</a>
+            </div>
+          </article>
+          <article class="card project-preview">
+            <div class="card-head">
+              <div class="card-icon"><i class="fas fa-atom"></i></div>
+              <div>
+                <h3 style="margin:0;">Physics Sandbox</h3>
+                <p style="color:var(--muted);margin-top:6px;">Simulasi pendulum, visual interaktif untuk pembelajaran.</p>
+              </div>
+            </div>
+            <br>
+            <div class="card-actions">
+              <a href="projects/physics-sim.html" class="btn btn-sm" role="button">Lihat</a>
+            </div>
+          </article>
+        </div>
+        <br>
+        <div style="text-align:center;margin-top:18px;">
+          <a href="projects.html" class="btn">Explore Projects</a>
+        </div>
+      </div>
+    </section>    
+    <br>
+    <br>
+
+    <section class="section" aria-labelledby="featured-articles">
+      <div class="container">
+        <div class="section-title">
+          <h2 id="featured-articles">Latest Articles</h2>
+          <p>Ringkasan artikel terbaru — baca selengkapnya di halaman Articles.</p>
+        </div>
+        <div class="cards-grid" id="articlesPreview">
+          <article class="card article-preview">
+            <div class="card-head">
+              <div class="card-icon"><i class="fas fa-book-open"></i></div>
+              <div>
+                <h3 style="margin:0;">Simulasi Ayunan (Pendulum)</h3>
+                <p style="color:var(--muted);margin-top:6px;">Tutorial pembuatan simulasi ayunan dengan Canvas untuk belajar gerak harmonik.</p>
+              </div>
+            </div>
+            <div class="card-actions">
+              <a href="artikel.html" class="btn btn-sm">Baca Selengkapnya</a>
+            </div>
+          </article>
+          <article class="card article-preview">
+            <div class="card-head">
+              <div class="card-icon"><i class="fas fa-gamepad"></i></div>
+              <div>
+                <h3 style="margin:0;">Dari Nol: Struktur Game Sederhana</h3>
+                <p style="color:var(--muted);margin-top:6px;">Catatan proses pembuatan game 'Arcade Escape' & pelajaran teknis.</p>
+              </div>
+            </div>
+            <div class="card-actions">
+              <a href="artikel.html" class="btn btn-sm">Baca Selengkapnya</a>
+            </div>
+          </article>
+        </div>
+        <br>
+        <div style="text-align:center;margin-top:18px;">
+          <a href="artikel.html" class="btn">Explore Article</a> </div>
+      </div>
+    </section>
+    <br>
+    <br>
+
+    <section id="contact" class="section">
+      <div class="container">
+        <div class="section-title">
+          <h2 style="margin-bottom:3px;">Contact</h2>
+          <p style="margin-bottom:4px;">Reach out via email or socials — form is simulated.</p>
+        </div>
+        <div class="animated-contact-grid">
+          <div class="animated-contact-info">
+            <h3>Contact Info</h3>
+            <div class="contact-row-list">
+              <strong>Email:</strong>
+              <span style="color:var(--accent);font-size:1.03em;">
+                <i class="fas fa-envelope" style="margin-right:7px; color:var(--accent-2);"></i>
+                <span>irfanrizkiaditri@gmail.com</span>
+              </span>
+            </div>
+            <div class="contact-row-list">
+              <strong>Phone:</strong>
+              <span style="color:var(--accent);font-size:1.03em;">
+                <i class="fas fa-phone" style="margin-right:7px; color:var(--accent-2);"></i>
+                +62 857 8891 8217
+              </span>
+            </div>
+            <div class="contact-row-list">
+              <strong>Social:</strong>
+              <div class="contact-social-icons">
+                <a href="#" class="contact-social-icon-link" title="GitHub"><i class="fab fa-github"></i>GitHub</a>
+                <a href="#" class="contact-social-icon-link" title="Instagram"><i class="fab fa-instagram"></i>Instagram</a>
+                <a href="#" class="contact-social-icon-link" title="LinkedIn"><i class="fab fa-linkedin-in"></i>LinkedIn</a>
+                <a href="https://wa.me/6285788918217" class="contact-social-icon-link" title="WhatsApp"><i class="fab fa-whatsapp"></i>WhatsApp</a>
+                <a href="mailto:irfanrizkiaditri@gmail.com" class="contact-social-icon-link" title="Email"><i class="fas fa-envelope"></i>Email</a>
+              </div>
+            </div>
+          </div>
+          <div class="animated-contact-form">
+            <h3>Send a Message</h3>
+            <form id="animatedContactForm" autocomplete="off" novalidate>
+              <input type="text" name="name" class="form-control" placeholder="Name" required>
+              <input type="email" name="email" class="form-control" placeholder="Email" required>
+              <textarea name="message" class="form-control" placeholder="Message" rows="4" required></textarea>
+              <button type="submit" class="btn-send">Send</button>
+              <div id="contactFormMsg" class="contact-form-message"></div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container">
+      <p>&copy; 2025 Fanra (Irfan Rizki Aditri). All Rights Reserved.</p>
+    </div>
+  </footer>
+
+  <a href="#" id="backToTop" title="Back to top"><i class="fas fa-arrow-up"></i></a>
+
+  <script>
+    // THEME: save/load
+    const root = document.documentElement;
+    const toggle = document.getElementById('themeToggle');
+    const saved = localStorage.getItem('site_theme') || 'dark';
+    root.setAttribute('data-theme', saved);
+
+    function setTheme(t){
+      root.setAttribute('data-theme', t);
+      localStorage.setItem('site_theme', t);
+      toggle.setAttribute('aria-pressed', t === 'light');
+    }
+
+    toggle.addEventListener('click', () => {
+      const now = root.getAttribute('data-theme');
+      setTheme(now === 'light' ? 'dark' : 'light');
+    });
+
+    // back to top show/hide
+    const back = document.getElementById('backToTop');
+    window.addEventListener('scroll', () => {
+      if(window.scrollY > 320) back.style.display = 'inline-flex'; else back.style.display = 'none';
+    });
+    back.addEventListener('click', (e) => { e.preventDefault(); window.scrollTo({top:0, behavior:'smooth'}); });
+
+    // mobile hamburger menu
+    const hamburger = document.getElementById('hamburger');
+    const mobileMenu = document.getElementById('mobileMenu');
+    hamburger.addEventListener('click', () => {
+      const open = mobileMenu.classList.toggle('open');
+      hamburger.setAttribute('aria-expanded', open);
+      mobileMenu.setAttribute('aria-hidden', !open);
+    });
+
+    // Perbaikan: tambahkan 'if (mobileMenu)' untuk halaman yang mungkin tidak punya
+    document.addEventListener('click', (e) => {
+      if(mobileMenu && !mobileMenu.contains(e.target) && !hamburger.contains(e.target) && mobileMenu.classList.contains('open')){
+        mobileMenu.classList.remove('open');
+        hamburger.setAttribute('aria-expanded', 'false');
+        mobileMenu.setAttribute('aria-hidden', 'true');
+      }
+    });
+
+    // Improve focus state for theme toggle via keyboard
+    toggle.addEventListener('keyup', (e) => { if(e.key === 'Enter' || e.key === ' ') toggle.click(); });
+
+    // CONTACT POPUP
+    const contactBtn = document.getElementById("contactTrigger");
+    const contactPopup = document.getElementById("contactPopup");
+    contactBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      const isOpen = contactPopup.style.display === "block";
+      contactPopup.style.display = isOpen ? "none" : "block";
+    });
+    document.addEventListener("click", (e) => {
+      // Perbaikan: tambahkan 'if (contactPopup)'
+      if (contactPopup && !contactPopup.contains(e.target) && !contactBtn.contains(e.target)) {
+        contactPopup.style.display = "none";
+      }
+    });
+
+    // ABOUT POPUP (KODE BARU YANG SUDAH DIPERBAIKI)
+    const aboutTrigger = document.getElementById("aboutTrigger");
+    const mobileAboutTrigger = document.getElementById("mobileAboutTrigger");
+    const aboutPopup = document.getElementById("aboutPopup");
+    const aboutClose = document.getElementById("aboutClose");
+
+    function openAboutPopup() {
+      if (aboutPopup) aboutPopup.classList.add("active");
+      document.body.style.overflow = "hidden";
+    }
+
+    function closeAboutPopup() {
+      if (aboutPopup) aboutPopup.classList.remove("active");
+      document.body.style.overflow = "auto";
+    }
+
+    if (aboutTrigger) {
+      aboutTrigger.addEventListener("click", (e) => {
+        e.preventDefault();
+        openAboutPopup();
+      });
+    }
+    
+    if (mobileAboutTrigger) {
+      mobileAboutTrigger.addEventListener("click", (e) => {
+        e.preventDefault();
+        openAboutPopup();
+        if (mobileMenu) { // Pastikan mobileMenu ada
+          mobileMenu.classList.remove('open');
+          hamburger.setAttribute('aria-expanded', 'false');
+          mobileMenu.setAttribute('aria-hidden', 'true');
+        }
+      });
+    }
+    
+    if (aboutClose) {
+      aboutClose.addEventListener("click", closeAboutPopup);
+    }
+
+    // INI ADALAH BARIS YANG DIPERBAIKI (UNTUK BUG index.html)
+    document.addEventListener("click", (e) => {
+      if (aboutPopup && aboutPopup.classList.contains("active") && !aboutPopup.querySelector('.about-popup').contains(e.target) && e.target !== aboutTrigger && e.target !== mobileAboutTrigger) {
+        closeAboutPopup();
+      }
+    });
+
+    // Close popup with ESC key
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && aboutPopup && aboutPopup.classList.contains("active")) {
+        closeAboutPopup();
+      }
+    });
+
+    // Animated Contact Form Validation & Message (KHUSUS index.html)
+    const acForm = document.getElementById("animatedContactForm");
+    const formMsg = document.getElementById("contactFormMsg");
+    if(acForm){
+      acForm.addEventListener('submit', function(e){
+        e.preventDefault();
+        // Simple validate
+        let valid = true;
+        Array.from(acForm.elements).forEach(el => {
+          if((el.tagName==='INPUT'||el.tagName==='TEXTAREA')&&el.required){
+            if(!el.value.trim()){
+              el.classList.add('error');
+              valid = false;
+            } else {
+              el.classList.remove('error');
+            }
+          }
+        });
+        if(valid){
+          formMsg.textContent = "Pesan berhasil disimulasikan terkirim. Terima kasih!";
+          formMsg.style.opacity = "1";
+          acForm.reset();
+          setTimeout(()=>{
+            formMsg.style.opacity="0";
+            formMsg.textContent="";
+          },2300);
+        } else {
+          formMsg.textContent = "Mohon isi semua data dengan benar.";
+          formMsg.style.opacity = "1";
+          setTimeout(()=>{
+            formMsg.style.opacity="0";
+            formMsg.textContent="";
+          },1400);
+        }
+      });
+      acForm.querySelectorAll('.form-control').forEach((input)=>{
+        input.addEventListener('input',()=> input.classList.remove('error'));
+      });
+    }
+  </script>
+</body>
+</html>

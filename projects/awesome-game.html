@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Fanra Escape — Arcade Escape (Upgraded)</title>
+
+  <!-- icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --bg:#0d0d0f; --card:#141418; --text:#ffffff;
+  --accent:#4fa3ff; --accent-2:#7c3aed; --muted:#9da3b3;
+  --glass:rgba(255,255,255,0.06); --card-border:rgba(255,255,255,0.06);
+}
+[data-theme="light"]{
+  --bg:#f6f8fb; --card:#ffffff; --text:#0b1220;
+  --accent:#2563eb; --accent-2:#7c3aed; --muted:#6b7280;
+  --glass:rgba(0,0,0,0.05); --card-border:rgba(0,0,0,0.08);
+}
+
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Poppins',sans-serif;}
+body{background:var(--bg);color:var(--text);transition:.25s;}
+
+.container{width:min(94%,1200px);margin:auto;}
+
+/* HEADER */
+header{
+  position:sticky;top:0;width:100%;
+  background:linear-gradient(180deg,rgba(0,0,0,.35),transparent);
+  backdrop-filter:blur(12px);border-bottom:1px solid var(--card-border);
+  z-index:1500;animation:headerDrop .55s cubic-bezier(.2,.9,.2,1);
+}
+@keyframes headerDrop{from{opacity:0;transform:translateY(-20px)}to{opacity:1;transform:translateY(0)}}
+
+.navbar{display:flex;align-items:center;gap:14px;padding:14px 0;}
+.logo{display:flex;align-items:center;gap:10px;font-size:1.1rem;font-weight:700;}
+.logo i{color:var(--accent);} .logo span{color:var(--accent);}
+
+.nav-wrap{margin-left:auto;display:flex;align-items:center;gap:14px;}
+.nav-links{display:flex;gap:20px;list-style:none;}
+.nav-links a{padding:6px 10px;border-radius:8px;transition:.25s;}
+.nav-links a:hover,.nav-links .active{color:var(--accent);transform:translateY(-2px);}
+@media(max-width:700px){.nav-links{display:none;} .hamburger{display:inline-flex;}}
+
+.hamburger{display:none;background:none;border:0;color:var(--text);font-size:1.25rem;padding:6px;}
+.mobile-menu{display:none;position:absolute;right:14px;top:72px;background:var(--card);
+  border:1px solid var(--card-border);border-radius:14px;min-width:220px;padding:12px;
+  box-shadow:0 14px 28px rgba(0,0,0,.5);}
+.mobile-menu.open{display:block;}
+
+.theme-toggle{cursor:pointer;display:flex;align-items:center;}
+.switch{width:46px;height:26px;border-radius:20px;padding:3px;background:var(--glass);
+  border:1px solid var(--card-border);position:relative;}
+.knob{width:20px;height:20px;background:#fff;border-radius:50%;position:absolute;left:3px;top:3px;transition:.25s;}
+[data-theme="light"] .switch{background:linear-gradient(90deg,var(--accent),var(--accent-2));}
+[data-theme="light"] .knob{left:23px;}
+
+/* PAGE */
+main{padding:20px 0 60px;}
+.page-title h1{font-size:1.4rem;margin-bottom:4px;}
+.page-title p{color:var(--muted);}
+
+/* GAME CARD */
+.game-card{
+  background:var(--card);border:1px solid var(--card-border);
+  border-radius:16px;padding:16px;box-shadow:0 16px 40px rgba(0,0,0,.45);
+}
+.game-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
+
+.btn{background:var(--accent);color:#000;padding:10px 14px;border-radius:10px;font-weight:600;border:0;}
+.btn-outline{
+  background:rgba(255,255,255,0.03);color:var(--text);
+  border:1px solid var(--glass);padding:8px 12px;border-radius:8px;
+}
+.small{padding:6px 10px;font-size:.9rem;}
+
+.game-container{
+  background:#000;border-radius:12px;overflow:hidden;position:relative;
+  width:100%;
+  aspect-ratio: 800 / 480; /* hybrid mode */
+}
+canvas{width:100%;height:100%;display:block;touch-action:none;}
+
+.overlay{
+  position:absolute;inset:0;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;text-align:center;
+  padding:16px;background:rgba(0,0,0,.55);backdrop-filter:blur(6px);
+  transition:.25s;
+}
+.hidden{opacity:0;pointer-events:none;}
+.visible{opacity:1;}
+
+.panel{display:flex;gap:12px;flex-wrap:wrap;}
+.stat{background:var(--card);border:1px solid var(--card-border);padding:8px 12px;border-radius:8px;text-align:center;}
+.stat .label{color:var(--muted);font-size:.8rem;}
+.stat .value{color:var(--accent);font-weight:700;margin-top:4px;}
+
+.powerups{display:flex;gap:6px;}
+.picon{width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;background:#555;color:#fff;opacity:.5;}
+.picon.active{opacity:1;}
+
+#exitFull{display:none;position:absolute;top:10px;left:10px;z-index:200;}
+
+#fsMenu{
+  display:none;position:absolute;top:50px;right:12px;z-index:200;
+  background:rgba(0,0,0,.65);border-radius:8px;padding:8px;gap:6px;
+  border:1px solid rgba(255,255,255,0.1);
+}
+
+footer{text-align:center;padding:20px 0;color:var(--muted);margin-top:40px;}
+
+</style>
+</head>
+
+<body data-theme="dark">
+
+<!-- HEADER -->
+<header>
+  <div class="container">
+    <nav class="navbar">
+      <a class="logo" href="../index.html"><i class="fas fa-feather-alt"></i> irfanrizkiaditri<span>.</span>site</a>
+
+      <div class="nav-wrap">
+        <ul class="nav-links">
+          <li><a href="../index.html">Home</a></li>
+          <li><a href="../artikel.html">Articles</a></li>
+          <li><a class="active" href="../projects.html">Projects</a></li>
+        </ul>
+
+        <button class="hamburger" id="hamburger"><i class="fas fa-bars"></i></button>
+
+        <div class="theme-toggle" id="themeToggle">
+          <div class="switch"><div class="knob"></div></div>
+        </div>
+
+        <div class="mobile-menu" id="mobileMenu">
+          <a href="../index.html">Home</a>
+          <a href="../artikel.html">Articles</a>
+          <a href="../projects.html">Projects</a>
+        </div>
+      </div>
+    </nav>
+  </div>
+</header>
+
+<!-- MAIN -->
+<main class="container">
+  <div class="page-title">
+    <h1>Fanra Escape — Arcade Escape (Upgraded)</h1>
+    <p>Hindari obstacle, tembak musuh, kumpulkan ammo, lawan boss, dan capai skor tertinggi!</p>
+  </div>
+
+  <div class="game-card" id="gameCard">
+    <div class="game-top">
+      <div class="game-title" style="display:flex;gap:10px;align-items:center;">
+        <i class="fas fa-rocket" style="color:var(--accent);font-size:1.3rem;"></i>
+        <div>
+          <strong>Fanra Escape</strong>
+          <div style="font-size:.75rem;color:var(--muted)">Arcade — Reflex & Shooter</div>
+        </div>
+      </div>
+
+      <button id="fullscreenBtn" class="btn-outline small">▢</button>
+    </div>
+
+    <div class="game-container" id="gameBox">
+      <canvas id="gameCanvas" width="800" height="480"></canvas>
+
+      <button id="exitFull" class="btn-outline small">✕ Exit</button>
+
+      <div id="fsMenu">
+        <button id="fsElement" class="btn-outline small">Full Game</button>
+        <button id="fsDocument" class="btn-outline small">Full Page</button>
+      </div>
+
+      <!-- START SCREEN -->
+      <div id="startOverlay" class="overlay visible">
+        <h2 style="color:var(--accent);margin-bottom:6px;">FANRA ESCAPE</h2>
+        <p style="max-width:520px;color:var(--muted);margin-bottom:12px;">
+          Gunakan A / D atau ← → untuk bergerak, klik/tekan untuk menembak (jika punya ammo).
+        </p>
+
+        <div class="panel" style="margin-bottom:12px;">
+          <div class="stat"><div class="label">Control</div><div class="value">A / D</div></div>
+          <div class="stat"><div class="label">Mode</div><div class="value">Survive</div></div>
+        </div>
+
+        <button id="playBtn" class="btn">MAIN SEKARANG</button>
+        <button id="demoBtn" class="btn-outline small" style="margin-left:8px;">DEMO</button>
+      </div>
+
+      <!-- GAME OVER -->
+      <div id="overOverlay" class="overlay hidden">
+        <h2 style="color:#ef4444;margin-bottom:4px;">GAME OVER</h2>
+        <p style="color:var(--muted);">Skor: <strong id="finalScore">0</strong></p>
+        <p style="color:var(--muted);margin-bottom:10px;">Best: <strong id="finalBest">0</strong></p>
+
+        <button id="restartBtn" class="btn">MAIN LAGI</button>
+        <button id="reviveBtn" class="btn-outline" style="margin-left:8px;">LANJUT (Koin)</button>
+
+        <p id="reviveInfo" style="margin-top:10px;color:var(--muted);">
+          Koin: <strong id="coinCount">0</strong> — Harga revive: <strong id="reviveCost">0</strong>
+        </p>
+      </div>
+    </div>
+
+    <!-- HUD -->
+    <div style="margin-top:14px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+      <div class="panel">
+        <div class="stat"><div class="label">Score</div><div id="score" class="value">0</div></div>
+        <div class="stat"><div class="label">Best</div><div id="best" class="value">0</div></div>
+        <div class="stat"><div class="label">Lives</div><div id="lives" class="value">3</div></div>
+        <div class="stat"><div class="label">Coins</div><div id="coins" class="value">0</div></div>
+      </div>
+
+      <div class="panel">
+        <div class="stat"><div class="label">Level</div><div id="level" class="value">1</div></div>
+        <div class="stat"><div class="label">Ammo</div><div id="ammo" class="value">0</div></div>
+        <div class="stat"><div class="label">Boss HP</div><div id="bossHp" class="value">—</div></div>
+
+        <div class="powerups">
+          <div id="pSlow" class="picon" style="background:#34d399;">S</div>
+          <div id="pShield" class="picon" style="background:#60a5fa;">D</div>
+          <div id="pMult" class="picon" style="background:#f59e0b;">2x</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Controls -->
+    <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;">
+      <button id="startBtn" class="btn-outline small">Mulai</button>
+      <button id="pauseBtn" class="btn-outline small">Jeda</button>
+      <button id="resetBtn" class="btn-outline small">Reset</button>
+    </div>
+
+  </div>
+</main>
+
+<footer>© 2025 Fanra (Irfan Rizki Aditri) — Fanra Escape</footer>
+
+<!-- GAME SCRIPTS -->
+<script src="arcade-core.js"></script>
+<script src="arcade-ui.js"></script>
+
+<script>
+// Theme
+const themeToggle=document.getElementById("themeToggle");
+const saved=localStorage.getItem("site_theme")||"dark";
+document.documentElement.setAttribute("data-theme",saved);
+themeToggle.addEventListener("click",()=>{
+  const now=document.documentElement.getAttribute("data-theme")==="light"?"dark":"light";
+  document.documentElement.setAttribute("data-theme",now);
+  localStorage.setItem("site_theme",now);
+});
+
+// Mobile menu
+const hamburger=document.getElementById("hamburger");
+const mobileMenu=document.getElementById("mobileMenu");
+hamburger.addEventListener("click",()=>{
+  mobileMenu.classList.toggle("open");
+});
+
+// Fullscreen menu toggle
+const fsMenu=document.getElementById("fsMenu");
+const fullscreenBtn=document.getElementById("fullscreenBtn");
+fullscreenBtn.addEventListener("click",(e)=>{
+  e.stopPropagation();
+  fsMenu.style.display=fsMenu.style.display==="none"||fsMenu.style.display===""?"flex":"none";
+});
+document.addEventListener("click",(e)=>{
+  if(!fsMenu.contains(e.target)&&!fullscreenBtn.contains(e.target)){
+    fsMenu.style.display="none";
+  }
+});
+</script>
+
+</body>
+</html>

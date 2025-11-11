@@ -1,0 +1,686 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <title>Articles - Irfan Rizki Aditri (Fanra)</title>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    /* CSS KONSISTEN - Disalin dari index.html 
+      (Termasuk CSS untuk .about-popup-overlay, .contact-popup, dll)
+    */
+    :root{
+      --bg:#0d0d0f;
+      --card:#141418;
+      --text:#ffffff;
+      --accent:#4fa3ff;
+      --accent-2:#7c3aed;
+      --muted:#9da3b3;
+      --glass:rgba(255,255,255,0.06);
+      --card-border:rgba(255,255,255,0.06);
+    }
+    [data-theme="light"]{
+      --bg:#f6f8fb;
+      --card:#ffffff;
+      --text:#0b1220;
+      --accent:#2563eb;
+      --accent-2:#7c3aed;
+      --muted:#6b7280;
+      --glass:rgba(0,0,0,0.05);
+      --card-border:rgba(0,0,0,0.08);
+    }
+    html{
+      font-family:"Poppins",sans-serif;
+      font-size:clamp(14px,1.6vw,16px);
+      -webkit-font-smoothing: antialiased;
+      overflow-x:hidden;
+    }
+    *{ margin:0; padding:0; box-sizing:border-box; }
+    body{
+      background:var(--bg);
+      color:var(--text);
+      min-height:100vh;
+      transition:background .25s ease, color .25s ease;
+    }
+    a{ text-decoration:none; color:inherit; }
+    .container{
+      width:min(94%,1200px);
+      margin:0 auto;
+    }
+    header{
+      position:sticky;
+      top:0; left:0; width:100%;
+      backdrop-filter:blur(12px) saturate(1.5);
+      background:linear-gradient(180deg,rgba(0,0,0,0.35),transparent);
+      border-bottom:1px solid var(--card-border);
+      z-index:1500;
+      animation:headerDrop .55s cubic-bezier(.2,.9,.2,1);
+    }
+    @keyframes headerDrop{
+      from{ transform:translateY(-20px); opacity:0; }
+      to{ transform:translateY(0); opacity:1; }
+    }
+    .navbar{
+      display:flex; align-items:center;
+      gap:16px;
+      padding:16px 0;
+    }
+    .logo{
+      display:flex; align-items:center; gap:10px;
+      font-weight:700; font-size:1.15rem;
+      letter-spacing:.4px;
+    }
+    .logo i{ color:var(--accent); font-size:1.2rem; }
+    .logo span{ color:var(--accent); }
+    .nav-wrap{
+      margin-left:auto;
+      display:flex; align-items:center; gap:14px;
+    }
+    .nav-links{
+      display:flex; gap:20px;
+      list-style:none;
+    }
+    .nav-links a{
+      padding:6px 10px;
+      font-weight:500;
+      border-radius:8px;
+      position:relative;
+      transition:.25s;
+    }
+    .nav-links a:hover,
+    .nav-links .active{
+      color:var(--accent);
+      transform:translateY(-2px);
+    }
+    .nav-links a::after{
+      content:"";
+      position:absolute;
+      bottom:-2px; left:0;
+      width:0%; height:2px;
+      background:var(--accent);
+      border-radius:6px;
+      transition:.28s;
+    }
+    .nav-links a:hover::after,
+    .nav-links .active::after{
+      width:100%;
+    }
+    .theme-toggle{
+      cursor:pointer; display:flex; align-items:center;
+    }
+    .switch{
+      width:46px; height:26px;
+      background:var(--glass);
+      border:1px solid var(--card-border);
+      border-radius:20px;
+      position:relative; padding:3px;
+      backdrop-filter:blur(5px);
+    }
+    .knob{
+      width:20px; height:20px;
+      background:#fff; border-radius:50%;
+      position:absolute; top:3px; left:3px;
+      box-shadow:0 4px 12px rgba(0,0,0,0.3);
+      transition:.25s;
+    }
+    [data-theme="light"] .switch{
+      background:linear-gradient(90deg,var(--accent),var(--accent-2));
+    }
+    [data-theme="light"] .knob{ left:23px; }
+    .hamburger{
+      display:none;
+      background:none;
+      border:0;
+      font-size:1.25rem;
+      color:var(--text);
+      padding:6px;
+    }
+    .mobile-menu{
+      display:none;
+      position:absolute;
+      right:14px;
+      top:72px;
+      background:var(--card);
+      border:1px solid var(--card-border);
+      border-radius:14px;
+      min-width:220px;
+      padding:12px;
+      box-shadow:0 14px 28px rgba(0,0,0,0.5);
+      animation:fadeMenu .3s ease;
+    }
+    @keyframes fadeMenu{
+      from{ opacity:0; transform:translateY(-6px); }
+      to{ opacity:1; transform:translateY(0); }
+    }
+    .mobile-menu a{
+      display:block;
+      padding:10px;
+      border-radius:8px;
+      transition:.25s;
+      font-weight:500;
+    }
+    .mobile-menu a:hover{
+      background:rgba(255,255,255,0.06);
+    }
+    .mobile-menu.open{
+      display:block;
+    }
+    @media (max-width:700px){
+      .nav-links{ display:none; }
+      .hamburger{ display:inline-flex; }
+    }
+    
+    /* CSS HALAMAN ARTIKEL (dari file aslimu) */
+    .section{padding:44px 0;animation:fadeInUp .8s cubic-bezier(.21,.66,.19,1);}
+    @keyframes fadeInUp{
+      from{opacity:0;transform:translateY(32px);}
+      to{opacity:1;transform:translateY(0);}
+    }
+    .section-title{ text-align:center; margin-bottom:28px; animation:fadeInUp .9s cubic-bezier(.21,.66,.19,1);}
+    .section-title h2{font-size:1.62rem;font-weight:700;letter-spacing:.5px; margin-bottom:8px;}
+    .section-title p{color:var(--muted);font-size:1em;}
+    .cards-grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fit, minmax(270px, 1fr));
+      gap:26px;
+      margin-bottom:20px;
+      animation:fadeInUp .75s .17s cubic-bezier(.21,.66,.19,1) both;
+    }
+    .card{
+      background:var(--card);
+      padding:28px 22px;
+      border-radius:14px;
+      border:1px solid var(--card-border);
+      box-shadow:0 12px 30px rgba(0,0,0,0.09);
+      animation:cardAppear .7s forwards;
+      opacity:0;
+      min-height:120px;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+    }
+    .card:nth-child(1){animation-delay:.07s;}
+    .card:nth-child(2){animation-delay:.21s;}
+    .card:nth-child(3){animation-delay:.32s;}
+    @keyframes cardAppear{
+      from{opacity:0;transform:scale(.94) translateY(38px);}
+      to{opacity:1;transform:scale(1) translateY(0);}
+    }
+    .card-head {
+      display: flex; gap:15px; align-items:flex-start; margin-bottom:10px;
+      animation:fadeInLeft .7s cubic-bezier(.21,.66,.19,1);
+    }
+    @keyframes fadeInLeft{
+      from{opacity:0;transform:translateX(-46px);}
+      to{opacity:1;transform:translateX(0);}
+    }
+    .card-icon {
+      font-size:1.8rem; color:var(--accent); min-width:44px; display:flex; align-items:center; justify-content:center;
+      filter: drop-shadow(0 7px 14px rgba(124,58,237,0.10));
+      animation:iconBounce .38s;
+    }
+    @keyframes iconBounce{
+      0%{transform:scale(.82);}
+      55%{transform:scale(1.18);}
+      75%{transform:scale(0.97);}
+      100%{transform:scale(1);}
+    }
+    .muted{ color:var(--muted); font-size:.96em;}
+    .card-actions {
+      margin-top:18px;
+      animation:fadeInUp .52s .36s both;
+    }
+    .btn-sm {
+      background:linear-gradient(92deg,var(--accent),var(--accent-2));
+      color:#fff;
+      padding:10px 19px;
+      border-radius:9px;
+      font-weight:600;
+      display:inline-block;
+      box-shadow:0 5px 18px rgba(124,58,237,0.13);
+      font-size:1em;
+      transition:.22s cubic-bezier(0.45,0.07,0.5,1.13);
+    }
+    .btn-sm:hover{
+      background:var(--accent-2);
+      transform:scale(1.06) translateY(-2px);
+      box-shadow:0 10px 30px rgba(124,58,237,0.14);
+    }
+    .article-content-empty {
+      padding:56px 0 40px 0;
+      text-align:center;
+      max-width:600px;
+      margin:0 auto;
+      color:var(--muted);
+      animation:fadeInUp .9s .24s both;
+    }
+    .article-content-empty i {
+      font-size:3.2rem;
+      color:var(--accent-2);
+      margin-bottom:20px;
+      animation:iconBounce .62s;
+    }
+    .article-content-empty h3 {
+      margin:14px 0 8px 0;
+      font-size:1.36rem;color:var(--accent);font-weight:600;
+    }
+    .article-content-empty p {
+      color:var(--muted);
+      font-size:1.06em;
+      margin-bottom:12px;
+    }
+    #backToTop{
+      position:fixed; bottom:30px; right:20px;
+      background:var(--accent); padding:10px 12px;
+      border-radius:50%; color:#000;
+      display:none; z-index:1300;
+      box-shadow:0 10px 25px rgba(0,0,0,0.45);
+      animation:fadeInUp .7s cubic-bezier(.21,.66,.19,1);
+    }
+    footer{
+      text-align:center; padding:28px 0; color:var(--muted); font-size:.95rem;
+      animation:fadeInUp .7s cubic-bezier(.21,.66,.19,1);
+      margin-top:40px;
+    }
+    @media(max-width:700px){
+      .nav-links{display:none;}
+      .hamburger{display:inline-flex;}
+      .cards-grid{grid-template-columns:1fr;}
+      .card{padding:17px 6px;}
+      .section{padding:26px 0;}
+    }
+    @media(max-width:420px){
+      .card{padding:12px;}
+      .section-title h2{font-size:1.18rem;}
+      .article-content-empty{padding:28px 0 18px;}
+      .article-content-empty i{font-size:2.1rem;}
+    }
+    .mobile-menu.open{display:block;}
+    a:focus, button:focus, input:focus, textarea:focus { outline: 3px solid rgba(79,163,255,0.15); outline-offset:2px; border-radius:8px; }
+
+    /* CSS POPUP (Disalin dari index.html agar konsisten) */
+    .contact-popup {
+      position: absolute;
+      top: 68px;
+      right: 90px;
+      background: var(--card);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 14px;
+      display: none;
+      z-index: 2000;
+      animation: popupFade .22s ease;
+      box-shadow: 0 18px 38px rgba(0,0,0,0.4);
+      backdrop-filter: blur(14px) saturate(1.4);
+    }
+    @keyframes popupFade {
+      from { opacity: 0; transform: scale(.92) translateY(-4px); }
+      to   { opacity: 1; transform: scale(1) translateY(0); }
+    }
+    .contact-grid-popup {
+      display: grid;
+      grid-template-columns: repeat(3, 85px);
+      gap: 14px;
+    }
+    .contact-item {
+      background: var(--glass);
+      border: 1px solid var(--card-border);
+      padding: 10px;
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      color: var(--text);
+      transition: .25s;
+      font-size: .85rem;
+    }
+    .contact-item i {
+      font-size: 1.4rem;
+      margin-bottom: 6px;
+      color: var(--accent);
+    }
+    .contact-item:hover {
+      transform: translateY(-4px) scale(1.05);
+      background: rgba(255,255,255,0.08);
+    }
+    @media (max-width:700px){
+      .contact-popup {
+        right: 20px;
+      }
+      .contact-grid-popup {
+        grid-template-columns: repeat(3, 80px);
+      }
+    }
+    @media (max-width:480px){
+      .contact-grid-popup {
+        grid-template-columns: repeat(2, 100px);
+        gap: 16px;
+      }
+    }
+    .about-popup-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(10px);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 3000;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s ease, visibility 0.3s ease;
+    }
+    .about-popup-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+    .about-popup {
+      background: var(--card);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      width: 90%;
+      max-width: 800px;
+      max-height: 80vh;
+      overflow-y: auto;
+      padding: 30px;
+      position: relative;
+      transform: translateY(20px);
+      transition: transform 0.3s ease;
+    }
+    .about-popup-overlay.active .about-popup {
+      transform: translateY(0);
+    }
+    .about-popup-close {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      background: var(--glass);
+      border: 1px solid var(--card-border);
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .about-popup-close:hover {
+      background: var(--accent-2);
+      transform: rotate(90deg);
+    }
+    .about-popup h2 {
+      font-size: 1.8rem;
+      margin-bottom: 20px;
+      color: var(--accent);
+      text-align: center;
+    }
+    .about-popup-content {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 20px;
+    }
+    .about-text {
+      line-height: 1.6;
+      color: var(--text);
+    }
+    .about-text p {
+      margin-bottom: 15px;
+    }
+    .about-skills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 15px;
+    }
+    .skill-tag {
+      background: var(--glass);
+      border: 1px solid var(--card-border);
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 0.9rem;
+    }
+    @media (max-width: 600px) {
+      .about-popup {
+        width: 95%;
+        padding: 20px;
+      }
+      .about-popup h2 {
+        font-size: 1.5rem;
+      }
+    }
+  </style>
+</head>
+<body data-theme="dark">
+  
+  <header>
+    <div class="container">
+      <nav class="navbar" aria-label="Main navigation">
+        <a class="logo" href="index.html"><i class="fas fa-feather-alt"></i> irfanrizkiaditri<span>.</span>site</a>
+        <div class="nav-wrap" role="navigation">
+          <ul class="nav-links" id="navLinks" aria-hidden="false">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="artikel.html" class="active" aria-current="page">Articles</a></li>
+            <li><a href="projects.html">Projects</a></li>
+            <li><a href="uses.html">Uses</a></li>
+            <li><a href="komentar.html">Comment</a></li> 
+            <li><a href="#" id="aboutTrigger" class="about-trigger">About</a></li>
+            <li><a href="#" id="contactTrigger" class="contact-trigger">Contact <i class="fas fa-chevron-down" style="font-size:10px;"></i></a></li>
+          </ul>
+          <button class="hamburger" id="hamburger" aria-label="Buka menu" aria-expanded="false"><i class="fas fa-bars"></i></button>
+          <div class="theme-toggle" id="themeToggle" role="button" aria-pressed="false" tabindex="0" title="Toggle theme">
+            <div class="switch" aria-hidden="true"><div class="knob"></div></div>
+          </div>
+          <div class="mobile-menu" id="mobileMenu" aria-hidden="true">
+            <a href="index.html" style="display:block;padding:8px;border-radius:8px;">Home</a>
+            <a href="artikel.html" style="display:block;padding:8px;border-radius:8px;">Articles</a>
+            <a href="projects.html" style="display:block;padding:8px;border-radius:8px;">Projects</a>
+            <a href="uses.html" style="display:block;padding:8px;border-radius:8px;">Uses</a>
+            <a href="komentar.html" style="display:block;padding:8px;border-radius:8px;">Comment</a>
+            <a href="#" id="mobileAboutTrigger" style="display:block;padding:8px;border-radius:8px;">About</a>
+            <a href="#contact" style="display:block;padding:8px;border-radius:8px;">Contact</a>
+          </div>
+          <div class="contact-popup" id="contactPopup" aria-hidden="true">
+            <div class="contact-grid-popup">
+              <a href="https://wa.me/6285788918217" target="_blank" class="contact-item">
+                <i class="fab fa-whatsapp"></i><span>WhatsApp</span>
+              </a>
+              <a href="#" target="_blank" class="contact-item">
+                <i class="fab fa-instagram"></i><span>Instagram</span>
+              </a>
+              <a href="#" target="_blank" class="contact-item">
+                <i class="fab fa-github"></i><span>GitHub</span>
+              </a>
+              <a href="#" target="_blank" class="contact-item">
+                <i class="fab fa-linkedin-in"></i><span>LinkedIn</span>
+              </a>
+              <a href="mailto:irfanrizkiaditri@gmail.com" class="contact-item">
+                <i class="fas fa-envelope"></i><span>Email</span>
+              </a>
+              <a href="#" class="contact-item">
+                <i class="fab fa-discord"></i><span>Discord</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <div class="about-popup-overlay" id="aboutPopup">
+    <div class="about-popup">
+      <button class="about-popup-close" id="aboutClose">
+        <i class="fas fa-times"></i>
+      </button>
+      <h2>About Me</h2>
+      <div class="about-popup-content">
+        <div class="about-text">
+          <p>Hello! I'm Irfan Rizki Aditri...</p>
+          </div>
+        <div>
+          <h3>Skills & Interests</h3>
+          <div class="about-skills">
+            <span class="skill-tag">Web Development</span>
+            <span class="skill-tag">Physics Simulations</span>
+            </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <main>
+    <section class="section">
+      <div class="container">
+        <div class="section-title">
+          <h2>All Articles</h2>
+          <p class="muted">Daftar artikel — klik untuk membaca.</p>
+        </div>
+        <div class="cards-grid">
+          <article class="card">
+            <div class="card-head">
+              <div class="card-icon"><i class="fas fa-book-open"></i></div>
+              <div>
+                <h3><a href="fisika-komprehensif.html">Judul Artikel</a></h3>
+                <div class="muted">Tanggal — Penulis</div>
+              </div>
+            </div>
+            <p class="muted">Deskripsi singkat artikel ini. Gunakan artikel-template.html untuk mengisi detail konten nanti.</p>
+            <div class="card-actions">
+              <a href="fisika-komprehensif.html" class="btn-sm">Baca</a>
+            </div>
+          </article>
+          </div>
+      </div>
+    </section>
+
+    <section class="article-content-empty">
+      <i class="fas fa-file-alt"></i>
+      <h3>Kosong / Template Artikel</h3>
+      <p>Belum ada konten artikel. Silakan tambahkan isi di sini nanti.</p>
+    </section>
+  </main>
+
+  <footer>
+    <p>&copy; 2025 Fanra (Irfan Rizki Aditri). All Rights Reserved.</p>
+  </footer>
+
+  <a href="#" id="backToTop"><i class="fas fa-arrow-up"></i></a>
+  
+  <script>
+    // THEME: save/load
+    const root = document.documentElement;
+    const toggle = document.getElementById('themeToggle');
+    const saved = localStorage.getItem('site_theme') || 'dark';
+    root.setAttribute('data-theme', saved);
+
+    function setTheme(t){
+      root.setAttribute('data-theme', t);
+      localStorage.setItem('site_theme', t);
+      toggle.setAttribute('aria-pressed', t === 'light');
+    }
+
+    toggle.addEventListener('click', () => {
+      const now = root.getAttribute('data-theme');
+      setTheme(now === 'light' ? 'dark' : 'light');
+    });
+
+    // back to top show/hide
+    const back = document.getElementById('backToTop');
+    window.addEventListener('scroll', () => {
+      if(window.scrollY > 320) back.style.display = 'inline-flex'; else back.style.display = 'none';
+    });
+    back.addEventListener('click', (e) => { e.preventDefault(); window.scrollTo({top:0, behavior:'smooth'}); });
+
+    // mobile hamburger menu
+    const hamburger = document.getElementById('hamburger');
+    const mobileMenu = document.getElementById('mobileMenu');
+    hamburger.addEventListener('click', () => {
+      const open = mobileMenu.classList.toggle('open');
+      hamburger.setAttribute('aria-expanded', open);
+      mobileMenu.setAttribute('aria-hidden', !open);
+    });
+
+    document.addEventListener('click', (e) => {
+      if(mobileMenu && !mobileMenu.contains(e.target) && !hamburger.contains(e.target) && mobileMenu.classList.contains('open')){
+        mobileMenu.classList.remove('open');
+        hamburger.setAttribute('aria-expanded', 'false');
+        mobileMenu.setAttribute('aria-hidden', 'true');
+      }
+    });
+
+    // Improve focus state for theme toggle via keyboard
+    toggle.addEventListener('keyup', (e) => { if(e.key === 'Enter' || e.key === ' ') toggle.click(); });
+
+    // CONTACT POPUP
+    const contactBtn = document.getElementById("contactTrigger");
+    const contactPopup = document.getElementById("contactPopup");
+    contactBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      const isOpen = contactPopup.style.display === "block";
+      contactPopup.style.display = isOpen ? "none" : "block";
+    });
+    document.addEventListener("click", (e) => {
+      if (contactPopup && !contactPopup.contains(e.target) && !contactBtn.contains(e.target)) {
+        contactPopup.style.display = "none";
+      }
+    });
+
+    // ABOUT POPUP (KODE BARU YANG SUDAH DIPERBAIKI)
+    const aboutTrigger = document.getElementById("aboutTrigger");
+    const mobileAboutTrigger = document.getElementById("mobileAboutTrigger");
+    const aboutPopup = document.getElementById("aboutPopup");
+    const aboutClose = document.getElementById("aboutClose");
+
+    function openAboutPopup() {
+      if (aboutPopup) aboutPopup.classList.add("active");
+      document.body.style.overflow = "hidden";
+    }
+
+    function closeAboutPopup() {
+      if (aboutPopup) aboutPopup.classList.remove("active");
+      document.body.style.overflow = "auto";
+    }
+
+    if (aboutTrigger) {
+      aboutTrigger.addEventListener("click", (e) => {
+        e.preventDefault();
+        openAboutPopup();
+      });
+    }
+    
+    if (mobileAboutTrigger) {
+      mobileAboutTrigger.addEventListener("click", (e) => {
+        e.preventDefault();
+        openAboutPopup();
+        if (mobileMenu) {
+          mobileMenu.classList.remove('open');
+          hamburger.setAttribute('aria-expanded', 'false');
+          mobileMenu.setAttribute('aria-hidden', 'true');
+        }
+      });
+    }
+    
+    if (aboutClose) {
+      aboutClose.addEventListener("click", closeAboutPopup);
+    }
+
+    document.addEventListener("click", (e) => {
+      if (aboutPopup && aboutPopup.classList.contains("active") && !aboutPopup.querySelector('.about-popup').contains(e.target) && e.target !== aboutTrigger && e.target !== mobileAboutTrigger) {
+        closeAboutPopup();
+      }
+    });
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && aboutPopup && aboutPopup.classList.contains("active")) {
+        closeAboutPopup();
+      }
+    });
+  </script>
+</body>
+</html>

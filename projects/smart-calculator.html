@@ -1,0 +1,1453 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <title>Smart Calculator — irfanrizkiaditri.site</title>
+  
+  <!-- Fonts & Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --bg: #0d0d0f;
+      --card: #141418;
+      --text: #ffffff;
+      --accent: #4fa3ff;
+      --accent-2: #7c3aed;
+      --muted: #9da3b3;
+      --glass: rgba(255,255,255,0.06);
+      --card-border: rgba(255,255,255,0.06);
+      --success: #10b981;
+      --danger: #ef4444;
+      --warning: #f59e0b;
+    }
+    
+    [data-theme="light"] {
+      --bg: #f6f8fb;
+      --card: #ffffff;
+      --text: #0b1220;
+      --accent: #2563eb;
+      --accent-2: #7c3aed;
+      --muted: #6b7280;
+      --glass: rgba(0,0,0,0.05);
+      --card-border: rgba(0,0,0,0.08);
+      --success: #10b981;
+      --danger: #ef4444;
+      --warning: #f59e0b;
+    }
+    
+    html {
+      font-family: "Poppins", sans-serif;
+      font-size: clamp(14px, 1.6vw, 16px);
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      transition: background 0.25s ease, color 0.25s ease;
+      line-height: 1.6;
+    }
+    
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+    
+    .container {
+      width: min(94%, 1200px);
+      margin: 0 auto;
+    }
+    
+    /* HEADER */
+    header {
+      position: sticky;
+      top: 0;
+      left: 0;
+      width: 100%;
+      backdrop-filter: blur(12px) saturate(1.5);
+      background: linear-gradient(180deg, rgba(0,0,0,0.35), transparent);
+      border-bottom: 1px solid var(--card-border);
+      z-index: 1500;
+      animation: headerDrop 0.55s cubic-bezier(0.2, 0.9, 0.2, 1);
+    }
+    
+    @keyframes headerDrop {
+      from {
+        transform: translateY(-20px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+    
+    .navbar {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 16px 0;
+    }
+    
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 700;
+      font-size: 1.15rem;
+      letter-spacing: 0.4px;
+    }
+    
+    .logo i {
+      color: var(--accent);
+      font-size: 1.2rem;
+    }
+    
+    .logo span {
+      color: var(--accent);
+    }
+    
+    .nav-wrap {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    
+    .nav-links {
+      display: flex;
+      gap: 20px;
+      list-style: none;
+    }
+    
+    .nav-links a {
+      padding: 6px 10px;
+      font-weight: 500;
+      border-radius: 8px;
+      position: relative;
+      transition: 0.25s;
+    }
+    
+    .nav-links a:hover,
+    .nav-links .active {
+      color: var(--accent);
+      transform: translateY(-2px);
+    }
+    
+    .nav-links a::after {
+      content: "";
+      position: absolute;
+      bottom: -2px;
+      left: 0;
+      width: 0%;
+      height: 2px;
+      background: var(--accent);
+      border-radius: 6px;
+      transition: 0.28s;
+    }
+    
+    .nav-links a:hover::after,
+    .nav-links .active::after {
+      width: 100%;
+    }
+    
+    .theme-toggle {
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+    }
+    
+    .switch {
+      width: 46px;
+      height: 26px;
+      background: var(--glass);
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      position: relative;
+      padding: 3px;
+      backdrop-filter: blur(5px);
+    }
+    
+    .knob {
+      width: 20px;
+      height: 20px;
+      background: #fff;
+      border-radius: 50%;
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      transition: 0.25s;
+    }
+    
+    [data-theme="light"] .switch {
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+    }
+    
+    [data-theme="light"] .knob {
+      left: 23px;
+    }
+    
+    .hamburger {
+      display: none;
+      background: none;
+      border: 0;
+      font-size: 1.25rem;
+      color: var(--text);
+      padding: 6px;
+    }
+    
+    .mobile-menu {
+      display: none;
+      position: absolute;
+      right: 14px;
+      top: 72px;
+      background: var(--card);
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
+      min-width: 220px;
+      padding: 12px;
+      box-shadow: 0 14px 28px rgba(0, 0, 0, 0.5);
+      animation: fadeMenu 0.3s ease;
+    }
+    
+    .mobile-menu a {
+      display: block;
+      padding: 10px;
+      border-radius: 8px;
+      transition: 0.25s;
+      font-weight: 500;
+    }
+    
+    .mobile-menu.open {
+      display: block;
+    }
+    
+    @keyframes fadeMenu {
+      from {
+        opacity: 0;
+        transform: translateY(-6px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    @media (max-width: 700px) {
+      .nav-links {
+        display: none;
+      }
+      .hamburger {
+        display: inline-flex;
+      }
+    }
+    
+    /* MAIN CONTENT */
+    main {
+      padding: 40px 0;
+    }
+    
+    .section-title {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+    
+    .section-title h2 {
+      font-size: 1.8rem;
+      margin-bottom: 6px;
+    }
+    
+    .section-title p {
+      color: var(--muted);
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    
+    /* CALCULATOR STYLES */
+    .calculator-container {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+    
+    .calculator-card {
+      background: var(--card);
+      border: 1px solid var(--card-border);
+      border-radius: 18px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35);
+      backdrop-filter: blur(8px);
+      padding: 24px;
+      transition: 0.25s ease;
+    }
+    
+    .calculator-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    
+    .calculator-title {
+      font-size: 1.5rem;
+      font-weight: 600;
+    }
+    
+    .mode-toggle {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    
+    .mode-btn {
+      flex: 1;
+      padding: 12px;
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      background: var(--glass);
+      cursor: pointer;
+      text-align: center;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+    
+    .mode-btn.active {
+      background: var(--accent);
+      color: white;
+      border-color: var(--accent);
+    }
+    
+    .calculator-display {
+      background: var(--card);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 20px;
+      min-height: 120px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+    
+    .calculator-expression {
+      font-size: 1.2rem;
+      color: var(--muted);
+      min-height: 24px;
+      word-break: break-all;
+      text-align: right;
+      overflow: hidden;
+    }
+    
+    .calculator-result {
+      font-size: 2.2rem;
+      font-weight: 600;
+      min-height: 48px;
+      text-align: right;
+      overflow: hidden;
+    }
+    
+    .calculator-buttons {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+    
+    .calculator-btn {
+      padding: 16px 0;
+      border: none;
+      border-radius: 12px;
+      font-size: 1.1rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      background: var(--glass);
+      color: var(--text);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    }
+    
+    .calculator-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+    }
+    
+    .calculator-btn:active {
+      transform: translateY(0);
+    }
+    
+    .calculator-btn.operator {
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      color: white;
+    }
+    
+    .calculator-btn.function {
+      background: var(--glass);
+      color: var(--accent);
+    }
+    
+    .calculator-btn.equals {
+      background: linear-gradient(135deg, var(--success), #059669);
+      color: white;
+    }
+    
+    .calculator-btn.clear {
+      background: linear-gradient(135deg, var(--danger), #dc2626);
+      color: white;
+    }
+    
+    .calculator-btn.wide {
+      grid-column: span 2;
+    }
+    
+    .scientific-panel {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 12px;
+      margin-top: 20px;
+      display: none;
+    }
+    
+    .scientific-panel.active {
+      display: grid;
+    }
+    
+    .error-message {
+      color: var(--danger);
+      background: rgba(239, 68, 68, 0.1);
+      padding: 12px;
+      border-radius: 12px;
+      margin-top: 15px;
+      text-align: center;
+      display: none;
+    }
+    
+    /* CURRENCY CONVERTER */
+    .currency-converter {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    
+    .currency-row {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+    
+    .currency-input {
+      flex: 1;
+      padding: 14px;
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      background: var(--glass);
+      color: var(--text);
+      font-size: 1rem;
+    }
+    
+    .currency-select {
+      flex: 1;
+      padding: 14px;
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      background: var(--glass);
+      color: var(--text);
+      font-size: 1rem;
+    }
+    
+    .convert-btn {
+      padding: 14px;
+      border: none;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+    
+    .convert-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
+    }
+    
+    .currency-result {
+      background: var(--glass);
+      padding: 16px;
+      border-radius: 12px;
+      text-align: center;
+      font-size: 1.3rem;
+      font-weight: 600;
+      min-height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .currency-info {
+      font-size: 0.85rem;
+      color: var(--muted);
+      text-align: center;
+      margin-top: 10px;
+    }
+    
+    /* HISTORY */
+    .history-list {
+      max-height: 300px;
+      overflow-y: auto;
+      padding-right: 8px;
+    }
+    
+    .history-list::-webkit-scrollbar {
+      width: 8px;
+    }
+    
+    .history-list::-webkit-scrollbar-track {
+      background: var(--glass);
+      border-radius: 4px;
+    }
+    
+    .history-list::-webkit-scrollbar-thumb {
+      background: var(--accent);
+      border-radius: 4px;
+    }
+    
+    .history-item {
+      padding: 14px;
+      border-bottom: 1px solid var(--card-border);
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    
+    .history-item:hover {
+      background: var(--glass);
+    }
+    
+    .history-expression {
+      font-weight: 500;
+      margin-bottom: 4px;
+    }
+    
+    .history-result {
+      color: var(--accent);
+      font-weight: 600;
+    }
+    
+    .clear-history-btn {
+      padding: 12px;
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      background: var(--glass);
+      color: var(--text);
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-top: 15px;
+    }
+    
+    /* CONSTANTS */
+    .constants-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+    
+    .constant-btn {
+      padding: 14px;
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      background: var(--glass);
+      color: var(--text);
+      cursor: pointer;
+      transition: all 0.2s;
+      text-align: center;
+    }
+    
+    .constant-btn:hover {
+      background: var(--accent);
+      color: white;
+      transform: translateY(-2px);
+    }
+    
+    /* TABS */
+    .calculator-tabs {
+      display: flex;
+      border-bottom: 1px solid var(--card-border);
+      margin-bottom: 20px;
+    }
+    
+    .calculator-tab {
+      padding: 12px 16px;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: all 0.2s;
+      font-weight: 500;
+    }
+    
+    .calculator-tab.active {
+      border-bottom-color: var(--accent);
+      color: var(--accent);
+    }
+    
+    .tab-content {
+      display: none;
+    }
+    
+    .tab-content.active {
+      display: block;
+      animation: fadeIn 0.3s ease;
+    }
+    
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    /* FOOTER */
+    footer {
+      margin-top: 40px;
+      padding: 20px 0;
+      text-align: center;
+      color: var(--muted);
+    }
+    
+    #backToTop {
+      position: fixed;
+      right: 16px;
+      bottom: 16px;
+      background: var(--accent);
+      color: white;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+      z-index: 100;
+    }
+    
+    @media (max-width: 768px) {
+      .calculator-buttons {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 10px;
+      }
+      
+      .calculator-btn {
+        padding: 14px 0;
+        font-size: 1rem;
+      }
+      
+      .scientific-panel {
+        grid-template-columns: repeat(4, 1fr);
+      }
+      
+      .constants-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .calculator-buttons {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 8px;
+      }
+      
+      .calculator-btn {
+        padding: 12px 0;
+        font-size: 0.9rem;
+      }
+      
+      .scientific-panel {
+        grid-template-columns: repeat(3, 1fr);
+      }
+      
+      .constants-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+  </style>
+</head>
+
+<body data-theme="dark">
+  <header>
+    <div class="container">
+      <nav class="navbar">
+        <a href="#" class="logo">
+          <i class="fas fa-calculator"></i> 
+          irfanrizkiaditri<span>.</span>site
+        </a>
+
+        <div class="nav-wrap">
+          <ul class="nav-links">
+            <li><a href="#" class="active">Calculator</a></li>
+            <li><a href="#currency">Currency</a></li>
+            <li><a href="#history">History</a></li>
+            <li><a href="#constants">Constants</a></li>
+          </ul>
+
+          <button class="hamburger" id="hamburger">
+            <i class="fas fa-bars"></i>
+          </button>
+
+          <div class="theme-toggle" id="themeToggle">
+            <div class="switch"><div class="knob"></div></div>
+          </div>
+
+          <div class="mobile-menu" id="mobileMenu">
+            <a href="#" class="active">Calculator</a>
+            <a href="#currency">Currency</a>
+            <a href="#history">History</a>
+            <a href="#constants">Constants</a>
+          </div>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <div class="container">
+      <section class="section-title">
+        <h2>Smart Calculator</h2>
+        <p>Advanced calculator with scientific functions, currency conversion, and calculation history</p>
+      </section>
+
+      <div class="calculator-container">
+        <div class="calculator-card">
+          <div class="calculator-header">
+            <div class="calculator-title">Calculator</div>
+            <div class="theme-toggle" id="calcThemeToggle">
+              <div class="switch"><div class="knob"></div></div>
+            </div>
+          </div>
+
+          <div class="mode-toggle">
+            <div class="mode-btn active" data-mode="basic">Basic</div>
+            <div class="mode-btn" data-mode="scientific">Scientific</div>
+          </div>
+
+          <div class="calculator-display">
+            <div class="calculator-expression" id="expressionDisplay"></div>
+            <div class="calculator-result" id="resultDisplay">0</div>
+          </div>
+
+          <div class="calculator-buttons" id="basicButtons">
+            <button class="calculator-btn clear" data-action="clear">C</button>
+            <button class="calculator-btn clear" data-action="clear-entry">CE</button>
+            <button class="calculator-btn function" data-action="backspace">⌫</button>
+            <button class="calculator-btn operator" data-action="/">÷</button>
+
+            <button class="calculator-btn" data-number="7">7</button>
+            <button class="calculator-btn" data-number="8">8</button>
+            <button class="calculator-btn" data-number="9">9</button>
+            <button class="calculator-btn operator" data-action="*">×</button>
+
+            <button class="calculator-btn" data-number="4">4</button>
+            <button class="calculator-btn" data-number="5">5</button>
+            <button class="calculator-btn" data-number="6">6</button>
+            <button class="calculator-btn operator" data-action="-">−</button>
+
+            <button class="calculator-btn" data-number="1">1</button>
+            <button class="calculator-btn" data-number="2">2</button>
+            <button class="calculator-btn" data-number="3">3</button>
+            <button class="calculator-btn operator" data-action="+">+</button>
+
+            <button class="calculator-btn wide" data-number="0">0</button>
+            <button class="calculator-btn" data-action=".">.</button>
+            <button class="calculator-btn equals" data-action="=">=</button>
+          </div>
+
+          <div class="scientific-panel" id="scientificButtons">
+            <button class="calculator-btn function" data-func="sin">sin</button>
+            <button class="calculator-btn function" data-func="cos">cos</button>
+            <button class="calculator-btn function" data-func="tan">tan</button>
+            <button class="calculator-btn function" data-func="log">log</button>
+            <button class="calculator-btn function" data-func="ln">ln</button>
+
+            <button class="calculator-btn function" data-func="asin">asin</button>
+            <button class="calculator-btn function" data-func="acos">acos</button>
+            <button class="calculator-btn function" data-func="atan">atan</button>
+            <button class="calculator-btn function" data-func="sqrt">√</button>
+            <button class="calculator-btn function" data-func="pow">x^y</button>
+
+            <button class="calculator-btn function" data-func="pi">π</button>
+            <button class="calculator-btn function" data-func="e">e</button>
+            <button class="calculator-btn function" data-func="fact">x!</button>
+            <button class="calculator-btn function" data-func="percent">%</button>
+            <button class="calculator-btn function" data-func="abs">|x|</button>
+
+            <button class="calculator-btn function" data-func="(">(</button>
+            <button class="calculator-btn function" data-func=")">)</button>
+            <button class="calculator-btn function" data-func="deg">deg</button>
+            <button class="calculator-btn function" data-func="rad">rad</button>
+            <button class="calculator-btn function" data-func="rand">rand</button>
+          </div>
+
+          <div class="error-message" id="errorMessage"></div>
+        </div>
+
+        <div class="calculator-card">
+          <div class="calculator-tabs">
+            <div class="calculator-tab active" data-tab="currency">Currency Converter</div>
+            <div class="calculator-tab" data-tab="history">Calculation History</div>
+            <div class="calculator-tab" data-tab="constants">Constants</div>
+          </div>
+
+          <div class="tab-content active" id="currencyTab">
+            <div class="currency-converter">
+              <div class="currency-row">
+                <input type="number" class="currency-input" id="currencyAmount" placeholder="Amount" value="1">
+                <select class="currency-select" id="fromCurrency">
+                  <option value="USD">USD - US Dollar</option>
+                  <option value="EUR">EUR - Euro</option>
+                  <option value="GBP">GBP - British Pound</option>
+                  <option value="JPY">JPY - Japanese Yen</option>
+                  <option value="CNY">CNY - Chinese Yuan</option>
+                  <option value="IDR">IDR - Indonesian Rupiah</option>
+                  <!-- More currencies will be loaded via JavaScript -->
+                </select>
+              </div>
+              <div class="currency-row">
+                <input type="text" class="currency-input" id="currencyResult" placeholder="Result" readonly>
+                <select class="currency-select" id="toCurrency">
+                  <option value="IDR">IDR - Indonesian Rupiah</option>
+                  <option value="USD">USD - US Dollar</option>
+                  <option value="EUR">EUR - Euro</option>
+                  <option value="GBP">GBP - British Pound</option>
+                  <option value="JPY">JPY - Japanese Yen</option>
+                  <option value="CNY">CNY - Chinese Yuan</option>
+                  <!-- More currencies will be loaded via JavaScript -->
+                </select>
+              </div>
+              <button class="convert-btn" id="convertBtn">Convert</button>
+              <div class="currency-result" id="currencyResultDisplay">1.00 USD = 15,500.00 IDR</div>
+              <div class="currency-info" id="exchangeInfo">Exchange rates updated: <span id="exchangeDate">Loading...</span></div>
+            </div>
+          </div>
+
+          <div class="tab-content" id="historyTab">
+            <div class="history-list" id="historyList">
+              <!-- History items will be loaded here -->
+            </div>
+            <button class="clear-history-btn" id="clearHistory">Clear History</button>
+          </div>
+
+          <div class="tab-content" id="constantsTab">
+            <div class="constants-grid">
+              <button class="constant-btn" data-constant="pi">π ≈ 3.1416</button>
+              <button class="constant-btn" data-constant="e">e ≈ 2.7183</button>
+              <button class="constant-btn" data-constant="phi">φ ≈ 1.6180</button>
+              <button class="constant-btn" data-constant="sqrt2">√2 ≈ 1.4142</button>
+              <button class="constant-btn" data-constant="sqrt3">√3 ≈ 1.7321</button>
+              <button class="constant-btn" data-constant="c">c = 3×10⁸ m/s</button>
+              <button class="constant-btn" data-constant="g">g ≈ 9.81 m/s²</button>
+              <button class="constant-btn" data-constant="h">h = 6.626×10⁻³⁴ J·s</button>
+              <button class="constant-btn" data-constant="G">G = 6.674×10⁻¹¹ N·m²/kg²</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <div class="container">
+      <p>&copy; 2025 irfanrizkiaditri.site. All Rights Reserved.</p>
+    </div>
+  </footer>
+
+  <a href="#" id="backToTop" title="Back to top"><i class="fas fa-arrow-up"></i></a>
+
+  <script>
+    // Initialize the calculator
+    (function() {
+      // DOM Elements
+      const expressionDisplay = document.getElementById('expressionDisplay');
+      const resultDisplay = document.getElementById('resultDisplay');
+      const errorMessage = document.getElementById('errorMessage');
+      const basicButtons = document.getElementById('basicButtons');
+      const scientificButtons = document.getElementById('scientificButtons');
+      const modeButtons = document.querySelectorAll('.mode-btn');
+      const tabs = document.querySelectorAll('.calculator-tab');
+      const tabContents = document.querySelectorAll('.tab-content');
+      const historyList = document.getElementById('historyList');
+      const clearHistoryBtn = document.getElementById('clearHistory');
+      const convertBtn = document.getElementById('convertBtn');
+      const themeToggle = document.getElementById('themeToggle');
+      const calcThemeToggle = document.getElementById('calcThemeToggle');
+      const currencyAmount = document.getElementById('currencyAmount');
+      const fromCurrency = document.getElementById('fromCurrency');
+      const toCurrency = document.getElementById('toCurrency');
+      const currencyResultDisplay = document.getElementById('currencyResultDisplay');
+      const exchangeDate = document.getElementById('exchangeDate');
+      
+      // State variables
+      let currentExpression = '';
+      let currentResult = '0';
+      let isScientificMode = false;
+      let useRadians = true;
+      let calculationHistory = JSON.parse(localStorage.getItem('calculator_history') || '[]');
+      let exchangeRates = {};
+      
+      // Initialize the app
+      function init() {
+        renderHistory();
+        setupEventListeners();
+        loadExchangeRates();
+        loadCurrencies();
+      }
+      
+      // Set up all event listeners
+      function setupEventListeners() {
+        // Mode buttons
+        modeButtons.forEach(btn => {
+          btn.addEventListener('click', () => {
+            modeButtons.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            isScientificMode = btn.dataset.mode === 'scientific';
+            scientificButtons.classList.toggle('active', isScientificMode);
+          });
+        });
+        
+        // Tabs
+        tabs.forEach(tab => {
+          tab.addEventListener('click', () => {
+            const tabId = tab.dataset.tab;
+            tabs.forEach(t => t.classList.remove('active'));
+            tabContents.forEach(c => c.classList.remove('active'));
+            tab.classList.add('active');
+            document.getElementById(`${tabId}Tab`).classList.add('active');
+            
+            // Scroll to the section
+            document.querySelector(`#${tabId}Tab`).scrollIntoView({ 
+              behavior: 'smooth', 
+              block: 'start' 
+            });
+          });
+        });
+        
+        // Basic calculator buttons
+        basicButtons.addEventListener('click', (e) => {
+          if (!e.target.matches('.calculator-btn')) return;
+          const action = e.target.dataset.action;
+          const number = e.target.dataset.number;
+          if (number !== undefined) appendNumber(number);
+          else handleAction(action);
+        });
+        
+        // Scientific calculator buttons
+        scientificButtons.addEventListener('click', (e) => {
+          if (!e.target.matches('.calculator-btn')) return;
+          const func = e.target.dataset.func;
+          if (func) appendFunction(func);
+        });
+        
+        // Constants buttons
+        document.querySelectorAll('.constant-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const constant = btn.dataset.constant;
+            appendConstant(constant);
+          });
+        });
+        
+        // History buttons
+        clearHistoryBtn.addEventListener('click', () => {
+          calculationHistory = [];
+          localStorage.setItem('calculator_history', JSON.stringify(calculationHistory));
+          renderHistory();
+        });
+        
+        // Currency conversion
+        convertBtn.addEventListener('click', convertCurrency);
+        currencyAmount.addEventListener('input', convertCurrency);
+        fromCurrency.addEventListener('change', convertCurrency);
+        toCurrency.addEventListener('change', convertCurrency);
+        
+        // Theme toggles
+        themeToggle.addEventListener('click', toggleTheme);
+        calcThemeToggle.addEventListener('click', toggleTheme);
+        
+        // Back to top button
+        const backToTop = document.getElementById('backToTop');
+        window.addEventListener('scroll', () => {
+          backToTop.style.display = window.scrollY > 300 ? 'flex' : 'none';
+        });
+        
+        backToTop.addEventListener('click', (e) => {
+          e.preventDefault();
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+        
+        // Hamburger menu
+        const hamburger = document.getElementById('hamburger');
+        const mobileMenu = document.getElementById('mobileMenu');
+        
+        hamburger.addEventListener('click', () => {
+          mobileMenu.classList.toggle('open');
+        });
+        
+        document.addEventListener('click', (e) => {
+          if (!mobileMenu.contains(e.target) && !hamburger.contains(e.target)) {
+            mobileMenu.classList.remove('open');
+          }
+        });
+      }
+      
+      // Toggle theme
+      function toggleTheme() {
+        const body = document.body;
+        const currentTheme = body.getAttribute('data-theme');
+        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+        body.setAttribute('data-theme', newTheme);
+        localStorage.setItem('site_theme', newTheme);
+      }
+      
+      // Append a number to the expression
+      function appendNumber(num) {
+        if (currentResult === '0' && num !== '.') {
+          currentResult = num;
+        } else {
+          currentResult += num;
+        }
+        currentExpression += num;
+        updateDisplay();
+      }
+      
+      // Append an operator to the expression
+      function appendOperator(op) {
+        if (currentExpression.slice(-1) === ' ') {
+          currentExpression = currentExpression.trim().slice(0, -1);
+        }
+        currentExpression += ` ${op} `;
+        currentResult = '0';
+        updateDisplay();
+      }
+      
+      // Append a scientific function
+      function appendFunction(func) {
+        if (func === 'deg') {
+          useRadians = false;
+        } else if (func === 'rad') {
+          useRadians = true;
+        } else if (func === 'pi') {
+          currentExpression += 'π';
+          currentResult = '3.141592653589793';
+        } else if (func === 'e') {
+          currentExpression += 'e';
+          currentResult = '2.718281828459045';
+        } else if (func === 'sqrt') {
+          currentExpression += '√(';
+        } else if (func === 'log') {
+          currentExpression += 'log(';
+        } else if (func === 'ln') {
+          currentExpression += 'ln(';
+        } else if (func === 'abs') {
+          currentExpression += '|';
+        } else if (func === '(' || func === ')') {
+          currentExpression += func;
+        } else if (func === 'rand') {
+          const rand = Math.random().toFixed(4);
+          currentExpression += rand;
+          currentResult = rand;
+        } else if (func === 'percent') {
+          if (currentResult !== '0') {
+            currentResult = (parseFloat(currentResult) / 100).toString();
+            currentExpression += '%';
+          }
+        } else if (func === 'fact') {
+          currentExpression += '!';
+        } else if (func === 'pow') {
+          currentExpression += '^';
+        } else {
+          // Trig functions
+          currentExpression += `${func}(`;
+        }
+        updateDisplay();
+      }
+      
+      // Append a constant
+      function appendConstant(constant) {
+        const constants = {
+          pi: '3.141592653589793',
+          e: '2.718281828459045',
+          phi: '1.618033988749895',
+          sqrt2: '1.4142135623730951',
+          sqrt3: '1.7320508075688772',
+          c: '299792458',
+          g: '9.80665',
+          h: '6.62607015e-34',
+          G: '6.67430e-11'
+        };
+        
+        if (constants[constant]) {
+          currentExpression = constants[constant];
+          currentResult = constants[constant];
+          updateDisplay();
+        }
+      }
+      
+      // Handle calculator actions
+      function handleAction(action) {
+        if (action === 'clear') {
+          currentExpression = '';
+          currentResult = '0';
+        } else if (action === 'clear-entry') {
+          currentResult = '0';
+        } else if (action === 'backspace') {
+          if (currentExpression.length > 0) {
+            currentExpression = currentExpression.slice(0, -1);
+            // Update result based on expression
+            if (currentExpression === '') {
+              currentResult = '0';
+            } else {
+              // Try to evaluate the expression without the last character
+              try {
+                currentResult = evaluateExpression(currentExpression).toString();
+              } catch (e) {
+                // If evaluation fails, try to get the last number
+                const parts = currentExpression.split(' ');
+                const lastPart = parts[parts.length - 1];
+                if (!isNaN(lastPart)) {
+                  currentResult = lastPart;
+                } else {
+                  currentResult = '0';
+                }
+              }
+            }
+          }
+        } else if (action === '=') {
+          try {
+            currentResult = evaluateExpression(currentExpression).toString();
+            // Add to history
+            calculationHistory.unshift({ expr: currentExpression, result: currentResult });
+            localStorage.setItem('calculator_history', JSON.stringify(calculationHistory.slice(0, 20))); // Keep only last 20
+            renderHistory();
+            currentExpression = currentResult;
+          } catch (e) {
+            showError('Calculation error! Please check your input.');
+          }
+        } else if (action === '.') {
+          if (!currentResult.includes('.')) {
+            if (currentResult === '0') {
+              currentResult = '0.';
+            } else {
+              currentResult += '.';
+            }
+            currentExpression += '.';
+          }
+        } else {
+          appendOperator(action);
+        }
+        updateDisplay();
+      }
+      
+      // Show error message
+      function showError(message) {
+        errorMessage.textContent = message;
+        errorMessage.style.display = 'block';
+        setTimeout(() => {
+          errorMessage.style.display = 'none';
+        }, 3000);
+      }
+      
+      // Update display
+      function updateDisplay() {
+        expressionDisplay.textContent = currentExpression;
+        resultDisplay.textContent = currentResult;
+      }
+      
+      // Evaluate expression
+      function evaluateExpression(expr) {
+        // Replace symbols with actual functions
+        let processedExpr = expr
+          .replace(/π/g, 'Math.PI')
+          .replace(/e/g, 'Math.E')
+          .replace(/√\(/g, 'Math.sqrt(')
+          .replace(/log\(/g, 'Math.log10(')
+          .replace(/ln\(/g, 'Math.log(')
+          .replace(/\|\(/g, 'Math.abs(')
+          .replace(/!/g, 'factorial')
+          .replace(/\^/g, '**');
+        
+        // Handle trigonometric functions based on mode
+        if (!useRadians) {
+          processedExpr = processedExpr
+            .replace(/sin\(/g, 'Math.sin(degToRad(')
+            .replace(/cos\(/g, 'Math.cos(degToRad(')
+            .replace(/tan\(/g, 'Math.tan(degToRad(')
+            .replace(/asin\(/g, 'radToDeg(Math.asin(')
+            .replace(/acos\(/g, 'radToDeg(Math.acos(')
+            .replace(/atan\(/g, 'radToDeg(Math.atan(');
+        }
+        
+        // Define helper functions
+        const degToRad = (degrees) => degrees * Math.PI / 180;
+        const radToDeg = (radians) => radians * 180 / Math.PI;
+        const factorial = (n) => {
+          if (n < 0) throw new Error('Factorial of negative number');
+          if (n === 0 || n === 1) return 1;
+          let result = 1;
+          for (let i = 2; i <= n; i++) {
+            result *= i;
+          }
+          return result;
+        };
+        
+        try {
+          // Use Function constructor to evaluate in a safe context
+          const fn = new Function('Math', 'degToRad', 'radToDeg', 'factorial', 
+            `return ${processedExpr}`);
+          return fn(Math, degToRad, radToDeg, factorial);
+        } catch (e) {
+          throw new Error('Invalid expression');
+        }
+      }
+      
+      // Render calculation history
+      function renderHistory() {
+        historyList.innerHTML = '';
+        if (calculationHistory.length === 0) {
+          historyList.innerHTML = '<div class="history-item">No history yet</div>';
+          return;
+        }
+        
+        calculationHistory.forEach(item => {
+          const div = document.createElement('div');
+          div.className = 'history-item';
+          div.innerHTML = `
+            <div class="history-expression">${item.expr}</div>
+            <div class="history-result">= ${item.result}</div>
+          `;
+          div.addEventListener('click', () => {
+            currentExpression = item.expr;
+            currentResult = item.result;
+            updateDisplay();
+          });
+          historyList.appendChild(div);
+        });
+      }
+      
+      // Load exchange rates from API
+      async function loadExchangeRates() {
+        try {
+          // Using exchangerate-api.com as it supports CORS
+          const res = await fetch('https://api.exchangerate-api.com/v4/latest/USD');
+          const data = await res.json();
+          exchangeRates = data.rates;
+          exchangeDate.textContent = new Date(data.date).toLocaleDateString();
+          convertCurrency();
+        } catch (e) {
+          console.error('Failed to load exchange rates', e);
+          exchangeDate.textContent = 'Failed to load rates';
+        }
+      }
+      
+      // Load currency options
+      function loadCurrencies() {
+        // Full list of currencies
+        const currencies = {
+          "USD": "US Dollar",
+          "EUR": "Euro",
+          "GBP": "British Pound",
+          "JPY": "Japanese Yen",
+          "CNY": "Chinese Yuan",
+          "IDR": "Indonesian Rupiah",
+          "CAD": "Canadian Dollar",
+          "AUD": "Australian Dollar",
+          "CHF": "Swiss Franc",
+          "INR": "Indian Rupee",
+          "BRL": "Brazilian Real",
+          "RUB": "Russian Ruble",
+          "KRW": "South Korean Won",
+          "TRY": "Turkish Lira",
+          "ZAR": "South African Rand",
+          "MXN": "Mexican Peso",
+          "SGD": "Singapore Dollar",
+          "NZD": "New Zealand Dollar",
+          "SEK": "Swedish Krona",
+          "NOK": "Norwegian Krone",
+          "DKK": "Danish Krone",
+          "PLN": "Polish Zloty",
+          "THB": "Thai Baht",
+          "MYR": "Malaysian Ringgit",
+          "PHP": "Philippine Peso",
+          "AED": "UAE Dirham",
+          "SAR": "Saudi Riyal",
+          "QAR": "Qatari Riyal",
+          "KWD": "Kuwaiti Dinar",
+          "EGP": "Egyptian Pound",
+          "NGN": "Nigerian Naira",
+          "KES": "Kenyan Shilling",
+          "GHS": "Ghanaian Cedi",
+          "MAD": "Moroccan Dirham",
+          "TND": "Tunisian Dinar",
+          "DZD": "Algerian Dinar",
+          "LYD": "Libyan Dinar",
+          "MUR": "Mauritian Rupee",
+          "XOF": "West African CFA Franc",
+          "XAF": "Central African CFA Franc",
+          "ARS": "Argentine Peso",
+          "CLP": "Chilean Peso",
+          "COP": "Colombian Peso",
+          "PEN": "Peruvian Sol",
+          "UYU": "Uruguayan Peso",
+          "PYG": "Paraguayan Guarani",
+          "BBD": "Barbadian Dollar",
+          "BSD": "Bahamian Dollar",
+          "BMD": "Bermudian Dollar",
+          "BND": "Brunei Dollar",
+          "HKD": "Hong Kong Dollar",
+          "ILS": "Israeli New Shekel",
+          "JMD": "Jamaican Dollar",
+          "JOD": "Jordanian Dinar",
+          "KZT": "Kazakhstani Tenge",
+          "LBP": "Lebanese Pound",
+          "MOP": "Macanese Pataca",
+          "OMR": "Omani Rial",
+          "PKR": "Pakistani Rupee",
+          "RON": "Romanian Leu",
+          "VND": "Vietnamese Dong",
+          "UAH": "Ukrainian Hryvnia",
+          "HUF": "Hungarian Forint",
+          "CZK": "Czech Koruna",
+          "ISK": "Icelandic Krona",
+          "HRK": "Croatian Kuna",
+          "BGN": "Bulgarian Lev",
+          "RON": "Romanian Leu",
+          "RSD": "Serbian Dinar",
+          "ALL": "Albanian Lek",
+          "AMD": "Armenian Dram",
+          "AZN": "Azerbaijani Manat",
+          "BAM": "Bosnia-Herzegovina Convertible Mark",
+          "BYN": "Belarusian Ruble",
+          "GEL": "Georgian Lari",
+          "KGS": "Kyrgyzstani Som",
+          "MDL": "Moldovan Leu",
+          "TJS": "Tajikistani Somoni",
+          "TMT": "Turkmenistani Manat",
+          "UZS": "Uzbekistani Som",
+          "BHD": "Bahraini Dinar",
+          "IQD": "Iraqi Dinar",
+          "IRR": "Iranian Rial",
+          "YER": "Yemeni Rial",
+          "AFN": "Afghan Afghani",
+          "BDT": "Bangladeshi Taka",
+          "LKR": "Sri Lankan Rupee",
+          "NPR": "Nepalese Rupee",
+          "KHR": "Cambodian Riel",
+          "MMK": "Myanmar Kyat",
+          "LAK": "Laotian Kip",
+          "BWP": "Botswana Pula",
+          "MWK": "Malawian Kwacha",
+          "TZS": "Tanzanian Shilling",
+          "UGX": "Ugandan Shilling",
+          "ZMW": "Zambian Kwacha",
+          "AOA": "Angolan Kwanza",
+          "MZN": "Mozambican Metical",
+          "CVE": "Cape Verdean Escudo",
+          "DJF": "Djiboutian Franc",
+          "ERN": "Eritrean Nakfa",
+          "ETB": "Ethiopian Birr",
+          "GMD": "Gambian Dalasi",
+          "GNF": "Guinean Franc",
+          "KMF": "Comorian Franc",
+          "LRD": "Liberian Dollar",
+          "LSL": "Lesotho Loti",
+          "MGA": "Malagasy Ariary",
+          "MRU": "Mauritanian Ouguiya",
+          "SCR": "Seychellois Rupee",
+          "SLL": "Sierra Leonean Leone",
+          "SOS": "Somali Shilling",
+          "STD": "São Tomé and Príncipe Dobra",
+          "SZL": "Swazi Lilangeni",
+          "TMT": "Turkmenistani Manat",
+          "XCD": "East Caribbean Dollar",
+          "FJD": "Fijian Dollar",
+          "PGK": "Papua New Guinean Kina",
+          "SBD": "Solomon Islands Dollar",
+          "VUV": "Vanuatu Vatu",
+          "WST": "Samoan Tala",
+          "TOP": "Tongan Paʻanga",
+          "FJD": "Fijian Dollar",
+          "PGK": "Papua New Guinean Kina",
+          "SBD": "Solomon Islands Dollar",
+          "VUV": "Vanuatu Vatu",
+          "WST": "Samoan Tala",
+          "TOP": "Tongan Paʻanga"
+        };
+        
+        // Populate select elements
+        Object.entries(currencies).forEach(([code, name]) => {
+          const option1 = document.createElement('option');
+          option1.value = code;
+          option1.textContent = `${code} - ${name}`;
+          fromCurrency.appendChild(option1);
+          
+          const option2 = document.createElement('option');
+          option2.value = code;
+          option2.textContent = `${code} - ${name}`;
+          toCurrency.appendChild(option2);
+        });
+        
+        // Set default selections
+        fromCurrency.value = 'USD';
+        toCurrency.value = 'IDR';
+      }
+      
+      // Convert currency
+      function convertCurrency() {
+        const amount = parseFloat(currencyAmount.value) || 1;
+        const from = fromCurrency.value;
+        const to = toCurrency.value;
+        
+        if (exchangeRates[from] && exchangeRates[to]) {
+          const result = (amount / exchangeRates[from]) * exchangeRates[to];
+          currencyResultDisplay.textContent = 
+            `${amount.toFixed(2)} ${from} = ${result.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${to}`;
+        } else {
+          currencyResultDisplay.textContent = 'Conversion not available';
+        }
+      }
+      
+      // Initialize the app
+      init();
+      
+      // Set theme from localStorage
+      const savedTheme = localStorage.getItem('site_theme') || 'dark';
+      document.body.setAttribute('data-theme', savedTheme);
+      
+      // Add event listener for theme toggle
+      document.querySelectorAll('.theme-toggle').forEach(toggle => {
+        toggle.addEventListener('click', () => {
+          const currentTheme = document.body.getAttribute('data-theme');
+          const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+          document.body.setAttribute('data-theme', newTheme);
+          localStorage.setItem('site_theme', newTheme);
+        });
+      });
+    })();
+  </script>
+</body>
+</html>
+

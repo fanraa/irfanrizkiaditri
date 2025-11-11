@@ -1,0 +1,855 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <title>Komentar - Irfan Rizki Aditri (Fanra)</title>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+
+  <style>
+    /* ... (SEMUA CSS LAMA ANDA ADA DI SINI, TIDAK BERUBAH) ... */
+    :root{
+      --bg:#0d0d0f;
+      --card:#141418;
+      --text:#ffffff;
+      --accent:#4fa3ff;
+      --accent-2:#7c3aed;
+      --muted:#9da3b3;
+      --glass:rgba(255,255,255,0.06);
+      --card-border:rgba(255,255,255,0.06);
+    }
+    [data-theme="light"]{
+      --bg:#f6f8fb;
+      --card:#ffffff;
+      --text:#0b1220;
+      --accent:#2563eb;
+      --accent-2:#7c3aed;
+      --muted:#6b7280;
+      --glass:rgba(0,0,0,0.05);
+      --card-border:rgba(0,0,0,0.08);
+    }
+    html{
+      font-family:"Poppins",sans-serif;
+      font-size:clamp(14px,1.6vw,16px);
+      -webkit-font-smoothing: antialiased;
+      overflow-x:hidden;
+      scroll-behavior: smooth;
+    }
+    *{ margin:0; padding:0; box-sizing:border-box; }
+    body{
+      background:var(--bg);
+      color:var(--text);
+      min-height:100vh;
+      transition:background .25s ease, color .25s ease;
+    }
+    a{ text-decoration:none; color:inherit; }
+    .container{
+      width:min(94%,1200px);
+      margin:0 auto;
+    }
+    header{
+      position:sticky;
+      top:0; left:0; width:100%;
+      backdrop-filter:blur(12px) saturate(1.5);
+      background:linear-gradient(180deg,rgba(0,0,0,0.35),transparent);
+      border-bottom:1px solid var(--card-border);
+      z-index:1500;
+      animation:headerDrop .55s cubic-bezier(.2,.9,.2,1);
+    }
+    @keyframes headerDrop{
+      from{ transform:translateY(-20px); opacity:0; }
+      to{ transform:translateY(0); opacity:1; }
+    }
+    .navbar{
+      display:flex; align-items:center;
+      gap:16px;
+      padding:16px 0;
+    }
+    .logo{
+      display:flex; align-items:center; gap:10px;
+      font-weight:700; font-size:1.15rem;
+      letter-spacing:.4px;
+    }
+    .logo i{ color:var(--accent); font-size:1.2rem; }
+    .logo span{ color:var(--accent); }
+    .nav-wrap{
+      margin-left:auto;
+      display:flex; align-items:center; gap:14px;
+    }
+    .nav-links{
+      display:flex; gap:20px;
+      list-style:none;
+    }
+    .nav-links a{
+      padding:6px 10px;
+      font-weight:500;
+      border-radius:8px;
+      position:relative;
+      transition:.25s;
+    }
+    .nav-links a:hover,
+    .nav-links .active{
+      color:var(--accent);
+      transform:translateY(-2px);
+    }
+    .nav-links a::after{
+      content:"";
+      position:absolute;
+      bottom:-2px; left:0;
+      width:0%; height:2px;
+      background:var(--accent);
+      border-radius:6px;
+      transition:.28s;
+    }
+    .nav-links a:hover::after,
+    .nav-links .active::after{
+      width:100%;
+    }
+    .theme-toggle{
+      cursor:pointer; display:flex; align-items:center;
+    }
+    .switch{
+      width:46px; height:26px;
+      background:var(--glass);
+      border:1px solid var(--card-border);
+      border-radius:20px;
+      position:relative; padding:3px;
+      backdrop-filter:blur(5px);
+    }
+    .knob{
+      width:20px; height:20px;
+      background:#fff; border-radius:50%;
+      position:absolute; top:3px; left:3px;
+      box-shadow:0 4px 12px rgba(0,0,0,0.3);
+      transition:.25s;
+    }
+    [data-theme="light"] .switch{
+      background:linear-gradient(90deg,var(--accent),var(--accent-2));
+    }
+    [data-theme="light"] .knob{ left:23px; }
+    .hamburger{
+      display:none;
+      background:none;
+      border:0;
+      font-size:1.25rem;
+      color:var(--text);
+      padding:6px;
+    }
+    .mobile-menu{
+      display:none;
+      position:absolute;
+      right:14px;
+      top:72px;
+      background:var(--card);
+      border:1px solid var(--card-border);
+      border-radius:14px;
+      min-width:220px;
+      padding:12px;
+      box-shadow:0 14px 28px rgba(0,0,0,0.5);
+      animation:fadeMenu .3s ease;
+    }
+    @keyframes fadeMenu{
+      from{ opacity:0; transform:translateY(-6px); }
+      to{ opacity:1; transform:translateY(0); }
+    }
+    .mobile-menu a{
+      display:block;
+      padding:10px;
+      border-radius:8px;
+      transition:.25s;
+      font-weight:500;
+    }
+    .mobile-menu a:hover{
+      background:rgba(255,255,255,0.06);
+    }
+    .mobile-menu.open{
+      display:block;
+    }
+    @media (max-width:700px){
+      .nav-links{ display:none; }
+      .hamburger{ display:inline-flex; }
+    }
+    
+    .section{ padding:44px 0 28px; }
+    .section-title{ text-align:center; margin-bottom:20px; }
+    .section-title h2 { font-size: clamp(1.5rem, 2.8vw, 2.2rem); margin-bottom: 8px; }
+    .section-title p { color: var(--muted); font-size: 1.05rem; }
+    .btn{ background:var(--accent); color:#ffffff; padding:10px 14px; border-radius:10px; font-weight:600; transition:.22s transform;}
+    .btn:hover{ background:var(--accent-2); transform:scale(1.08);}
+    
+    footer{ text-align:center; padding:28px 0; color:var(--muted); margin-top:30px; font-size:.95rem; }
+    #backToTop{ position: fixed; bottom:28px; right:20px; background:var(--accent); color:#000; padding:10px 12px; border-radius:50%; display:none; z-index:1200; box-shadow:0 8px 24px rgba(0,0,0,0.35); animation:fadeInUp .7s cubic-bezier(.21,.66,.19,1); }
+    @keyframes fadeInUp{
+      from{ opacity:0; transform:translateY(26px);}
+      to{ opacity:1; transform:translateY(0);}
+    }
+    a:focus, button:focus, input:focus, textarea:focus { outline: 3px solid rgba(79,163,255,0.15); outline-offset:2px; border-radius:8px; }
+    
+    /* CSS POPUP (Kontak & About) */
+    .contact-popup {
+      position: absolute;
+      top: 68px;
+      right: 90px;
+      background: var(--card);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 14px;
+      display: none;
+      z-index: 2000;
+      animation: popupFade .22s ease;
+      box-shadow: 0 18px 38px rgba(0,0,0,0.4);
+      backdrop-filter: blur(14px) saturate(1.4);
+    }
+    @keyframes popupFade {
+      from { opacity: 0; transform: scale(.92) translateY(-4px); }
+      to   { opacity: 1; transform: scale(1) translateY(0); }
+    }
+    .contact-grid-popup {
+      display: grid;
+      grid-template-columns: repeat(3, 85px);
+      gap: 14px;
+    }
+    .contact-item {
+      background: var(--glass);
+      border: 1px solid var(--card-border);
+      padding: 10px;
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      color: var(--text);
+      transition: .25s;
+      font-size: .85rem;
+    }
+    .contact-item i {
+      font-size: 1.4rem;
+      margin-bottom: 6px;
+      color: var(--accent);
+    }
+    .contact-item:hover {
+      transform: translateY(-4px) scale(1.05);
+      background: rgba(255,255,255,0.08);
+    }
+    .about-popup-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(10px);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 3000;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s ease, visibility 0.3s ease;
+    }
+    .about-popup-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+    .about-popup {
+      background: var(--card);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      width: 90%;
+      max-width: 800px;
+      max-height: 80vh;
+      overflow-y: auto;
+      padding: 30px;
+      position: relative;
+      transform: translateY(20px);
+      transition: transform 0.3s ease;
+    }
+    .about-popup-overlay.active .about-popup {
+      transform: translateY(0);
+    }
+    .about-popup-close {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      background: var(--glass);
+      border: 1px solid var(--card-border);
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .about-popup-close:hover {
+      background: var(--accent-2);
+      transform: rotate(90deg);
+    }
+    .about-popup h2 {
+      font-size: 1.8rem;
+      margin-bottom: 20px;
+      color: var(--accent);
+      text-align: center;
+    }
+    .about-popup-content {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 20px;
+    }
+    .about-text {
+      line-height: 1.6;
+      color: var(--text);
+    }
+    .about-text p {
+      margin-bottom: 15px;
+    }
+    .about-skills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 15px;
+    }
+    .skill-tag {
+      background: var(--glass);
+      border: 1px solid var(--card-border);
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 0.9rem;
+    }
+    
+    /* CSS ANIMASI SCROLL (SAMA SEPERTI YANG LAIN) */
+    .reveal {
+      opacity: 0;
+      transform: translateY(40px);
+      transition: opacity 0.8s cubic-bezier(.21,.66,.19,1), transform 0.8s cubic-bezier(.21,.66,.19,1);
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .reveal:nth-child(1) { transition-delay: 0.1s; }
+    .reveal:nth-child(2) { transition-delay: 0.2s; }
+    .reveal:nth-child(3) { transition-delay: 0.3s; }
+
+    /* === CSS HALAMAN KOMENTAR === */
+    .guestbook-container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    
+    .guestbook-form-card {
+      background: var(--card);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 28px;
+    }
+    
+    .guestbook-form-card h3 {
+      text-align: center;
+      color: var(--accent);
+      margin-bottom: 16px;
+    }
+    
+    .guestbook-form .form-group {
+      margin-bottom: 16px;
+    }
+    
+    .guestbook-form label {
+      display: block;
+      color: var(--muted);
+      margin-bottom: 6px;
+      font-weight: 500;
+    }
+    
+    .guestbook-form .form-control {
+      width: 100%;
+      padding: 12px;
+      border-radius: 9px;
+      border: 1.4px solid var(--card-border);
+      background: var(--glass);
+      color: var(--text);
+      font-size: 1.01em;
+      transition: .24s;
+    }
+    
+    .guestbook-form .form-control:focus {
+      border-color: var(--accent);
+      outline: none;
+    }
+    
+    .btn-submit {
+      display: block;
+      width: 100%;
+      background: var(--accent);
+      color: #ffffff;
+      padding: 12px 14px;
+      border-radius: 10px;
+      font-weight: 600;
+      transition: .22s transform;
+      border: none;
+      cursor: pointer;
+      font-size: 1.05rem;
+    }
+    
+    .btn-submit:hover {
+      background: var(--accent-2);
+      transform: scale(1.02);
+    }
+    /* Style saat tombol disabled */
+    .btn-submit:disabled {
+      background: var(--muted);
+      cursor: not-allowed;
+      transform: none;
+    }
+    
+    .comment-list-container h3 {
+      text-align: center;
+      color: var(--muted);
+      margin-bottom: 20px;
+      font-weight: 400;
+    }
+    
+    .comment-card {
+      background: var(--card);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 18px;
+      margin-bottom: 16px;
+      display: flex;
+      gap: 14px;
+    }
+    
+    .comment-avatar {
+      flex-shrink: 0;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: var(--glass);
+      color: var(--accent-2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+    }
+    
+    .comment-body {
+      width: 100%;
+    }
+    
+    .comment-body strong {
+      color: var(--accent);
+      font-size: 1.05rem;
+    }
+    
+    .comment-body .comment-date {
+      font-size: 0.85rem;
+      color: var(--muted);
+      float: right;
+    }
+    
+    .comment-body p {
+      color: var(--text);
+      margin-top: 6px;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body data-theme="dark">
+  
+  <header>
+    <div class="container">
+      <nav class="navbar" aria-label="Main navigation">
+        <a class="logo" href="index.html"><i class="fas fa-feather-alt"></i> irfanrizkiaditri<span>.</span>site</a>
+        <div class="nav-wrap" role="navigation">
+          <ul class="nav-links" id="navLinks" aria-hidden="false">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="artikel.html">Articles</a></li>
+            <li><a href="projects.html">Projects</a></li>
+            <li><a href="uses.html">Uses</a></li>
+            <li><a href="komentar.html" class="active" aria-current="page">Comment</a></li> 
+            <li>
+              <a href="#" id="aboutTrigger" class="about-trigger">
+                About
+              </a>
+            </li>
+            <li>
+              <a href="#" id="contactTrigger" class="contact-trigger">
+                Contact <i class="fas fa-chevron-down" style="font-size:10px;"></i>
+              </a>
+            </li>
+          </ul>
+          <button class="hamburger" id="hamburger" aria-label="Buka menu" aria-expanded="false"><i class="fas fa-bars"></i></button>
+          <div class="theme-toggle" id="themeToggle" role="button" aria-pressed="false" tabindex="0" title="Toggle theme">
+            <div class="switch" aria-hidden="true"><div class="knob"></div></div>
+          </div>
+          <div class="mobile-menu" id="mobileMenu" aria-hidden="true">
+            <a href="index.html" style="display:block;padding:8px;border-radius:8px;">Home</a>
+            <a href="artikel.html" style="display:block;padding:8px;border-radius:8px;">Articles</a>
+            <a href="projects.html" style="display:block;padding:8px;border-radius:8px;">Projects</a>
+            <a href="uses.html" style="display:block;padding:8px;border-radius:8px;">Uses</a>
+            <a href="komentar.html" style="display:block;padding:8px;border-radius:8px;">Comment</a>
+            <a href="#" id="mobileAboutTrigger" style="display:block;padding:8px;border-radius:8px;">About</a>
+            <a href="#contact" style="display:block;padding:8px;border-radius:8px;">Contact</a>
+          </div>
+          <div class="contact-popup" id="contactPopup" aria-hidden="true">
+            <div class="contact-grid-popup">
+              <a href="https://wa.me/6285788918217" target="_blank" class="contact-item">
+                <i class="fab fa-whatsapp"></i><span>WhatsApp</span>
+              </a>
+              <a href="#" target="_blank" class="contact-item">
+                <i class="fab fa-instagram"></i><span>Instagram</span>
+              </a>
+              <a href="#" target="_blank" class="contact-item">
+                <i class="fab fa-github"></i><span>GitHub</span>
+              </a>
+              <a href="#" target="_blank" class="contact-item">
+                <i class="fab fa-linkedin-in"></i><span>LinkedIn</span>
+              </a>
+              <a href="mailto:irfanrizkiaditri@gmail.com" class="contact-item">
+                <i class="fas fa-envelope"></i><span>Email</span>
+              </a>
+              <a href="#" class="contact-item">
+                <i class="fab fa-discord"></i><span>Discord</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <div class="about-popup-overlay" id="aboutPopup">
+    <div class="about-popup">
+      <button class="about-popup-close" id="aboutClose">
+        <i class="fas fa-times"></i>
+      </button>
+      <h2>About Me</h2>
+      <div class="about-popup-content">
+        <div class="about-text">
+          <p>Hello! I'm Irfan Rizki Aditri, but you can call me Fanra. I'm currently a Physics student at Institut Teknologi Sumatera (ITERA).</p>
+          <p>I have a deep passion for both physics and web development...</p>
+        </div>
+        <div>
+          <h3>Skills & Interests</h3>
+          <div class="about-skills">
+            <span class="skill-tag">Web Development</span>
+            <span class="skill-tag">Physics Simulations</span>
+            <span class="skill-tag">Game Development</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <main>
+    <section class="section">
+      <div class="container guestbook-container">
+        
+        <div class="section-title reveal">
+          <h2>Komentar</h2>
+          <p>Silakan tinggalkan pesan, kesan, atau sapaan!</p>
+        </div>
+        
+        <div class="guestbook-form-card reveal">
+          <h3>Tinggalkan Jejak</h3>
+          <form class="guestbook-form" action="#" method="POST">
+            <div class="form-group">
+              <label for="guestName">Nama Kamu</label>
+              <input type="text" id="guestName" name="name" class="form-control" placeholder="Tulis nama..." required>
+            </div>
+            <div class="form-group">
+              <label for="guestMessage">Pesan Kamu</label>
+              <textarea id="guestMessage" name="message" class="form-control" rows="4" placeholder="Tulis pesan di sini..." required></textarea>
+            </div>
+            <button type="submit" class="btn-submit">Kirim Pesan</button>
+          </form>
+        </div>
+
+        <div class="comment-list-container reveal">
+          <h3>Apa Kata Mereka</h3>
+          
+          </div>
+        
+      </div>
+    </section>
+  </main>
+  <footer class="reveal">
+    <div class="container">
+      <p>&copy; 2025 Fanra (Irfan Rizki Aditri). All Rights Reserved.</p>
+    </div>
+  </footer>
+
+  <a href="#" id="backToTop" title="Back to top"><i class="fas fa-arrow-up"></i></a>
+
+  <script>
+    // ==========================================================
+    // BAGIAN 1: KONFIGURASI FIREBASE
+    // ==========================================================
+    
+    const firebaseConfig = {
+      apiKey: "AIzaSyCVYfH91lXeOIkLFXmk_rRsObNbo4n-G_A",
+      authDomain: "portofolio-fanra.firebaseapp.com",
+      projectId: "portofolio-fanra",
+      storageBucket: "portofolio-fanra.firebasestorage.app",
+      messagingSenderId: "1048993283215",
+      appId: "1:1048993283215:web:137862db54a113409404fa",
+      measurementId: "G-JFJ1X7FQSR"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    const komentarCollection = db.collection('komentar');
+
+    // ==========================================================
+    // BAGIAN 2: SCRIPT LAMA KAMU (Tema, Menu, Popup, dll)
+    // ==========================================================
+
+    // THEME: save/load
+    const root = document.documentElement;
+    const toggle = document.getElementById('themeToggle');
+    const saved = localStorage.getItem('site_theme') || 'dark';
+    root.setAttribute('data-theme', saved);
+    function setTheme(t){
+      root.setAttribute('data-theme', t);
+      localStorage.setItem('site_theme', t);
+      toggle.setAttribute('aria-pressed', t === 'light');
+    }
+    toggle.addEventListener('click', () => {
+      const now = root.getAttribute('data-theme');
+      setTheme(now === 'light' ? 'dark' : 'light');
+    });
+
+    // back to top show/hide
+    const back = document.getElementById('backToTop');
+    window.addEventListener('scroll', () => {
+      if(window.scrollY > 320) back.style.display = 'inline-flex'; else back.style.display = 'none';
+    });
+    back.addEventListener('click', (e) => { e.preventDefault(); window.scrollTo({top:0, behavior:'smooth'}); });
+
+    // mobile hamburger menu
+    const hamburger = document.getElementById('hamburger');
+    const mobileMenu = document.getElementById('mobileMenu');
+    hamburger.addEventListener('click', () => {
+      const open = mobileMenu.classList.toggle('open');
+      hamburger.setAttribute('aria-expanded', open);
+      mobileMenu.setAttribute('aria-hidden', !open);
+    });
+    document.addEventListener('click', (e) => {
+      if(mobileMenu && !mobileMenu.contains(e.target) && !hamburger.contains(e.target) && mobileMenu.classList.contains('open')){
+        mobileMenu.classList.remove('open');
+        hamburger.setAttribute('aria-expanded', 'false');
+        mobileMenu.setAttribute('aria-hidden', 'true');
+      }
+    });
+
+    // Improve focus state
+    toggle.addEventListener('keyup', (e) => { if(e.key === 'Enter' || e.key === ' ') toggle.click(); });
+
+    // CONTACT POPUP
+    const contactBtn = document.getElementById("contactTrigger");
+    const contactPopup = document.getElementById("contactPopup");
+    contactBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      const isOpen = contactPopup.style.display === "block";
+      contactPopup.style.display = isOpen ? "none" : "block";
+    });
+    document.addEventListener("click", (e) => {
+      if (contactPopup && !contactPopup.contains(e.target) && !contactBtn.contains(e.target)) {
+        contactPopup.style.display = "none";
+      }
+    });
+
+    // ==========================================================
+    // 2. PERBAIKAN BUG JAVASCRIPT: Skrip "About" yang sudah benar
+    // ==========================================================
+    const aboutTrigger = document.getElementById("aboutTrigger");
+    const mobileAboutTrigger = document.getElementById("mobileAboutTrigger");
+    const aboutPopup = document.getElementById("aboutPopup");
+    const aboutClose = document.getElementById("aboutClose");
+    function openAboutPopup() {
+      if (aboutPopup) aboutPopup.classList.add("active");
+      document.body.style.overflow = "hidden";
+    }
+    function closeAboutPopup() {
+      if (aboutPopup) aboutPopup.classList.remove("active");
+      document.body.style.overflow = "auto";
+    }
+    if (aboutTrigger) {
+      aboutTrigger.addEventListener("click", (e) => {
+        e.preventDefault();
+        openAboutPopup();
+      });
+    }
+    if (mobileAboutTrigger) {
+      mobileAboutTrigger.addEventListener("click", (e) => {
+        e.preventDefault();
+        openAboutPopup();
+        if (mobileMenu) {
+          mobileMenu.classList.remove('open');
+          hamburger.setAttribute('aria-expanded', 'false');
+          mobileMenu.setAttribute('aria-hidden', 'true');
+        }
+      });
+    }
+    if (aboutClose) {
+      aboutClose.addEventListener("click", closeAboutPopup);
+    }
+    
+    // INI ADALAH BARIS YANG DIPERBAIKI (mencegah konflik klik)
+    document.addEventListener("click", (e) => {
+      if (aboutPopup && aboutPopup.classList.contains("active") && 
+          !aboutPopup.querySelector('.about-popup').contains(e.target) && 
+          e.target !== aboutTrigger && 
+          e.target !== mobileAboutTrigger) {
+        closeAboutPopup();
+      }
+    });
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && aboutPopup && aboutPopup.classList.contains("active")) {
+        closeAboutPopup();
+      }
+    });
+
+    // ==========================================================
+    // BAGIAN 3: SCRIPT BARU KOMENTAR (FIREBASE)
+    // ==========================================================
+    
+    function createCommentCard(data) {
+      const nama = data.nama || 'Anonymous';
+      const pesan = data.pesan || 'Tidak ada pesan.';
+      const icon = data.avatarIcon || 'fas fa-user';
+      
+      let tanggal = 'Baru saja';
+      if (data.createdAt && data.createdAt.toDate) {
+        tanggal = data.createdAt.toDate().toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
+      }
+
+      return `
+        <div class="comment-card reveal">
+          <div class="comment-avatar">
+            <i class="${icon}"></i>
+          </div>
+          <div class="comment-body">
+            <span class="comment-date">${tanggal}</span>
+            <strong>${nama}</strong>
+            <p>${pesan}</p>
+          </div>
+        </div>
+      `;
+    }
+
+    function loadLiveComments() {
+      const container = document.querySelector('.comment-list-container');
+      if (!container) return;
+      
+      komentarCollection.orderBy("createdAt", "desc").onSnapshot(querySnapshot => {
+        container.innerHTML = '<h3>Apa Kata Mereka</h3>';
+        
+        if (querySnapshot.empty) {
+          container.innerHTML += '<p style="text-align:center; color:var(--muted);">Belum ada komentar. Jadilah yang pertama!</p>';
+          return;
+        }
+
+        querySnapshot.forEach(doc => {
+          container.innerHTML += createCommentCard(doc.data());
+        });
+        
+        const newElements = container.querySelectorAll(".reveal");
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach(entry => {
+            if(entry.isIntersecting) {
+              entry.target.classList.add('visible');
+            }
+          });
+        }, { threshold: 0.1 });
+        newElements.forEach(el => observer.observe(el));
+        
+      }, error => {
+        console.error('Error memuat komentar:', error);
+        container.innerHTML += '<p style="text-align:center; color:red;">Gagal memuat komentar.</p>';
+      });
+    }
+
+    function handleFormSubmit(e) {
+      e.preventDefault();
+      
+      const form = e.target;
+      const namaInput = form.querySelector('#guestName');
+      const pesanInput = form.querySelector('#guestMessage');
+      const submitButton = form.querySelector('.btn-submit');
+      
+      const nama = namaInput.value;
+      const pesan = pesanInput.value;
+      
+      if (!nama || !pesan) {
+        alert('Nama dan pesan tidak boleh kosong!');
+        return;
+      }
+      
+      submitButton.disabled = true;
+      submitButton.textContent = 'Mengirim...';
+      
+      const data = {
+        nama: nama,
+        pesan: pesan,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+        avatarIcon: "fas fa-user-check"
+      };
+      
+      komentarCollection.add(data)
+        .then(() => {
+          form.reset();
+          submitButton.disabled = false;
+          submitButton.textContent = 'Kirim Pesan';
+        })
+        .catch(error => {
+          console.error("Error menambah dokumen: ", error);
+          alert('Terjadi kesalahan! Gagal mengirim pesan.');
+          submitButton.disabled = false;
+          submitButton.textContent = 'Kirim Pesan';
+        });
+    }
+
+    // ==========================================================
+    // BAGIAN 4: MENJALANKAN FUNGSI
+    // ==========================================================
+
+    document.addEventListener("DOMContentLoaded", () => {
+      // 1. Jalankan script animasi scroll (IntersectionObserver)
+      const observerOptions = {
+        root: null,
+        rootMargin: "0px",
+        threshold: 0.1
+      };
+      const observer = new IntersectionObserver((entries, observer) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("visible");
+            observer.unobserve(entry.target);
+          }
+        });
+      }, observerOptions);
+      const elementsToReveal = document.querySelectorAll(".reveal");
+      elementsToReveal.forEach(el => {
+        observer.observe(el);
+      });
+      
+      // 2. Muat komentar yang sudah ada secara live
+      loadLiveComments();
+      
+      // 3. Hubungkan form dengan fungsi 'handleFormSubmit'
+      const guestbookForm = document.querySelector('.guestbook-form');
+      if (guestbookForm) {
+        guestbookForm.addEventListener('submit', handleFormSubmit);
+      }
+    });
+  </script>
+</body>
+</html>
