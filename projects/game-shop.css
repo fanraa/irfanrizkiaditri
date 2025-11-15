@@ -1,0 +1,254 @@
+/* game-shop.css */
+/* CSS khusus untuk Toko, Profil, dan Upgrade */
+
+/* [PERBAIKAN] Overlay Toko di HP & Permintaan Toko Kecil */
+#shopOverlay .overlay-box {
+  max-width: 600px; /* [PERMINTAAN] Toko lebih kecil */
+  width: 95%;
+  padding: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  max-height: 500px; /* [PERMINTAAN] Toko lebih kecil */
+}
+
+.shop-header {
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--card-border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.shop-header h2 {
+  margin: 0;
+}
+
+#shopCoinDisplay {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--success);
+  background: var(--glass);
+  padding: 8px 12px;
+  border-radius: 8px;
+  white-space: nowrap;
+  margin-left: 10px;
+}
+
+/* Tab navigasi */
+.shop-tabs {
+  display: flex;
+  background: var(--glass);
+  padding: 12px 24px;
+  gap: 10px;
+  border-bottom: 1px solid var(--card-border);
+  flex-wrap: wrap;
+  flex-shrink: 0;
+}
+
+.shop-tab-btn {
+  background: none;
+  border: 2px solid transparent;
+  color: var(--muted);
+  padding: 8px 12px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.shop-tab-btn:hover {
+  color: var(--text);
+  background: var(--glass);
+}
+
+.shop-tab-btn.active {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+
+/* [PERBAIKAN] Konten tab dibuat scrollable */
+.shop-content {
+  padding: 20px;
+  flex-grow: 1;
+  overflow-y: auto;
+  min-height: 0; /* [PERBAIKAN BUG HP] Ini adalah kuncinya! */
+}
+
+.shop-pane {
+  display: none;
+}
+.shop-pane.active {
+  display: block;
+  animation: fadeIn 0.3s ease;
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Grid untuk item-item */
+.shop-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px;
+}
+
+/* Styling per item */
+.shop-item {
+  background: var(--bg);
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+  padding: 16px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  transition: all 0.2s ease;
+}
+.shop-item:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+}
+
+.shop-item .item-icon {
+  font-size: 2rem;
+  margin-bottom: 10px;
+  color: var(--accent);
+}
+
+.shop-item h4 {
+  color: var(--text);
+  margin-bottom: 4px;
+}
+
+.shop-item p.item-desc {
+  font-size: 0.9rem;
+  color: var(--muted);
+  flex-grow: 1;
+  margin: 0;
+}
+
+.shop-item .item-price {
+  font-weight: 600;
+  font-size: 1.1rem;
+  color: var(--success);
+  margin: 10px 0;
+}
+
+.shop-item .btn-buy {
+  background: var(--accent);
+  border: 0;
+  padding: 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  color: white;
+  width: 100%;
+}
+.shop-item .btn-buy:hover {
+  filter: brightness(1.2);
+}
+.shop-item .btn-buy:disabled {
+  background: var(--muted);
+  cursor: not-allowed;
+  filter: brightness(1);
+}
+
+/* Tombol Tutup Toko */
+.shop-footer {
+  padding: 20px 24px;
+  border-top: 1px solid var(--card-border);
+  background: var(--glass);
+  text-align: right;
+  flex-shrink: 0;
+}
+
+/* Bagian Profil & Upgrade */
+.profile-stats, .upgrade-list {
+  background: var(--glass);
+  padding: 20px;
+  border-radius: 12px;
+}
+
+.profile-stats h3, .upgrade-list h3 {
+  border-bottom: 1px solid var(--card-border);
+  padding-bottom: 10px;
+  margin-bottom: 15px;
+}
+
+.stat-item, .upgrade-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 1.1rem;
+  margin-bottom: 12px;
+  padding: 10px;
+  border-radius: 8px;
+  background: var(--bg);
+  flex-wrap: wrap;
+}
+
+.stat-item span:first-child, .upgrade-item .upgrade-info {
+  font-weight: 500;
+  color: var(--muted);
+  text-align: left;
+}
+.upgrade-item .upgrade-info span {
+  display: block;
+  font-size: 1.1rem;
+  color: var(--text);
+  font-weight: 600;
+}
+.upgrade-item .upgrade-info .level-display {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--warning);
+}
+
+.stat-item span:last-child {
+  font-weight: 600;
+  color: var(--accent);
+}
+
+/* Tombol di bagian upgrade */
+.upgrade-item .btn-buy {
+  padding: 8px 12px;
+  font-size: 0.9rem;
+  min-width: 120px;
+  flex-shrink: 0;
+  margin-left: 10px;
+  margin-top: 5px;
+}
+
+/* [FITUR BARU] CSS UNTUK LOGIN OVERLAY */
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 20px;
+}
+.form-group {
+  width: 100%;
+}
+.form-group input {
+  width: 100%;
+  padding: 12px 14px;
+  background: var(--glass);
+  border: 1px solid var(--card-border);
+  border-radius: 8px;
+  color: var(--text);
+  font-size: 1rem;
+  font-family: 'Poppins', sans-serif;
+}
+.auth-toggle {
+  margin-top: 10px;
+  font-size: 0.9rem;
+}
+.auth-toggle a {
+  color: var(--accent);
+  font-weight: 600;
+  cursor: pointer;
+}

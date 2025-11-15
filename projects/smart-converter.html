@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Smart Converter — Fanra</title>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+
+  <style>
+    /* Theme variables */
+    :root{
+      --bg-light:#f6f8fb; --bg-dark:#0b1220;
+      --card-light:#ffffff; --card-dark:#0f1419;
+      --text-light:#0b1220; --text-dark:#eef6ff;
+      --muted-light:#6b7280; --muted-dark:#98a3b1;
+      --accent:#2563eb; --accent-2:#4fa3ff;
+      --border-light:rgba(0,0,0,0.08); --border-dark:rgba(255,255,255,0.06);
+      --radius:12px; --maxw:1100px;
+      font-family:"Poppins",sans-serif;
+    }
+    html[data-theme="light"]{ --bg:var(--bg-light); --card:var(--card-light); --text:var(--text-light); --muted:var(--muted-light); --border:var(--border-light); }
+    html[data-theme="dark"]{ --bg:var(--bg-dark); --card:var(--card-dark); --text:var(--text-dark); --muted:var(--muted-dark); --border:var(--border-dark); }
+
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0;background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased}
+    .container{width:92%;max-width:var(--maxw);margin:20px auto;padding:0 12px}
+
+    header{position:sticky;top:0;padding:12px 0;border-bottom:1px solid var(--border);background:transparent;z-index:100}
+    .nav{display:flex;justify-content:space-between;align-items:center}
+    .brand{display:flex;align-items:center;gap:10px;font-weight:700}
+    .controls{display:flex;gap:8px;align-items:center}
+
+    .title{margin:18px 0}
+    .subtitle{color:var(--muted);font-size:.95rem}
+
+    .card{background:var(--card);border-radius:16px;padding:16px;border:1px solid var(--border);box-shadow:0 10px 30px rgba(2,6,23,0.06)}
+    .grid{display:grid;grid-template-columns:420px 1fr;gap:18px}
+    @media(max-width:980px){ .grid{grid-template-columns:1fr} }
+
+    .panel{padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--card)}
+    .row{display:flex;gap:8px;align-items:center}
+    .input, select{padding:10px;border-radius:10px;border:1px solid var(--border);background:transparent;color:var(--text);width:100%}
+    .btn{background:linear-gradient(90deg,var(--accent),var(--accent-2));color:#fff;padding:10px 12px;border-radius:10px;border:none;cursor:pointer;font-weight:700}
+    .btn.ghost{background:transparent;border:1px solid var(--border);padding:8px 10px;border-radius:10px;color:var(--text)}
+
+    /* list with flags */
+    .list{max-height:420px;overflow:auto;border-radius:10px;border:1px solid var(--border);padding:6px;background:var(--card)}
+    .list-item{display:flex;align-items:center;gap:10px;padding:8px;border-radius:8px;cursor:pointer}
+    .list-item:hover{background:rgba(255,255,255,0.02)}
+    .flag{width:28px;height:20px;object-fit:cover;border-radius:4px}
+    .code{font-weight:700}
+    .name{color:var(--muted);font-size:.92rem}
+
+    .popular{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;margin-top:12px}
+    .rate{padding:10px;border-radius:8px;border:1px solid var(--border);display:flex;justify-content:space-between;background:var(--card)}
+    .muted{color:var(--muted)}
+    .result{margin-top:12px;padding:12px;border-radius:10px;border:1px solid var(--border);background:var(--card)}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container">
+      <div class="nav">
+        <div class="brand"><i class="fas fa-feather-alt"></i> irfanrizkiaditri<span style="color:var(--accent)">.</span>site</div>
+        <div class="controls">
+          <button id="backBtn" class="btn.ghost">⟵ Kembali</button>
+          <button id="themeToggle" class="btn.ghost">Theme</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div class="container">
+      <div class="title">
+        <h1>Smart Converter — Fanra</h1>
+        <div class="subtitle">Data offline tersedia jika API tidak dapat dihubungi — lengkap dan stabil.</div>
+      </div>
+
+      <div class="card">
+        <div class="grid">
+          <div class="panel">
+            <div class="row">
+              <input id="amount" class="input" type="number" step="any" value="1" />
+              <select id="fromSelect" class="input" style="max-width:160px"></select>
+              <select id="toSelect" class="input" style="max-width:160px"></select>
+            </div>
+
+            <div style="display:flex;gap:8px;margin-top:12px">
+              <button id="convertBtn" class="btn">Konversi</button>
+              <button id="swapBtn" class="btn.ghost">Tukar</button>
+              <button id="fetchBtn" class="btn.ghost">Muat Kurs</button>
+              <button id="copyBtn" class="btn.ghost"><i class="fas fa-copy"></i></button>
+            </div>
+
+            <div class="result" id="resultBox"><strong>Hasil:</strong> <span id="result">—</span></div>
+            <div style="margin-top:8px" class="muted">Tanggal kurs: <span id="rateDate">—</span></div>
+            <div style="margin-top:6px" class="muted">Status: <span id="status">idle</span></div>
+          </div>
+
+          <div>
+            <div style="display:flex;gap:8px;margin-bottom:8px">
+              <input id="search" class="input" placeholder="Cari mata uang (kode atau nama)..." />
+              <button id="clearSearch" class="btn.ghost">Clear</button>
+            </div>
+
+            <div style="display:flex;gap:8px">
+              <div style="flex:1">
+                <div style="font-weight:700;margin-bottom:6px">Dari</div>
+                <div id="fromList" class="list" role="listbox"></div>
+              </div>
+              <div style="flex:1">
+                <div style="font-weight:700;margin-bottom:6px">Ke</div>
+                <div id="toList" class="list" role="listbox"></div>
+              </div>
+            </div>
+
+            <div style="margin-top:12px">
+              <div style="display:flex;justify-content:space-between;align-items:center">
+                <div style="font-weight:700">Kurs Populer</div><div class="muted">basis USD</div>
+              </div>
+              <div id="popular" class="popular"></div>
+            </div>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:8px;align-items:center;margin-top:12px">
+          <button id="exportRates" class="btn.ghost">Export Cache</button>
+          <button id="clearCache" class="btn.ghost">Hapus Cache</button>
+          <div style="margin-left:auto" class="muted">Sumber: exchangerate.host (fallback ke localRates bila perlu)</div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+  /* THEME */
+  (function(){
+    const root = document.documentElement;
+    const saved = localStorage.getItem('site_theme') || 'dark';
+    root.setAttribute('data-theme', saved);
+    document.getElementById('themeToggle').addEventListener('click', ()=>{
+      const now = root.getAttribute('data-theme');
+      const next = now === 'light' ? 'dark' : 'light';
+      root.setAttribute('data-theme', next);
+      localStorage.setItem('site_theme', next);
+    });
+  })();
+
+  /* LOCAL RATES (fallback) relative to USD
+     Values represent: 1 USD = X currency
+     These are sample realistic values (update periodically if you want).
+  */
+  const localRates = {
+    USD:1, EUR:0.92, IDR:15500, JPY:150, GBP:0.79, AUD:1.55, CAD:1.39,
+    CNY:7.10, SGD:1.35, MYR:4.45, THB:34.2, KRW:1350, INR:83.2, BRL:5.6,
+    MXN:18.2, ZAR:18.3, NZD:1.65, CHF:0.88, SEK:9.5, NOK:9.8, DK:6.8,
+    // continue fill many common currencies
+    // ensure keys exist for basic conversions; full list extended further below
+  };
+
+  // Extended localRates: add many keys (you can expand as needed)
+  Object.assign(localRates, {
+    BGN:1.80, HRK:6.95, RON:4.45, HUF:354, CZK:23.6, PLN:3.7, ILS:3.55,
+    PHP:55.6, VND:24300, PKR:280, NGN:825, EGP:30.5, ARS:350, COP:4300,
+    CLP:820, PAB:1, PEN:3.7, UYU:38.9, JMD:150, LKR:320, BDT:107,
+    // more...
+    KWD:0.31, QAR:3.64, AED:3.67, SAR:3.75, OMR:0.38, BHD:0.38,
+    // Add extra african and pacific currencies
+    ZMW:19.5, MZN:63.2, FJD:2.25, PGK:3.52, SBD:8.0, TOP:2.3
+  });
+
+  /* Helper to get flag url */
+  function flagUrl(cc){
+    if(!cc) return '';
+    return `https://flagcdn.com/w20/${cc.toLowerCase()}.png`;
+  }
+
+  /* CURRENCIES list with optional flag country codes (partial, extend as needed) */
+  const CURRENCIES = [
+    {code:'USD',name:'US Dollar',flag:'us'},{code:'EUR',name:'Euro',flag:'eu'},{code:'IDR',name:'Indonesian Rupiah',flag:'id'},
+    {code:'JPY',name:'Japanese Yen',flag:'jp'},{code:'GBP',name:'British Pound',flag:'gb'},{code:'AUD',name:'Australian Dollar',flag:'au'},
+    {code:'CAD',name:'Canadian Dollar',flag:'ca'},{code:'CNY',name:'Chinese Yuan',flag:'cn'},{code:'SGD',name:'Singapore Dollar',flag:'sg'},
+    {code:'MYR',name:'Malaysian Ringgit',flag:'my'},{code:'THB',name:'Thai Baht',flag:'th'},{code:'KRW',name:'South Korean Won',flag:'kr'},
+    {code:'INR',name:'Indian Rupee',flag:'in'},{code:'BRL',name:'Brazilian Real',flag:'br'},{code:'MXN',name:'Mexican Peso',flag:'mx'},
+    {code:'ZAR',name:'South African Rand',flag:'za'},{code:'NZD',name:'New Zealand Dollar',flag:'nz'},{code:'CHF',name:'Swiss Franc',flag:'ch'},
+    {code:'SEK',name:'Swedish Krona',flag:'se'},{code:'NOK',name:'Norwegian Krone',flag:'no'},{code:'DKK',name:'Danish Krone',flag:'dk'},
+    {code:'PLN',name:'Polish Zloty',flag:'pl'},{code:'HUF',name:'Hungarian Forint',flag:'hu'},{code:'CZK',name:'Czech Koruna',flag:'cz'},
+    {code:'ILS',name:'Israeli Shekel',flag:'il'},{code:'AED',name:'UAE Dirham',flag:'ae'},{code:'SAR',name:'Saudi Riyal',flag:'sa'},
+    {code:'KWD',name:'Kuwaiti Dinar',flag:'kw'},{code:'QAR',name:'Qatari Riyal',flag:'qa'},{code:'OMR',name:'Omani Rial',flag:'om'},
+    {code:'BHD',name:'Bahraini Dinar',flag:'bh'},{code:'EGP',name:'Egyptian Pound',flag:'eg'},{code:'NGN',name:'Nigerian Naira',flag:'ng'},
+    {code:'VND',name:'Vietnamese Dong',flag:'vn'},{code:'PHP',name:'Philippine Peso',flag:'ph'},{code:'PKR',name:'Pakistani Rupee',flag:'pk'},
+    {code:'BDT',name:'Bangladeshi Taka',flag:'bd'},{code:'LKR',name:'Sri Lankan Rupee',flag:'lk'},{code:'NAD',name:'Namibian Dollar',flag:'na'},
+    /* ... extend list as needed to reach ~200 — can be added on demand ... */
+  ];
+
+  // DOM refs
+  const fromSelect = document.getElementById('fromSelect');
+  const toSelect = document.getElementById('toSelect');
+  const fromList = document.getElementById('fromList');
+  const toList = document.getElementById('toList');
+  const amountInput = document.getElementById('amount');
+  const resultSpan = document.getElementById('result');
+  const rateDate = document.getElementById('rateDate');
+  const status = document.getElementById('status');
+  const searchBox = document.getElementById('search');
+  const popularEl = document.getElementById('popular');
+
+  // populate selects
+  function populateSelects(){
+    CURRENCIES.forEach(c=>{
+      const o1 = document.createElement('option'); o1.value = c.code; o1.textContent = c.code + ' — ' + c.name;
+      const o2 = o1.cloneNode(true);
+      fromSelect.appendChild(o1); toSelect.appendChild(o2);
+    });
+    fromSelect.value = 'USD'; toSelect.value = 'IDR';
+  }
+  populateSelects();
+
+  // render lists (with flags)
+  function renderLists(filter=''){
+    const f = filter.toLowerCase();
+    fromList.innerHTML = ''; toList.innerHTML = '';
+    CURRENCIES.filter(c => !f || c.code.toLowerCase().includes(f) || c.name.toLowerCase().includes(f))
+      .forEach(c=>{
+        const row1 = document.createElement('div'); row1.className='list-item';
+        row1.innerHTML = `<img class="flag" src="${c.flag?flagUrl(c.flag): ''}" alt="${c.code}"> <div style="flex:1"><div class="code">${c.code}</div><div class="name">${c.name}</div></div>`;
+        row1.addEventListener('click', ()=> fromSelect.value = c.code);
+        fromList.appendChild(row1);
+
+        const row2 = row1.cloneNode(true);
+        row2.addEventListener('click', ()=> toSelect.value = c.code);
+        toList.appendChild(row2);
+      });
+  }
+  renderLists();
+
+  // local rates and state for API
+  const RATES_KEY = 'fanra_rates_v2';
+  const RATES_TS = 'fanra_rates_ts_v2';
+  let rates = {}; let ratesTimestamp = null;
+
+  // attempt to load cached rates
+  (function initRates(){
+    try{
+      const cached = localStorage.getItem(RATES_KEY);
+      const ts = localStorage.getItem(RATES_TS);
+      if(cached){ rates = JSON.parse(cached); ratesTimestamp = ts; rateDate.textContent = ts || 'cached'; status.textContent = 'Memakai cache lokal'; renderPopular(); }
+      else { status.textContent = 'Cache kosong, tekan "Muat Kurs" untuk ambil dari API'; }
+    }catch(e){ console.warn('initRates', e); status.textContent = 'Cache error'; }
+  })();
+
+  // fetch rates from API (base USD)
+  async function fetchRates(){
+    status.textContent = 'Mengambil kurs dari API...';
+    try{
+      const res = await fetch('https://api.exchangerate.host/latest?base=USD');
+      const data = await res.json();
+      if(data && data.rates){
+        rates = data.rates;
+        ratesTimestamp = data.date || new Date().toISOString();
+        localStorage.setItem(RATES_KEY, JSON.stringify(rates));
+        localStorage.setItem(RATES_TS, ratesTimestamp);
+        rateDate.textContent = ratesTimestamp;
+        status.textContent = 'Kurs terbaru dimuat dari API';
+        renderPopular();
+        return true;
+      } else throw new Error('no rates');
+    }catch(err){
+      console.warn('fetchRates failed', err);
+      // fallback to localRates
+      rates = Object.assign({}, localRates);
+      ratesTimestamp = 'localFallback';
+      rateDate.textContent = 'localFallback';
+      status.textContent = 'API gagal — memakai data lokal fallback';
+      renderPopular();
+      return false;
+    }
+  }
+
+  document.getElementById('fetchBtn').addEventListener('click', fetchRates);
+
+  function renderPopular(){
+    popularEl.innerHTML = '';
+    const list = ['USD','EUR','IDR','JPY','GBP','AUD','CAD','CNY','SGD','MYR','THB','KRW','INR','BRL','ZAR'];
+    list.forEach(code=>{
+      const r = rates && rates[code] ? rates[code] : (localRates[code] || null);
+      const card = document.createElement('div'); card.className='rate';
+      card.innerHTML = `<div style="font-weight:700">${code}</div><div>${r?Number(r).toLocaleString(undefined,{maximumFractionDigits:6}):'—'}</div>`;
+      popularEl.appendChild(card);
+    });
+  }
+
+  // Convert function: try API rates first; if not present use localRates
+  function convert(){
+    const amount = parseFloat(amountInput.value);
+    const from = fromSelect.value;
+    const to = toSelect.value;
+    if(isNaN(amount) || amount <= 0){ alert('Masukkan jumlah yang valid (>0).'); return; }
+
+    // select rate source (rates may be API or fallback)
+    const rFrom = rates && rates[from] ? rates[from] : (localRates[from] || null);
+    const rTo = rates && rates[to] ? rates[to] : (localRates[to] || null);
+    if(!rFrom || !rTo){
+      // As extra fallback, try to compute ratio via USD if one side exists
+      if(rFrom && !rTo){
+        // compute rTo using rFrom and localRates if possible
+        if(localRates[to]){ // local known
+          const usd = amount / rFrom; const final = usd * localRates[to];
+          resultSpan.textContent = Number(final).toLocaleString('id-ID',{maximumFractionDigits:8}) + ' ' + to;
+          status.textContent = 'Konversi: gabungan API/local fallback';
+          return;
+        }
+      }
+      if(rTo && !rFrom){
+        if(localRates[from]){
+          const usd = amount / localRates[from]; const final = usd * rTo;
+          resultSpan.textContent = Number(final).toLocaleString('id-ID',{maximumFractionDigits:8}) + ' ' + to;
+          status.textContent = 'Konversi: gabungan API/local fallback';
+          return;
+        }
+      }
+      // final fallback: try using localRates only if both available
+      if(localRates[from] && localRates[to]){
+        const usd = amount / localRates[from];
+        const final = usd * localRates[to];
+        resultSpan.textContent = Number(final).toLocaleString('id-ID',{maximumFractionDigits:8}) + ' ' + to;
+        status.textContent = 'Konversi dari local fallback';
+        return;
+      }
+      alert('Kurs tidak tersedia untuk pasangan ini. Silakan muat kurs atau pilih pasangan lain.');
+      return;
+    }
+
+    // normal conversion using rates
+    const usd = amount / rFrom;
+    const final = usd * rTo;
+    resultSpan.textContent = Number(final).toLocaleString('id-ID',{maximumFractionDigits:8}) + ' ' + to;
+    rateDate.textContent = ratesTimestamp || 'cached';
+    status.textContent = 'Berhasil dikonversi';
+  }
+
+  // Attach convert & other UI listeners
+  document.getElementById('convertBtn').addEventListener('click', convert);
+  document.getElementById('swapBtn').addEventListener('click', ()=>{
+    const a = fromSelect.value; fromSelect.value = toSelect.value; toSelect.value = a;
+  });
+  document.getElementById('copyBtn').addEventListener('click', ()=>{
+    const t = resultSpan.textContent;
+    if(t && t !== '—') navigator.clipboard?.writeText(t).then(()=> alert('Hasil disalin'));
+  });
+
+  document.getElementById('exportRates').addEventListener('click', ()=>{
+    const cached = localStorage.getItem(RATES_KEY);
+    if(!cached){ alert('Tidak ada cache. Muat kurs terlebih dahulu.'); return; }
+    const blob = new Blob([cached], {type:'application/json'}); const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href = url; a.download = 'exchange_rates_usd.json'; a.click(); URL.revokeObjectURL(url);
+  });
+  document.getElementById('clearCache').addEventListener('click', ()=>{
+    if(confirm('Hapus cache kurs?')){ localStorage.removeItem(RATES_KEY); localStorage.removeItem(RATES_TS); rates={}; ratesTimestamp=null; rateDate.textContent='—'; status.textContent='Cache dihapus'; renderPopular(); resultSpan.textContent='—'; }
+  });
+
+  // search filter for lists
+  document.getElementById('search').addEventListener('input', (e)=> renderLists(e.target.value.trim()));
+  document.getElementById('clearSearch').addEventListener('click', ()=> { document.getElementById('search').value=''; renderLists(''); });
+
+  function renderLists(filter=''){
+    const f = filter.toLowerCase();
+    fromList.innerHTML=''; toList.innerHTML='';
+    CURRENCIES.filter(c => !f || c.code.toLowerCase().includes(f) || c.name.toLowerCase().includes(f)).forEach(c=>{
+      const node = document.createElement('div'); node.className='list-item';
+      const img = document.createElement('img'); img.className='flag'; img.alt = c.code; img.src = c.flag ? flagUrl(c.flag) : '';
+      const info = document.createElement('div'); info.style.flex='1'; info.innerHTML=`<div class="code">${c.code}</div><div class="name">${c.name}</div>`;
+      node.appendChild(img); node.appendChild(info);
+      node.addEventListener('click', ()=> { fromSelect.value = c.code; });
+      fromList.appendChild(node);
+
+      const node2 = node.cloneNode(true);
+      node2.addEventListener('click', ()=> { toSelect.value = c.code; });
+      toList.appendChild(node2);
+    });
+  }
+
+  // helper used earlier
+  function flagUrl(cc){
+    if(!cc) return '';
+    return `https://flagcdn.com/w20/${cc.toLowerCase()}.png`;
+  }
+
+  // init lists & try background fetch
+  renderLists();
+  (async ()=> { await fetchRates(); })();
+
+  // back button
+  document.getElementById('backBtn').addEventListener('click', ()=> {
+    if(history.length > 1) history.back(); else location.href='index.html';
+  });
+
+  // keyboard: Enter to convert
+  document.addEventListener('keydown', (e)=> {
+    if(e.key === 'Enter') convert();
+  });
+
+  </script>
+</body>
+</html>

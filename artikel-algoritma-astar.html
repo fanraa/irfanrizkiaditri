@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <title>Mengenal Algoritma A*: Jantung Navigasi di Game dan Google Maps - Fanra</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css"> 
+  <style>
+    .article-image { max-width: 100%; height: auto; border-radius: 12px; margin: 25px 0; box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+    .article-source { margin-top: 40px; padding: 15px; border-top: 1px solid var(--card-border); font-size: 0.9rem; color: var(--muted); }
+    .callout { background: var(--glass); border-left: 5px solid var(--accent-2); padding: 15px; margin: 25px 0; border-radius: 8px; }
+  </style>
+</head>
+<body data-theme="dark">
+  
+  <main>
+    <section class="section">
+      <div class="container article-container reveal">
+        <h1 class="article-title">Mengenal Algoritma A* (A-Star): Jantung Navigasi di Game dan Google Maps</h1>
+        <p class="article-meta"><i class="fas fa-calendar-alt"></i> 11 November 2025 &nbsp; | &nbsp; <i class="fas fa-user-circle"></i> Irfan Rizki Aditri &nbsp; | &nbsp; <i class="fas fa-tags"></i> Algoritma, GameDev, JavaScript</p>
+        
+        <img src="https://via.placeholder.com/800x400?text=Ilustrasi+Pathfinding+dengan+A-Star" alt="Ilustrasi Algoritma A-Star" class="article-image">
+
+        <div class="article-content">
+          <p>Sebagai *game developer* yang sering berkutat dengan AI (kecerdasan buatan), saya bisa bilang bahwa **A-Star ($\text{A}^{*}$)** adalah algoritma wajib yang harus dikuasai. Algoritma *pathfinding* ini tidak hanya digunakan oleh musuh di game-mu untuk menemukan jalan pintas, tetapi juga oleh aplikasi navigasi seperti Google Maps untuk menentukan rute tercepat.</p>
+
+          <h2>Filosofi A-Star: Memilih yang Paling Optimal</h2>
+          <p>A-Star adalah perpaduan antara Algoritma Dijkstra (yang menjamin rute terpendek) dan *Best-First Search* (yang menggunakan heuristik untuk mempercepat pencarian). Kombinasi ini menjadikannya cepat dan akurat.</p>
+          
+          <div class="callout">
+            <strong><i class="fas fa-magic"></i> Fungsi Evaluasi $f(n)$:</strong>
+            <p>A-Star bekerja dengan mengevaluasi setiap titik ($n$) menggunakan fungsi $\mathbf{f(n) = g(n) + h(n)}$:</p>
+            <ul>
+                <li>$\mathbf{g(n)}$: Biaya (jarak) dari titik awal ke titik $n$ saat ini. (Faktor Real)</li>
+                <li>$\mathbf{h(n)}$: Heuristik. Estimasi biaya (jarak) dari titik $n$ ke titik tujuan. (Faktor Estimasi)</li>
+            </ul>
+          </div>
+
+          <h3>Penerapan dalam Game Development</h3>
+          <p>Bayangkan kamu membuat game strategi, dan musuh harus menghindari sungai atau tebing (obstacle) untuk menyerang markasmu. Peta game diwakilkan sebagai *Graph* (kumpulan node/titik). A-Star memungkinkan musuh memilih jalan:</p>
+
+          <pre><code>// Pseudocode A-Star di setiap Node/Titik
+while (OpenList is NOT empty):
+    current_node = Node dengan F_value TERKECIL
+    
+    // Jika sudah sampai tujuan, hentikan
+    if (current_node == goal_node):
+        ReconstructPath() 
+        return
+        
+    for neighbor in current_node.Neighbors:
+        tentative_g_score = current_node.g_score + Jarak(current_node, neighbor)
+        
+        if (tentative_g_score < neighbor.g_score):
+            // Path yang lebih baik ditemukan
+            neighbor.parent = current_node
+            neighbor.g_score = tentative_g_score
+            neighbor.h_score = HitungHeuristik(neighbor, goal_node)
+            neighbor.f_score = neighbor.g_score + neighbor.h_score
+            
+            if neighbor is NOT in OpenList:
+                Add neighbor to OpenList</code></pre>
+          
+          <p>Kode di atas menunjukkan esensi dari A-Star: selalu mencari rute yang saat ini terlihat paling menjanjikan (memiliki nilai $\mathbf{f(n)}$ terkecil) sambil tetap memastikan rute tersebut valid.</p>
+          
+          <h2>Heuristik yang Benar (Admissible Heuristic)</h2>
+          <p>Kekuatan A-Star terletak pada fungsi $\mathbf{h(n)}$. Agar algoritma dapat menjamin rute terpendek secara optimal, heuristik yang digunakan harus *admissible* (tidak pernah melebih-lebihkan biaya sebenarnya). Heuristik yang paling umum adalah Jarak Euclidean (garis lurus) atau Jarak Manhattan (pergerakan vertikal/horizontal, seperti di papan catur).</p>
+
+          <blockquote>
+            "Jika kamu menggunakan heuristik yang terlalu tinggi (misalnya memprediksi jarak 100km padahal aslinya 50km), A-Star akan berjalan lebih cepat, tetapi rute yang dihasilkan mungkin bukan yang terpendek."
+          </blockquote>
+          
+          <p>Baik itu dalam game *Arcade Escape* (untuk navigasi musuh) atau simulasi fisika (untuk analisis lintasan), A-Star adalah bukti bagaimana matematika dan coding dapat menghasilkan solusi yang cerdas dan efisien untuk masalah navigasi di dunia nyata dan virtual.</p>
+
+          <div class="article-source">
+            **Sumber Referensi:**<br>
+            [1] Pearl, J. (1984). *Heuristics: Intelligent Search Strategies for Computer Problem Solving*. Addison-Wesley. <br>
+            [2] Russell, S. J., & Norvig, P. (2020). *Artificial Intelligence: A Modern Approach*. 4th ed. Pearson Education. <br>
+            [3] Dijkstra, E. W. (1959). *A note on two problems in connexion with graphs*. Numerische Mathematik.
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+  
+  </body>
+</html>

@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Fanra Escape — Arcade Escape (Upgraded)</title>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="game-shop.css">
+
+<style>
+/* ... (SEMUA CSS LAMA KAMU DARI awesome-game.html ADA DI SINI) ... */
+:root{
+  --bg:#0d0d0f; --card:#141418; --text:#ffffff;
+  --accent:#4fa3ff; --accent-2:#7c3aed; --muted:#9da3b3;
+  --glass:rgba(255,255,255,0.06); --card-border:rgba(255,255,255,0.06);
+  --success: #10b981; --danger: #ef4444; --warning: #f59e0b;
+}
+[data-theme="light"]{
+  --bg:#f6f8fb; --card:#ffffff; --text:#0b1220;
+  --accent:#2563eb; --accent-2:#7c3aed; --muted:#6b7280;
+  --glass:rgba(0,0,0,0.05); --card-border:rgba(0,0,0,0.08);
+}
+html{
+  font-family:"Poppins",sans-serif;
+  font-size:clamp(14px, 1.6vw, 16px);
+  scroll-behavior:smooth;
+  -webkit-font-smoothing:antialiased;
+}
+*{ margin:0; padding:0; box-sizing:border-box; }
+body{
+  background:var(--bg); color:var(--text);
+  min-height:100vh;
+  transition:background .25s ease, color .25s ease;
+  line-height:1.6;
+}
+a{ text-decoration:none; color:inherit; }
+
+/* ... (CSS Header, Nav, dll.) ... */
+header{
+  position:sticky; top:0; left:0; width:100%;
+  backdrop-filter:blur(12px) saturate(1.5);
+  background:linear-gradient(180deg, rgba(0,0,0,0.35), transparent);
+  border-bottom:1px solid var(--card-border);
+  z-index:1500;
+  animation:headerDrop .55s cubic-bezier(.2,.9,.2,1);
+}
+@keyframes headerDrop{
+  from{transform:translateY(-20px);opacity:0;}
+  to{transform:translateY(0);opacity:1;}
+}
+.container{ width:min(94%, 1200px); margin:0 auto; }
+.navbar{ display:flex; align-items:center; gap:16px; padding:16px 0; }
+.logo{ display:flex; align-items:center; gap:10px; font-weight:700; font-size:1.15rem; letter-spacing:.4px; }
+.logo i{ color:var(--accent); font-size:1.2rem; }
+.logo span{ color:var(--accent); }
+.nav-wrap{ margin-left:auto; display:flex; align-items:center; gap:14px; }
+.nav-links{ display:flex; gap:20px; list-style:none; }
+.nav-links a{ padding:6px 10px; font-weight:500; border-radius:8px; position:relative; transition:.25s; }
+.nav-links a:hover, .nav-links .active{ color:var(--accent); transform:translateY(-2px); }
+.nav-links a::after{ content:""; position:absolute; bottom:-2px; left:0; width:0%; height:2px; background:var(--accent); border-radius:6px; transition:.28s; }
+.nav-links a:hover::after, .nav-links .active::after{ width:100%; }
+.theme-toggle{ cursor:pointer; display:flex; align-items:center; }
+.switch{ width:46px; height:26px; background:var(--glass); border:1px solid var(--card-border); border-radius:20px; position:relative; padding:3px; backdrop-filter:blur(5px); }
+.knob{ width:20px; height:20px; background:#fff; border-radius:50%; position:absolute; top:3px; left:3px; box-shadow:0 4px 12px rgba(0,0,0,.3); transition:.25s; }
+[data-theme="light"] .switch{ background:linear-gradient(90deg, var(--accent), var(--accent-2)); }
+[data-theme="light"] .knob{ left:23px; }
+.hamburger{ display:none; background:none; border:0; font-size:1.25rem; color:var(--text); padding:6px; }
+.mobile-menu{ display:none; position:absolute; right:14px; top:72px; background:var(--card); border:1px solid var(--card-border); border-radius:14px; min-width:220px; padding:12px; box-shadow:0 14px 28px rgba(0,0,0,.5); animation:fadeMenu .3s ease; }
+.mobile-menu a{ display:block; padding:10px; border-radius:8px; transition:.25s; font-weight:500; }
+.mobile-menu.open{ display:block; }
+@keyframes fadeMenu{ from{opacity:0;transform:translateY(-6px);} to{opacity:1;transform:translateY(0);} }
+@media(max-width: 700px){ .nav-links{display:none;} .hamburger{display:inline-flex;} }
+
+/* ... (CSS Main, Footer) ... */
+main{ padding:40px 0; }
+footer{ margin-top:40px; padding:20px 0; text-align:center; color:var(--muted); }
+
+/* ==== GAME STYLES ==== */
+.game-card{
+  background:var(--card);
+  border:1px solid var(--card-border);
+  border-radius:18px;
+  box-shadow:0 10px 30px rgba(0,0,0,.4);
+  backdrop-filter:blur(8px);
+  padding:24px;
+  transition:.25s ease;
+  max-width:1000px;
+  margin:0 auto;
+}
+.game-box{
+  position:relative;
+  width:100%;
+  max-width:800px; /* base width */
+  margin:0 auto;
+  aspect-ratio: 800 / 480; /* base ratio */
+  background:linear-gradient(180deg, #1f222e, #11131a);
+  border-radius:12px;
+  overflow:hidden;
+  border:1px solid var(--card-border);
+  box-shadow:inset 0 4px 20px rgba(0,0,0,.5);
+}
+#gameCanvas{
+  position:absolute;
+  top:0; left:0; width:100%; height:100%;
+  image-rendering:pixelated; /* crisp pixels */
+  cursor:crosshair;
+}
+.full-game{ position:fixed!important; top:0; left:0; width:100vw!important; height:100vh!important; border-radius:0!important; max-width:none!important; z-index:2000; }
+.full-game #gameCanvas{ border-radius:0; }
+.hud{
+  display:flex; justify-content:space-between; align-items:center;
+  padding:12px 16px;
+  font-weight:600;
+  border-bottom:1px solid var(--card-border);
+  background:rgba(0,0,0,.15);
+}
+.hud-group{ display:flex; align-items:center; gap:16px; }
+.hud-item{ display:flex; align-items:center; gap:6px; font-size:.9rem; }
+.hud-item i{ color:var(--accent); font-size:1rem; }
+.hud-item #lives{ color:var(--danger); }
+.hud-item #ammoCount{ color:var(--warning); }
+
+.game-controls{
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  padding:16px 0 0 0;
+}
+.btn-outline{
+  background:var(--glass);
+  border:1px solid var(--card-border);
+  color:var(--text); padding:10px 14px;
+  border-radius:10px; cursor:pointer; font-weight:500;
+  transition:.2s;
+  font-size: 0.95rem;
+}
+.btn-outline:hover{ 
+  background:var(--accent); 
+  border-color:var(--accent); 
+  color:#fff; 
+  transform: translateY(-2px);
+}
+.btn-outline i {
+  margin-right: 8px;
+}
+
+/* ==== OVERLAY STYLES ==== */
+.overlay{
+  position:absolute;
+  top:0; left:0; width:100%; height:100%;
+  backdrop-filter:blur(8px) saturate(1.2);
+  background:rgba(0,0,0,.6);
+  z-index:100;
+  display:flex; align-items:center; justify-content:center;
+  opacity:0; pointer-events:none; transition:.3s ease;
+}
+.overlay.active{ opacity:1; pointer-events:all; }
+.overlay-box{
+  background:var(--card);
+  border:1px solid var(--card-border);
+  border-radius:14px;
+  padding:24px 32px;
+  text-align:center;
+  box-shadow:0 10px 30px rgba(0,0,0,.5);
+  animation:popIn .3s cubic-bezier(.2,.9,.2,1);
+  width: 90%;
+}
+@keyframes popIn{ from{opacity:0;transform:scale(.9);} to{opacity:1;transform:scale(1);} }
+.overlay-box h2{ margin-bottom:8px; font-size:1.8rem; }
+.overlay-box p{ margin-bottom:20px; color:var(--muted); max-width:300px; margin-left: auto; margin-right: auto; }
+.btn-main{
+  background:linear-gradient(135deg, var(--accent), var(--accent-2));
+  border:0; color:#fff;
+  padding:12px 24px; border-radius:10px;
+  font-weight:600; font-size:1rem;
+  cursor:pointer; transition:.2s;
+  display:block; width:100%; margin:10px 0;
+}
+.btn-main:hover{ transform:scale(1.03); box-shadow:0 6px 15px rgba(0,0,0,.3); }
+.btn-main:disabled{ background:var(--muted); opacity:.7; cursor:not-allowed; }
+#overScore{ margin:10px 0; font-size:1.2rem; }
+#overScore span{ font-weight:700; color:var(--accent); }
+
+/* CSS PAPAN PERINGKAT */
+.leaderboard-card {
+  background:var(--card);
+  border:1px solid var(--card-border);
+  border-radius:18px;
+  box-shadow:0 10px 30px rgba(0,0,0,.4);
+  padding:24px;
+  max-width:1000px;
+  margin: 30px auto 0 auto;
+}
+.leaderboard-card h2 {
+  text-align: center;
+  margin-bottom: 20px;
+  color: var(--accent);
+}
+.leaderboard-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  max-height: 300px;
+  overflow-y: auto;
+}
+.leaderboard-list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background: var(--glass);
+  border-radius: 8px;
+  margin-bottom: 8px;
+  font-size: 1.1rem;
+}
+.leaderboard-list li span:first-child {
+  color: var(--muted);
+  font-weight: 600;
+  min-width: 30px;
+}
+.leaderboard-list li strong {
+  color: var(--text);
+  flex-grow: 1;
+  text-align: left;
+  margin-left: 15px;
+}
+.leaderboard-list li span:last-child {
+  color: var(--success);
+  font-weight: 700;
+}
+.leaderboard-footer {
+  text-align: center;
+  margin-top: 20px;
+  color: var(--muted);
+}
+.leaderboard-footer .btn-main {
+  max-width: 300px;
+  margin-left: auto;
+  margin-right: auto;
+}
+/* Sembunyikan/tampilkan elemen berdasarkan status login */
+.logged-out .show-when-logged-in { display: none; }
+.logged-in .show-when-logged-out { display: none; }
+</style>
+</head>
+<body data-theme="dark" class="logged-out"> <header>
+  <nav class="container navbar">
+    <a href="#" class="logo"><i class="fas fa-ghost"></i> <span>Fanra</span>Escape</a>
+    <div class="nav-wrap">
+      <div class="nav-links">
+        <a href="#game" class="active">Game</a>
+        <a href="javascript:history.back()">Kembali</a>
+      </div>
+      <div class="theme-toggle" id="themeToggle">
+        <div class="switch"><div class="knob"></div></div>
+      </div>
+      <button class="hamburger" id="hamburger"><i class="fas fa-bars"></i></button>
+    </div>
+  </nav>
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="#game" class="active">Game</a>
+    <a href="javascript:history.back()">Kembali</a>
+  </div>
+</header>
+
+<main>
+  <div class="game-card" id="gameCard">
+    <div class="hud">
+      <div class="hud-group">
+        <div class="hud-item" title="Score"><i class="fas fa-star"></i> <span id="score">0</span></div>
+        <div class="hud-item" title="Best Score"><i class="fas fa-trophy"></i> <span id="best">0</span></div>
+      </div>
+      <div class="hud-group">
+        <div class="hud-item" title="Lives"><i class="fas fa-heart"></i> <span id="lives">&times;3</span></div>
+        <div class="hud-item" title="Ammo"><i class="fas fa-bolt"></i> <span id="ammoCount">100</span></div>
+        <div class="hud-item" title="Coins"><i class="fas fa-circle-dollar-to-slot"></i> <span id="coinCount">0</span></div>
+      </div>
+    </div>
+    
+    <div class="game-box" id="gameBox">
+      <canvas id="gameCanvas" width="800" height="480"></canvas>
+
+      <div id="startOverlay" class="overlay active">
+        <div class="overlay-box">
+          <h2>Fanra Escape</h2>
+          <p>Klik/Tap untuk menembak, Tahan+Geser untuk bergerak.</p>
+          <button id="playBtn" class="btn-main">Mulai Game</button>
+          <button id="demoBtn" class="btn-outline">Lihat Demo</button>
+          <button id="shopBtnStart" class="btn-outline">Toko <i class="fas fa-store"></i></button>
+        </div>
+      </div>
+
+      <div id="overOverlay" class="overlay">
+        <div class="overlay-box">
+          <h2>Game Over</h2>
+          <div id="overScore">
+            <div>Skor: <span id="finalScore">0</span></div>
+            <div>Terbaik: <span id="finalBest">0</span></div>
+          </div>
+          <button id="restartBtn" class="btn-main">Main Lagi</button>
+          <button id="reviveBtn" class="btn-main">Lanjutkan? <span id="reviveCost">(100)</span></button>
+          <button id="shopBtnOver" class="btn-outline">Toko <i class="fas fa-store"></i></button>
+        </div>
+      </div>
+      
+      <div id="pauseOverlay" class="overlay">
+        <div class="overlay-box">
+          <h2>Game Dijeda</h2>
+          <p>Pilih aksi untuk melanjutkan.</p>
+          <button id="pauseResumeBtn" class="btn-main">Lanjutkan</button>
+          <button id="pauseRestartBtn" class="btn-outline">Mulai Ulang</button>
+          <button id="pauseShopBtn" class="btn-outline">Toko <i class="fas fa-store"></i></button>
+          <button id="pauseQuitBtn" class="btn-outline" style="color: var(--danger); border-color: var(--danger);">Keluar ke Menu</button>
+        </div>
+      </div>
+
+      <div id="shopOverlay" class="overlay">
+        <div class="overlay-box">
+          <div class="shop-header">
+            <h2><i class="fas fa-store"></i> Toko</h2>
+            <div id="shopCoinDisplay">Koin: 0</div>
+          </div>
+          
+          <div class="shop-tabs">
+            <button class="shop-tab-btn active" data-tab="skins">Skin Pesawat</button>
+            <button class="shop-tab-btn" data-tab="upgrades">Upgrades</button>
+            <button class="shop-tab-btn" data-tab="buy">Beli</button>
+            <button class="shop-tab-btn" data-tab="profile">Profil</button>
+          </div>
+
+          <div class="shop-content">
+            <div id="shop-pane-skins" class="shop-pane active">
+              <div class="shop-grid" id="skin-grid"></div>
+            </div>
+            <div id="shop-pane-upgrades" class="shop-pane">
+              <div class="upgrade-list" id="upgrade-list"></div>
+            </div>
+            <div id="shop-pane-buy" class="shop-pane">
+              <div class="shop-grid" id="consumable-grid"></div>
+            </div>
+            <div id="shop-pane-profile" class="shop-pane"></div>
+          </div>
+
+          <div class="shop-footer">
+            <button id="closeShopBtn" class="btn-main">Tutup</button>
+          </div>
+        </div>
+      </div>
+      
+      <div id="loginOverlay" class="overlay">
+        <div class="overlay-box" style="max-width: 400px;">
+          <h2 id="authTitle">Masuk</h2>
+          <p id="authSubtitle">Masuk untuk menyimpan skormu ke papan peringkat.</p>
+          <div class="auth-form">
+            <form id="loginForm">
+              <div class="form-group">
+                <input type="email" id="loginEmail" placeholder="Email" required>
+              </div>
+              <div class="form-group">
+                <input type="password" id="loginPassword" placeholder="Password" required>
+              </div>
+              <button type="submit" class="btn-main">Masuk</button>
+            </form>
+            <form id="signupForm" style="display: none;">
+              <div class="form-group">
+                <input type="email" id="signupEmail" placeholder="Email" required>
+              </div>
+              <div class="form-group">
+                <input type="password" id="signupPassword" placeholder="Password (min. 6 karakter)" required>
+              </div>
+              <button type="submit" class="btn-main">Daftar</button>
+            </form>
+            
+            <button id="googleSignInBtn" class="btn-outline" style="width: 100%;"><i class="fab fa-google"></i> Lanjut dengan Google</button>
+            
+            <p class="auth-toggle">
+              <span id="toggleToSignup">Belum punya akun? <a href="#">Daftar</a></span>
+              <span id="toggleToLogin" style="display: none;">Sudah punya akun? <a href="#">Masuk</a></span>
+            </p>
+            <p id="authError" style="color: var(--danger); margin-top: 10px;"></p>
+          </div>
+          <button id="closeLoginBtn" class="btn-main" style="background: var(--muted); margin-top: 20px;">Tutup</button>
+        </div>
+      </div>
+      
+    </div>
+
+    <div class="game-controls">
+      <button id="fullscreenBtn" class="btn-outline"><i class="fas fa-expand"></i> Fullscreen</button>
+      <button id="pauseBtn" class="btn-outline"><i class="fas fa-pause"></i> Jeda</button>
+      <button id="resetBtn" class="btn-outline"><i class="fas fa-sync-alt"></i> Reset</button>
+    </div>
+
+  </div>
+  
+  <div class="leaderboard-card">
+    <h2><i class="fas fa-trophy"></i> Papan Peringkat</h2>
+    <ol class="leaderboard-list" id="leaderboard-list">
+      </ol>
+    <div class="leaderboard-footer">
+      <div class="show-when-logged-out">
+        <p>Skor tinggimu belum terdaftar.</p>
+        <button class="btn-main" id="loginBtn">Masuk & Daftarkan Skormu</button>
+      </div>
+      <div class="show-when-logged-in">
+        <p>Selamat datang, <strong id="usernameDisplay">...</strong>!</p>
+        <button class="btn-outline" id="logoutBtn">Keluar</button>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<footer>© 2025 Fanra (Irfan Rizki Aditri) — Fanra Escape</footer>
+
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+
+<script src="arcade-core.js"></script>
+<script src="arcade-ui.js"></script>
+<script src="game-shop.js"></script>
+<script src="game-auth.js"></script> <script>
+// Theme
+const themeToggle=document.getElementById("themeToggle");
+const saved=localStorage.getItem("site_theme")||"dark";
+document.documentElement.setAttribute("data-theme",saved);
+themeToggle.addEventListener("click",()=>{
+  const now=document.documentElement.getAttribute("data-theme")==="light"?"dark":"light";
+  document.documentElement.setAttribute("data-theme",now);
+  localStorage.setItem("site_theme",now);
+});
+
+// Mobile menu
+const hamburger=document.getElementById("hamburger");
+const mobileMenu=document.getElementById("mobileMenu");
+hamburger.addEventListener("click",()=>{
+  mobileMenu.classList.toggle("open");
+});
+
+// Init game
+FanraCore.init(
+  document.getElementById('gameCanvas'),
+  document.getElementById('gameBox')
+);
+</script>
+</body>
+</html>

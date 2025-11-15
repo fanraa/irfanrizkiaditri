@@ -1,0 +1,1330 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fanra Chat - Premium Messenger</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+
+    <style>
+        /* ========================================================= */
+        /* TEMA GLOBAL & KONSISTENSI */
+        /* ========================================================= */
+        :root{
+            --bg:#0d0d0f;
+            --card:#141418;
+            --text:#ffffff;
+            --accent:#4fa3ff; /* [UBAH] Menggunakan aksen dari file lama */
+            --accent-2:#7c3aed; /* [UBAH] Menggunakan aksen dari file lama */
+            --muted:#9da3b3;
+            --glass:rgba(255,255,255,0.06);
+            --card-border:rgba(255,255,255,0.06);
+            --sidebar-width: 300px;
+        }
+        [data-theme="light"]{
+            --bg:#f6f8fb;
+            --card:#ffffff;
+            --text:#0b1220;
+            --accent:#007bff; /* [UBAH] Aksen terang */
+            --accent-2:#5856d6; /* [UBAH] Aksen terang */
+            --muted:#6b7280; /* [UBAH] Muted terang */
+            --glass:rgba(0,0,0,0.05);
+            --card-border:rgba(0,0,0,0.08);
+        }
+        html{
+            font-family:"Poppins",sans-serif;
+            font-size:clamp(14px,1.6vw,16px);
+            -webkit-font-smoothing: antialiased;
+            overflow-x:hidden;
+            scroll-behavior: smooth;
+            height: 100%;
+        }
+        *{ margin:0; padding:0; box-sizing:border-box; }
+        body{
+            background:var(--bg);
+            color:var(--text);
+            min-height:100vh;
+            display: flex;
+            flex-direction: column;
+            transition:background .25s ease, color .25s ease;
+        }
+        a{ text-decoration:none; color:inherit; }
+        button { cursor: pointer; border: none; background: none; color: inherit; }
+
+        /* Form Controls */
+        input[type="text"], input[type="email"], input[type="password"] {
+            width: 100%;
+            padding: 8px 15px;
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            background: var(--card);
+            color: var(--text);
+            font-family: inherit;
+            font-size: 1rem;
+            transition: border-color 0.2s;
+        }
+        input:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        /* [UBAH] Header Baru (Gaya dari realtime-chat.html) */
+        header{
+            position:sticky; top:0; left:0; width:100%;
+            backdrop-filter:blur(12px) saturate(1.5);
+            background:var(--card); 
+            border-bottom:1px solid var(--card-border);
+            z-index:1500;
+        }
+        .container{ width:min(94%, 1200px); margin:0 auto; }
+        .navbar{
+            display:flex; align-items:center;
+            padding:16px 0; /* [UBAH] Padding lebih besar */
+        }
+        .logo{
+            display:flex; align-items:center; gap:10px;
+            font-weight:700; font-size:1.15rem;
+        }
+        .logo i{ color:var(--accent); font-size:1.2rem; }
+        .logo span{ color:var(--accent); }
+
+        .nav-wrap{
+            margin-left:auto;
+            display:flex; align-items:center; gap:14px;
+        }
+        .nav-links{ 
+            display:flex; 
+            gap:20px; 
+            list-style:none; 
+            align-items: center; 
+        }
+        .nav-links a{ 
+            padding:6px 10px; 
+            font-weight:500; 
+            border-radius:8px; 
+            position:relative; 
+            transition:.25s; 
+            cursor: pointer; 
+            display: flex; /* [UBAH] Agar icon sejajar */
+            align-items: center;
+            gap: 8px;
+        }
+        .nav-links a:hover{ 
+            color:var(--accent); 
+            transform:translateY(-2px); 
+        }
+        
+        /* Tombol Menu HP (HANYA SATU) */
+        .mobile-menu-btn {
+            display: none;
+            background: none; border: none;
+            color: var(--text);
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 5px;
+            z-index: 2000;
+        }
+
+        @media(max-width: 768px){ 
+            .nav-links{display:none;} 
+            .mobile-menu-btn { display: block; }
+            .navbar { padding: 16px; } /* [UBAH] Samakan padding di HP */
+        }
+        /* [HAPUS] CSS Header Lama */
+        /* ...CSS header, .navbar, .logo lama dihapus... */
+
+        /* CSS Theme Toggle (Masih sama, hanya dipindah) */
+        .theme-toggle{
+            cursor:pointer; display:flex; align-items:center;
+            /* [UBAH] Beri style seperti link agar konsisten */
+            padding:6px 10px; 
+            font-weight:500; 
+            border-radius:8px; 
+            position:relative; 
+            transition:.25s; 
+        }
+        .theme-toggle:hover {
+            transform:translateY(-2px);
+        }
+        .switch{
+            width:46px; height:26px;
+            background:var(--glass);
+            border:1px solid var(--card-border);
+            border-radius:20px;
+            position:relative; padding:3px;
+            backdrop-filter:blur(5px);
+        }
+        .knob{
+            width:20px; height:20px;
+            background:#fff; border-radius:50%;
+            position:absolute; top:3px; left:3px;
+            box-shadow:0 4px 12px rgba(0,0,0,0.3);
+            transition:.25s;
+        }
+        [data-theme="light"] .switch{
+            background:linear-gradient(90deg,var(--accent),var(--accent-2));
+        }
+        [data-theme="light"] .knob{ left:23px; }
+
+        /* ========================================================= */
+        /* CHAT APPLICATION LAYOUT */
+        /* ========================================================= */
+        .chat-app-container {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+            height: calc(100vh - 65px); /* [UBAH] Sesuaikan tinggi */
+        }
+
+        /* Sidebar - Daftar Chat */
+        .chat-sidebar {
+            width: var(--sidebar-width);
+            background: var(--card);
+            border-right: 1px solid var(--card-border); /* [UBAH] Garis lebih tipis */
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.3s ease, margin-left 0.3s ease; /* [UBAH] Tambah transisi margin */
+            position: relative;
+            z-index: 1000;
+        }
+        .user-list {
+            flex: 1;
+            overflow-y: auto;
+        }
+        .user-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--card-border);
+            transition: background 0.2s;
+            cursor: pointer;
+        }
+        .user-item:hover { background: var(--glass); }
+        .user-item.active { 
+            background: var(--accent); /* [UBAH] Warna solid */
+            color: #fff; /* [UBAH] Teks putih */
+        }
+        .user-avatar {
+            width: 40px; height: 40px;
+            background: var(--muted);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            margin-right: 12px;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+        .user-avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .user-info { flex: 1; overflow: hidden; }
+        .user-info strong { display: block; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .user-info span { font-size: 0.85rem; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .user-item.active .user-info span { color: rgba(255,255,255,0.8); }
+
+        /* [UBAH] Area profile disembunyikan, diganti tombol settings di header */
+        .profile-area {
+            padding: 12px 16px;
+            border-top: 1px solid var(--card-border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .profile-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+        }
+        /* [HAPUS] Tombol settings lama disembunyikan di desktop */
+        .settings-btn { display: none; }
+
+
+        /* Main Chat Area */
+        .chat-main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: var(--bg);
+        }
+        .chat-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--card-border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between; 
+            min-height: 70px;
+        }
+        .chat-target-info {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+        }
+        .chat-actions button {
+            background: var(--glass);
+            border: 1px solid var(--card-border);
+            padding: 8px 12px;
+            border-radius: 8px;
+            transition: background 0.2s;
+        }
+        .chat-actions button:hover { background: var(--accent); color: #fff; }
+
+        .chat-output {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .message {
+            max-width: 60%;
+            padding: 10px 14px;
+            border-radius: 18px;
+            line-height: 1.4;
+            position: relative;
+            cursor: pointer;
+            word-wrap: break-word;
+            word-break: break-word;
+        }
+        .message.sent {
+            background: var(--accent);
+            color: #fff;
+            margin-left: auto;
+            border-bottom-right-radius: 4px;
+        }
+        .message.received {
+            background: var(--card);
+            border: 1px solid var(--card-border);
+            border-bottom-left-radius: 4px;
+        }
+        .message-time {
+            display: block;
+            font-size: 0.75rem;
+            margin-top: 4px;
+            text-align: right;
+            color: inherit;
+            opacity: 0.7;
+        }
+
+        /* Context Menu (Hapus Pesan) */
+        .context-menu {
+            position: fixed;
+            background: var(--card);
+            border: 1px solid var(--card-border);
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+            z-index: 5500;
+            min-width: 180px;
+            display: none;
+            overflow: hidden;
+        }
+        .context-menu button {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            padding: 10px 15px;
+            text-align: left;
+            transition: background 0.2s;
+            font-size: 0.9rem;
+        }
+        .context-menu button:hover {
+            background: var(--glass);
+        }
+        .context-menu button i { margin-right: 10px; }
+        .context-menu .delete-for-everyone { color: #ff4d4f; }
+
+        .chat-input {
+            padding: 16px 20px;
+            border-top: 1px solid var(--card-border);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .emoji-button {
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            background: var(--glass);
+            border: 1px solid var(--card-border);
+            transition: background 0.2s;
+            font-size: 1.2rem;
+        }
+        .emoji-button:hover { background: var(--accent); }
+
+        /* Emoji Modal */
+        #emoji-modal .modal-content {
+            max-width: 320px;
+            padding: 15px;
+        }
+        .emoji-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .emoji-grid button {
+            font-size: 1.4rem;
+            padding: 5px;
+            line-height: 1;
+        }
+        .emoji-grid button:hover { background: var(--glass); border-radius: 4px; }
+        
+
+        /* Modals (Settings & Profile) */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(8px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 4000;
+        }
+        .modal-overlay.active { display: flex; }
+        .modal-content {
+            background: var(--card);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            width: 90%;
+            max-width: 500px;
+            padding: 30px;
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+            transform: scale(0.95);
+            transition: transform 0.3s ease;
+        }
+        .modal-overlay.active .modal-content {
+            transform: scale(1);
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--card-border);
+            padding-bottom: 15px;
+        }
+        .modal-header h2 { margin: 0; color: var(--accent); font-size: 1.5rem; }
+        .modal-close-btn {
+            background: var(--glass);
+            border: 1px solid var(--card-border);
+            width: 36px; height: 36px;
+            border-radius: 50%;
+            transition: background 0.2s;
+        }
+        .modal-close-btn:hover { background: var(--accent-2); }
+        .btn-action {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: 600;
+            margin-top: 10px;
+            transition: opacity 0.2s;
+        }
+        .btn-primary { background: var(--accent); color: #fff; }
+        .btn-danger { background: #ff4d4f; color: #fff; }
+        .btn-secondary { background: var(--glass); border: 1px solid var(--card-border); color: var(--text); }
+
+        /* Profile Modal Specific */
+        #profile-info-display { text-align: center; }
+        #profile-avatar {
+            width: 100px; height: 100px; margin: 0 auto 15px;
+            font-size: 3rem;
+            background: var(--accent-2);
+            color: #fff;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            overflow: hidden;
+        }
+        #profile-avatar img { width: 100%; height: 100%; object-fit: cover; }
+        #profile-username { font-size: 1.8rem; margin-bottom: 5px; }
+        #profile-email { color: var(--muted); font-size: 1rem; }
+        #profile-uid { font-size: 0.8rem; color: var(--muted); margin-top: 10px; }
+
+        /* Responsive */
+        
+        /* [HAPUS] .mobile-nav-toggle lama */
+
+        @media (max-width: 768px) {
+            .chat-sidebar {
+                position: fixed; /* [UBAH] Jadi 'fixed' */
+                left: 0;
+                top: 65px; /* [UBAH] Di bawah header baru */
+                bottom: 0;
+                width: 300px; /* [UBAH] Lebar tetap */
+                transform: translateX(-100%);
+                z-index: 1050;
+            }
+            .chat-sidebar.open {
+                transform: translateX(0);
+                box-shadow: 0 0 30px rgba(0,0,0,0.5);
+            }
+            .chat-main {
+                width: 100%; 
+            }
+            
+            /* [HAPUS] .mobile-nav-toggle-header (Tombol menu kedua) */
+            
+            .chat-header {
+                /* [UBAH] Hapus justify-content: flex-start */
+            }
+            .chat-target-info {
+                flex: 1;
+            }
+
+            /* [UBAH] Tombol settings lama ditampilkan lagi di HP */
+            .settings-btn { display: flex; }
+            .profile-area {
+                /* [UBAH] Tampilkan profile area di HP */
+                display: flex;
+            }
+        }
+    </style>
+</head>
+<body data-theme="dark">
+    
+    <header>
+      <nav class="container navbar">
+        <a class="logo" href="../index.html"><i class="fas fa-feather-alt"></i> <span>Fanra</span>Chat</a>
+        <div class="nav-wrap">
+          <div class="nav-links">
+            <a id="header-settings-btn"><i class="fas fa-cog"></i> Pengaturan</a>
+            <div class="theme-toggle" id="themeToggle" role="button" aria-pressed="false" tabindex="0" title="Toggle theme">
+                <div class="switch" aria-hidden="true"><div class="knob"></div></div>
+            </div>
+            <a href="javascript:history.back()"><i class="fas fa-arrow-left"></i> Kembali</a>
+          </div>
+          <button class="mobile-menu-btn" id="mobile-sidebar-toggle">
+              <i class="fas fa-bars"></i>
+          </button>
+        </div>
+      </nav>
+    </header>
+    <div class="chat-app-container">
+
+        <div class="chat-sidebar" id="chat-sidebar">
+            <div class="sidebar-header">
+                <h3></h3>
+            </div>
+            
+            <div class="search-area">
+                <input type="text" id="search-user-input" placeholder="Cari pengguna (nama atau ID)...">
+            </div>
+
+            <div class="user-list" id="user-list">
+                <p style="text-align: center; color: var(--muted); padding: 20px;">Memuat pengguna...</p>
+            </div>
+
+            <div class="profile-area">
+                <div class="profile-info" id="current-user-profile-info">
+                    <div class="user-avatar" id="current-user-avatar"><i class="fas fa-user"></i></div>
+                    <span id="current-user-name">Guest</span>
+                </div>
+                <button class="settings-btn" id="settings-button" aria-label="Pengaturan">
+                    <i class="fas fa-cog"></i>
+                </button>
+            </div>
+        </div>
+
+        <div class="chat-main" id="chat-main">
+            <div class="chat-header">
+                <div class="chat-target-info" id="chat-target-profile-info">
+                    <div class="user-avatar" id="chat-target-avatar"><i class="fas fa-user"></i></div>
+                    <h3 id="chat-target-name" style="margin-left: 10px;">Pilih Percakapan</h3>
+                </div>
+                <div class="chat-actions" id="chat-actions" style="display: none;">
+                    <button id="delete-chat-button" title="Hapus Percakapan Ini">
+                        <i class="fas fa-trash"></i> Hapus Semua Chat
+                    </button>
+                </div>
+            </div>
+
+            <div class="chat-output" id="chat-output">
+                <p style="text-align: center; color: var(--muted); margin-top: auto;">Pilih pengguna dari sidebar untuk memulai percakapan.</p>
+            </div>
+
+            <div class="chat-input">
+                <button class="emoji-button" id="emoji-button" title="Emoji"><i class="far fa-smile"></i></button>
+                <input type="text" id="message-input" placeholder="Kirim pesan...">
+                <button id="send-button" disabled>
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+    <div id="auth-screen">
+        <div class="auth-card">
+            <h2>Welcome to Fanra Chat</h2>
+            <p style="color: var(--muted); margin-bottom: 25px;">Please sign in with Google to continue chatting.</p>
+            <button class="google-login-btn" id="google-login-button">
+                <i class="fab fa-google"></i> Sign In with Google
+            </button>
+        </div>
+    </div>
+    
+    <div class="context-menu" id="message-context-menu">
+        <button id="delete-for-me-btn"><i class="fas fa-times-circle"></i> Hapus untuk Saya</button>
+        <button id="delete-for-everyone-btn" class="delete-for-everyone"><i class="fas fa-trash-alt"></i> Hapus untuk Semua</button>
+    </div>
+
+    <div class="modal-overlay" id="emoji-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Pilih Emoji</h2>
+                <button class="modal-close-btn" data-close-modal="emoji-modal"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="emoji-grid" id="emoji-grid">
+                </div>
+        </div>
+    </div>
+
+
+    <div class="modal-overlay" id="settings-modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Pengaturan Akun</h2>
+                <button class="modal-close-btn" data-close-modal="settings-modal-overlay"><i class="fas fa-times"></i></button>
+            </div>
+
+            <div class="settings-section">
+                <h3>Info Akun</h3>
+                <button class="btn-action btn-secondary" id="open-my-profile-button">
+                    <i class="fas fa-user-circle"></i> Lihat Profil Saya
+                </button>
+                <label for="new-username-input" style="display: block; margin: 15px 0 8px;">Ganti Username:</label>
+                <input type="text" id="new-username-input" placeholder="Masukkan username baru" style="margin-bottom: 10px;">
+                <button class="btn-action btn-primary" id="update-username-button">Simpan Username</button>
+            </div>
+            
+            <div class="settings-section">
+                <h3>Akses & Keamanan</h3>
+                <button class="btn-action btn-secondary" id="switch-account-button">
+                    <i class="fas fa-exchange-alt"></i> Pindah/Ganti Akun (Google Pop-up)
+                </button>
+                <button class="btn-action btn-secondary" id="logout-button">
+                    <i class="fas fa-sign-out-alt"></i> Logout Akun
+                </button>
+            </div>
+
+            <div class="settings-section" style="border-bottom: none;">
+                <h3>Zona Bahaya</h3>
+                <button class="btn-action btn-danger" id="delete-account-button">
+                    <i class="fas fa-user-times"></i> Hapus Akun Permanen
+                </button>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="profile-modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="profile-modal-title">Profil Pengguna</h2>
+                <button class="modal-close-btn" data-close-modal="profile-modal-overlay"><i class="fas fa-times"></i></button>
+            </div>
+
+            <div id="profile-info-display">
+                <div id="profile-avatar"><i class="fas fa-user"></i></div>
+                <h3 id="profile-username">Nama Pengguna</h3>
+                <p id="profile-email">email@contoh.com</p>
+                <p id="profile-uid">UID: loading...</p>
+                <button class="btn-action btn-secondary" id="start-chat-button" style="display:none; margin-top: 20px;">
+                    <i class="fas fa-comment"></i> Mulai Chat
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        // =========================================================
+        // JAVASCRIPT LOGIC
+        // =========================================================
+
+        // 1. Konfigurasi Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyCVYfH91lXeOIkLFXmk_rRsObNbo4n-G_A",
+            authDomain: "portofolio-fanra.firebaseapp.com",
+            projectId: "portofolio-fanra",
+            storageBucket: "portofolio-fanra.firebasestorage.app",
+            messagingSenderId: "1048993283215",
+            appId: "1:1048993283215:web:137862db54a113409404fa",
+            measurementId: "G-JFJ1X7FQSR"
+        };
+
+        if (firebase.apps.length === 0) {
+            firebase.initializeApp(firebaseConfig);
+        }
+
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+        const googleProvider = new firebase.auth.GoogleAuthProvider();
+        
+        googleProvider.setCustomParameters({
+            prompt: 'select_account' 
+        });
+
+        let currentChatTarget = null;
+        let unsubscribeChat = null; 
+
+        // DOM Elements
+        const root = document.documentElement;
+        const toggle = document.getElementById('themeToggle');
+        // [UBAH] Ganti ID tombol mobile
+        const mobileToggle = document.getElementById('mobile-sidebar-toggle'); 
+        const sidebar = document.getElementById('chat-sidebar');
+        const chatOutput = document.getElementById('chat-output');
+        const userList = document.getElementById('user-list');
+        const chatTargetName = document.getElementById('chat-target-name');
+        const chatTargetProfileInfo = document.getElementById('chat-target-profile-info');
+        const chatTargetAvatar = document.getElementById('chat-target-avatar');
+        const currentUserEl = document.getElementById('current-user-name');
+        const currentUserAvatarEl = document.getElementById('current-user-avatar');
+        const currentUserProfileInfo = document.getElementById('current-user-profile-info');
+        const messageInput = document.getElementById('message-input');
+        const sendButton = document.getElementById('send-button');
+        const googleLoginButton = document.getElementById('google-login-button');
+        const authScreen = document.getElementById('auth-screen');
+        const chatMain = document.getElementById('chat-main');
+        const searchInput = document.getElementById('search-user-input');
+        const chatActions = document.getElementById('chat-actions');
+        
+        // [HAPUS] Tombol Toggle di Header Chat
+        // const mobileToggleHeader = ...
+
+        // Settings Modal Elements
+        const settingsModal = document.getElementById('settings-modal-overlay');
+        const settingsButton = document.getElementById('settings-button');
+        const openMyProfileButton = document.getElementById('open-my-profile-button');
+        const logoutButton = document.getElementById('logout-button');
+        const switchAccountButton = document.getElementById('switch-account-button');
+        const updateUsernameButton = document.getElementById('update-username-button');
+        const newUsernameInput = document.getElementById('new-username-input');
+        const deleteAccountButton = document.getElementById('delete-account-button');
+        const deleteChatButton = document.getElementById('delete-chat-button');
+        
+        // Profile Modal Elements
+        const profileModal = document.getElementById('profile-modal-overlay');
+        const profileModalTitle = document.getElementById('profile-modal-title');
+        const profileAvatarEl = document.getElementById('profile-avatar');
+        const profileUsernameEl = document.getElementById('profile-username');
+        const profileEmailEl = document.getElementById('profile-email');
+        const profileUidEl = document.getElementById('profile-uid');
+        const startChatButton = document.getElementById('start-chat-button');
+
+        // Message Deletion/Context Menu
+        const messageContextMenu = document.getElementById('message-context-menu');
+        const deleteForMeBtn = document.getElementById('delete-for-me-btn');
+        const deleteForEveryoneBtn = document.getElementById('delete-for-everyone-btn');
+        let selectedMessageData = null; // { msgId, senderId }
+
+        // Emoji Elements
+        const emojiButton = document.getElementById('emoji-button');
+        const emojiModal = document.getElementById('emoji-modal');
+        const emojiGrid = document.getElementById('emoji-grid');
+        const commonEmojis = ['👋', '😊', '😂', '👍', '❤️', '🙏', '🤯', '🔥', '🎉', '💡', '🚀', '💯', '🤔', '😎', '😜', '😭'];
+
+        // =========================================================
+        // 2. UI/UX (Theme, Sidebar, Modal)
+        // =========================================================
+
+        // Theme Toggle
+        const savedTheme = localStorage.getItem('site_theme') || 'dark';
+        root.setAttribute('data-theme', savedTheme);
+        toggle.setAttribute('aria-pressed', savedTheme === 'light');
+        function setTheme(t){
+            root.setAttribute('data-theme', t);
+            localStorage.setItem('site_theme', t);
+            toggle.setAttribute('aria-pressed', t === 'light');
+        }
+        toggle.addEventListener('click', () => {
+            const now = root.getAttribute('data-theme');
+            setTheme(now === 'light' ? 'dark' : 'light');
+        });
+
+        // Mobile Sidebar Toggle (di Navbar)
+        if (mobileToggle) {
+            mobileToggle.addEventListener('click', () => {
+                sidebar.classList.toggle('open');
+                mobileToggle.querySelector('i').className = sidebar.classList.contains('open') ? 'fas fa-times' : 'fas fa-bars';
+            });
+            document.getElementById('user-list').addEventListener('click', (e) => {
+                if (e.target.closest('.user-item') && window.matchMedia("(max-width: 768px)").matches) {
+                    setTimeout(() => {
+                        sidebar.classList.remove('open');
+                        mobileToggle.querySelector('i').className = 'fas fa-bars';
+                    }, 100);
+                }
+            });
+        }
+        
+        // [HAPUS] Event listener untuk mobileToggleHeader
+        
+        // Global Modal Close Handler
+        document.querySelectorAll('[data-close-modal]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.getElementById(btn.getAttribute('data-close-modal')).classList.remove('active');
+            });
+        });
+        document.querySelectorAll('.modal-overlay').forEach(overlay => {
+            overlay.addEventListener('click', (e) => {
+                if (e.target === overlay) {
+                    overlay.classList.remove('active');
+                }
+            });
+        });
+        
+        // Hide Context Menu on click anywhere
+        document.addEventListener('click', (e) => {
+            if (!messageContextMenu.contains(e.target)) {
+                messageContextMenu.style.display = 'none';
+            }
+        });
+
+        // Settings Modal Handlers
+        settingsButton.addEventListener('click', () => {
+            if (auth.currentUser) {
+                newUsernameInput.value = auth.currentUser.displayName || '';
+            }
+            settingsModal.classList.add('active');
+        });
+
+        // [BARU] Listener untuk tombol settings di header desktop
+        const headerSettingsBtn = document.getElementById('header-settings-btn');
+        if (headerSettingsBtn) {
+            headerSettingsBtn.addEventListener('click', () => {
+                settingsButton.click(); // Memicu klik pada tombol settings asli
+            });
+        }
+
+        // Fungsi untuk mengelola tampilan layar
+        function showScreen(screen) {
+            authScreen.style.display = 'none';
+            chatMain.style.display = 'flex';
+            sidebar.style.display = 'flex';
+            
+            if (screen === 'auth') {
+                authScreen.style.display = 'flex';
+                chatMain.style.display = 'none';
+                sidebar.style.display = 'none';
+            }
+        }
+
+        // =========================================================
+        // 3. PROFILE MODAL LOGIC
+        // =========================================================
+        
+        function openProfileModal(userData, isSelf = false) {
+            profileModalTitle.textContent = isSelf ? 'Profil Saya' : 'Profil Pengguna';
+            profileUsernameEl.textContent = userData.displayName || 'Anonim';
+            profileEmailEl.textContent = userData.email || 'Email tidak tersedia';
+            profileUidEl.textContent = `UID: ${userData.uid}`;
+            
+            if (userData.photoURL) {
+                profileAvatarEl.innerHTML = `<img src="${userData.photoURL}" alt="${userData.displayName[0]}">`;
+            } else {
+                profileAvatarEl.innerHTML = `<i class="fas fa-user"></i>`;
+            }
+
+            if (!isSelf && (!currentChatTarget || currentChatTarget.uid !== userData.uid)) {
+                startChatButton.style.display = 'block';
+                startChatButton.onclick = () => {
+                    profileModal.classList.remove('active');
+                    selectChatTarget(userData);
+                };
+            } else {
+                startChatButton.style.display = 'none';
+            }
+
+            profileModal.classList.add('active');
+        }
+
+        currentUserProfileInfo.addEventListener('click', () => {
+            if (auth.currentUser) {
+                 openProfileModal({
+                    uid: auth.currentUser.uid,
+                    displayName: auth.currentUser.displayName,
+                    email: auth.currentUser.email,
+                    photoURL: auth.currentUser.photoURL
+                 }, true);
+            }
+        });
+
+        chatTargetProfileInfo.addEventListener('click', async () => {
+            if (!currentChatTarget) return;
+
+            try {
+                const userDoc = await db.collection('users').doc(currentChatTarget.uid).get();
+                if (userDoc.exists) {
+                    openProfileModal({
+                        uid: currentChatTarget.uid,
+                        displayName: currentChatTarget.displayName,
+                        email: userDoc.data().email,
+                        photoURL: userDoc.data().photoURL
+                    }, false);
+                }
+            } catch (error) {
+                console.error("Failed to load user profile:", error);
+            }
+        });
+
+        openMyProfileButton.addEventListener('click', () => {
+            settingsModal.classList.remove('active');
+            currentUserProfileInfo.click();
+        });
+
+
+        // =========================================================
+        // 4. EMOJI LOGIC
+        // =========================================================
+        
+        emojiButton.addEventListener('click', () => emojiModal.classList.add('active'));
+
+        commonEmojis.forEach(emoji => {
+            const btn = document.createElement('button');
+            btn.textContent = emoji;
+            btn.addEventListener('click', () => {
+                messageInput.value += emoji;
+                messageInput.focus();
+            });
+            emojiGrid.appendChild(btn);
+        });
+
+
+        // =========================================================
+        // 5. FIREBASE CORE LOGIC (Chat ID, Login, Logout)
+        // =========================================================
+        
+        googleLoginButton.addEventListener('click', async () => {
+            try {
+                await auth.signInWithPopup(googleProvider);
+            } catch (error) {
+                console.error("Login failed:", error);
+                alert("Gagal masuk: " + error.message);
+            }
+        });
+        
+        async function handleLogout(switchAccount = false) {
+            if (unsubscribeChat) unsubscribeChat();
+            await auth.signOut();
+            showScreen('auth');
+            alert(`Anda telah keluar.${switchAccount ? ' Silakan login dengan akun lain.' : ''}`);
+        }
+        logoutButton.addEventListener('click', () => handleLogout(false));
+        
+        switchAccountButton.addEventListener('click', async () => {
+            await handleLogout(true);
+            googleLoginButton.click();
+        });
+
+        function getChatId(user1Id, user2Id) {
+            return user1Id < user2Id ? `${user1Id}_${user2Id}` : `${user2Id}_${user1Id}`;
+        }
+
+        sendButton.addEventListener('click', async () => {
+            const user = auth.currentUser;
+            const text = messageInput.value.trim();
+
+            if (!user || !currentChatTarget || text === "") return;
+
+            const chatId = getChatId(user.uid, currentChatTarget.uid);
+
+            try {
+                const newMessageRef = await db.collection('chats').doc(chatId).collection('messages').add({
+                    text,
+                    senderId: user.uid,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                db.collection('chats').doc(chatId).set({
+                    lastMessage: text,
+                    lastSent: firebase.firestore.FieldValue.serverTimestamp(),
+                    users: [user.uid, currentChatTarget.uid]
+                }, { merge: true });
+            } catch (error) {
+                 alert("Gagal mengirim pesan: " + error.message);
+            }
+            messageInput.value = '';
+        });
+        
+        messageInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                sendButton.click();
+            }
+        });
+
+        // =========================================================
+        // 6. CHAT, SEARCH & DELETION ACTIONS
+        // =========================================================
+
+        function selectChatTarget(targetUser) {
+            if (currentChatTarget && currentChatTarget.uid === targetUser.uid) return;
+
+            currentChatTarget = targetUser;
+            chatTargetName.textContent = targetUser.displayName || 'Anonim';
+            messageInput.disabled = false;
+            sendButton.disabled = false;
+            chatActions.style.display = 'flex';
+            messageInput.focus();
+            
+            if (targetUser.photoURL) {
+                 chatTargetAvatar.innerHTML = `<img src="${targetUser.photoURL}" alt="${targetUser.displayName[0]}">`;
+            } else {
+                chatTargetAvatar.innerHTML = `<i class="fas fa-user"></i>`;
+            }
+
+            document.querySelectorAll('.user-item').forEach(el => el.classList.remove('active'));
+            const activeEl = document.getElementById(`user-item-${targetUser.uid}`);
+            if (activeEl) activeEl.classList.add('active');
+
+            if (unsubscribeChat) {
+                unsubscribeChat();
+            }
+
+            loadChatMessages(targetUser.uid);
+        }
+
+        searchInput.addEventListener('input', () => loadUserList(auth.currentUser, searchInput.value));
+
+        function loadUserList(currentUser, searchTerm = '') {
+            userList.innerHTML = '<p style="text-align: center; color: var(--muted); padding: 20px;">Memuat pengguna...</p>';
+            
+            db.collection('users').get().then(snapshot => {
+                userList.innerHTML = '';
+                let foundUsers = false;
+                const filteredUsers = [];
+
+                snapshot.forEach(doc => {
+                    const userData = doc.data();
+                    const displayName = userData.displayName || 'Anonim';
+                    const isCurrentUser = doc.id === currentUser.uid;
+                    
+                    const matchesSearch = !searchTerm || 
+                                          displayName.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                                          doc.id.toLowerCase().includes(searchTerm.toLowerCase());
+                    
+                    if (!isCurrentUser && matchesSearch) {
+                        filteredUsers.push({ uid: doc.id, displayName, photoURL: userData.photoURL, email: userData.email });
+                        foundUsers = true;
+                    }
+                });
+
+                if (foundUsers) {
+                    filteredUsers.forEach(targetUser => {
+                        const userItem = document.createElement('div');
+                        userItem.className = 'user-item';
+                        userItem.id = `user-item-${targetUser.uid}`;
+
+                        let avatarContent = targetUser.photoURL 
+                            ? `<img src="${targetUser.photoURL}" alt="${targetUser.displayName[0]}">` 
+                            : `<i class="fas fa-user"></i>`;
+
+                        userItem.innerHTML = `
+                            <div class="user-avatar">${avatarContent}</div>
+                            <div class="user-info">
+                                <strong>${targetUser.displayName}</strong>
+                                <span id="last-message-${targetUser.uid}">Belum ada pesan...</span>
+                            </div>
+                        `;
+                        userItem.addEventListener('click', () => {
+                            selectChatTarget(targetUser);
+                        });
+                        userList.appendChild(userItem);
+                    });
+                } else {
+                    userList.innerHTML = `<p style="text-align: center; color: var(--muted); padding: 20px;">${searchTerm ? 'Pengguna tidak ditemukan.' : 'Belum ada pengguna lain.'}</p>`;
+                }
+
+            }).catch(error => {
+                console.error("Error loading users:", error);
+                userList.innerHTML = '<p style="text-align: center; color: red; padding: 20px;">Gagal memuat daftar pengguna.</p>';
+            });
+        }
+
+        function loadChatMessages(targetUid) {
+            const currentUser = auth.currentUser;
+            if (!currentUser) return;
+
+            const chatId = getChatId(currentUser.uid, targetUid);
+            const chatRef = db.collection('chats').doc(chatId).collection('messages');
+
+            chatOutput.innerHTML = '<p style="text-align: center; color: var(--muted); margin-top: auto;">Memuat pesan...</p>';
+
+            if (unsubscribeChat) unsubscribeChat();
+
+            unsubscribeChat = chatRef.orderBy('timestamp').onSnapshot(snapshot => {
+                chatOutput.innerHTML = ''; 
+                let hasMessages = false;
+                let lastMessageText = "Belum ada pesan";
+
+                snapshot.forEach(doc => {
+                    hasMessages = true;
+                    const msg = doc.data();
+                    lastMessageText = msg.text;
+
+                    const isSent = msg.senderId === currentUser.uid;
+                    const messageDiv = document.createElement('div');
+                    messageDiv.className = `message ${isSent ? 'sent' : 'received'}`;
+                    messageDiv.setAttribute('data-message-id', doc.id);
+                    messageDiv.setAttribute('data-sender-id', msg.senderId);
+                    
+                    const timestamp = msg.timestamp ? msg.timestamp.toDate().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) : '...';
+                    
+                    messageDiv.innerHTML = `
+                        ${msg.text}
+                        <span class="message-time">${timestamp}</span>
+                    `;
+                    
+                    messageDiv.addEventListener('contextmenu', (e) => showMessageContextMenu(e, doc.id, msg.senderId, isSent));
+                    messageDiv.addEventListener('click', (e) => {
+                        if(e.button !== 2 && !window.matchMedia("(max-width: 768px)").matches) return;
+                        if(window.matchMedia("(max-width: 768px)").matches) showMessageContextMenu(e, doc.id, msg.senderId, isSent);
+                    });
+
+                    chatOutput.appendChild(messageDiv);
+                });
+
+                const lastMsgEl = document.getElementById(`last-message-${targetUid}`);
+                if (lastMsgEl) {
+                    lastMsgEl.textContent = lastMessageText.length > 30 ? lastMessageText.substring(0, 30) + '...' : lastMessageText;
+                }
+
+                if (!hasMessages) {
+                    chatOutput.innerHTML = '<p style="text-align: center; color: var(--muted); margin-top: auto;">Mulai kirim pesan dan lihat percakapan Anda di sini.</p>';
+                }
+
+                chatOutput.scrollTop = chatOutput.scrollHeight;
+            }, error => {
+                console.error("Error loading chat:", error);
+                chatOutput.innerHTML = '<p style="text-align: center; color: red;">Gagal memuat chat. Periksa koneksi atau izin (chats).</p>';
+            });
+        }
+        
+        function showMessageContextMenu(e, msgId, senderId, isSent) {
+            e.preventDefault();
+            
+            selectedMessageData = { msgId, senderId };
+
+            let x = e.clientX || e.touches[0].clientX;
+            let y = e.clientY || e.touches[0].clientY;
+            
+            if (isSent) {
+                 x -= messageContextMenu.offsetWidth;
+            }
+
+            messageContextMenu.style.left = `${x}px`;
+            messageContextMenu.style.top = `${y}px`;
+
+            deleteForEveryoneBtn.style.display = isSent ? 'flex' : 'none';
+            messageContextMenu.style.display = 'block';
+        }
+
+        deleteForMeBtn.addEventListener('click', () => {
+            if (!selectedMessageData) return;
+            const { msgId } = selectedMessageData;
+            const messageElement = chatOutput.querySelector(`[data-message-id="${msgId}"]`);
+            if (messageElement) {
+                messageElement.remove();
+            }
+            messageContextMenu.style.display = 'none';
+            selectedMessageData = null;
+        });
+
+        deleteForEveryoneBtn.addEventListener('click', async () => {
+            if (!selectedMessageData || !currentChatTarget) return;
+            if (!confirm("Yakin ingin menghapus pesan ini untuk SEMUA orang?")) {
+                messageContextMenu.style.display = 'none';
+                return;
+            }
+            const { msgId } = selectedMessageData;
+            const currentUser = auth.currentUser;
+            const chatId = getChatId(currentUser.uid, currentChatTarget.uid);
+            try {
+                await db.collection('chats').doc(chatId).collection('messages').doc(msgId).delete();
+                const messageElement = chatOutput.querySelector(`[data-message-id="${msgId}"]`);
+                if (messageElement) {
+                    messageElement.remove();
+                }
+                alert("Pesan berhasil dihapus untuk semua orang!");
+            } catch (error) {
+                console.error("Error deleting message:", error);
+                alert("Gagal menghapus pesan: " + error.message);
+            }
+            messageContextMenu.style.display = 'none';
+            selectedMessageData = null;
+        });
+
+        deleteChatButton.addEventListener('click', async () => {
+            if (!auth.currentUser || !currentChatTarget) return;
+            if (!confirm(`Anda yakin ingin menghapus SEMUA pesan di chat dengan ${currentChatTarget.displayName || 'pengguna ini'}? Aksi ini TIDAK dapat dibatalkan.`)) return;
+            const chatId = getChatId(auth.currentUser.uid, currentChatTarget.uid);
+            try {
+                const messagesRef = db.collection('chats').doc(chatId).collection('messages');
+                const batch = db.batch();
+                const snapshot = await messagesRef.get();
+                snapshot.docs.forEach((doc) => {
+                    batch.delete(doc.ref);
+                });
+                await batch.commit();
+                await db.collection('chats').doc(chatId).delete();
+                loadChatMessages(currentChatTarget.uid);
+                alert("Pesan berhasil dihapus!");
+            } catch (error) {
+                console.error("Error deleting chat:", error);
+                alert("Gagal menghapus pesan: " + error.message);
+            }
+        });
+
+        // =========================================================
+        // 7. SETTINGS ACTIONS
+        // =========================================================
+        
+        updateUsernameButton.addEventListener('click', async () => {
+            const user = auth.currentUser;
+            const newName = newUsernameInput.value.trim();
+            if (!user || !newName) {
+                alert("Nama tidak boleh kosong.");
+                return;
+            }
+            try {
+                await user.updateProfile({ displayName: newName });
+                await db.collection('users').doc(user.uid).update({ displayName: newName });
+                currentUserEl.textContent = newName;
+                alert("Username berhasil diperbarui!");
+            } catch (error) {
+                console.error("Error updating username:", error);
+                alert("Gagal memperbarui username: " + error.message);
+            }
+        });
+        
+        deleteAccountButton.addEventListener('click', async () => {
+            const user = auth.currentUser;
+            if (!user) return;
+            if (!confirm("PERINGATAN: Menghapus akun akan menghapus data Anda secara PERMANEN. Anda yakin?")) return;
+            try {
+                await user.reauthenticateWithPopup(googleProvider);
+                await db.collection('users').doc(user.uid).delete();
+                await user.delete();
+                handleLogout();
+                alert("Akun berhasil dihapus.");
+            } catch (error) {
+                console.error("Error deleting account:", error);
+                if (error.code === 'auth/requires-recent-login') {
+                     alert("Gagal menghapus akun. Mohon re-login (logout lalu login kembali) dan coba lagi.");
+                } else {
+                     alert("Gagal menghapus akun: " + error.message);
+                }
+            }
+        });
+
+        // =========================================================
+        // 8. AUTH STATE LISTENER & INITIALIZATION
+        // =========================================================
+
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                showScreen('app');
+                
+                const displayName = user.displayName || 'Anda';
+                currentUserEl.textContent = displayName;
+                
+                if (user.photoURL) {
+                    currentUserAvatarEl.innerHTML = `<img src="${user.photoURL}" alt="${displayName[0]}">`;
+                } else {
+                    currentUserAvatarEl.innerHTML = `<i class="fas fa-user"></i>`;
+                }
+
+                db.collection('users').doc(user.uid).set({
+                    displayName: user.displayName || 'Anonim',
+                    email: user.email,
+                    photoURL: user.photoURL,
+                    lastSeen: firebase.firestore.FieldValue.serverTimestamp()
+                }, { merge: true }).then(() => {
+                    loadUserList(user);
+                });
+                
+                currentChatTarget = null;
+                messageInput.disabled = true;
+                sendButton.disabled = true;
+                chatTargetName.textContent = 'Pilih Percakapan';
+                chatActions.style.display = 'none';
+                chatTargetAvatar.innerHTML = `<i class="fas fa-user"></i>`;
+                chatOutput.innerHTML = '<p style="text-align: center; color: var(--muted); margin-top: auto;">Pilih pengguna dari sidebar untuk memulai percakapan.</p>';
+
+            } else {
+                showScreen('auth');
+                currentChatTarget = null;
+                messageInput.disabled = true;
+                sendButton.disabled = true;
+                chatActions.style.display = 'none';
+                chatTargetName.textContent = 'Pilih Percakapan';
+                chatTargetAvatar.innerHTML = `<i class="fas fa-user"></i>`;
+                chatOutput.innerHTML = '<p style="text-align: center; color: var(--muted); margin-top: auto;">Pilih pengguna dari sidebar untuk memulai percakapan.</p>';
+                if (unsubscribeChat) unsubscribeChat();
+            }
+        });
+
+        // =========================================================
+        // 9. FULLSCREEN TOGGLE DAN KEYDOWN HANDLER
+        // =========================================================
+
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(err => {
+                    console.error(`Error attempting to enable full-screen mode: ${err.message} (${err.name})`);
+                    alert("Gagal masuk mode fullscreen: Browser Anda mungkin memblokirnya.");
+                });
+            } else {
+                document.exitFullscreen();
+            }
+        }
+        
+       // [INI KODE PERBAIKANNYA]
+        document.addEventListener('keydown', (e) => {
+            
+            // [BARU] Cek dulu apakah kita sedang mengetik di input atau textarea
+            const activeEl = document.activeElement;
+            const isTyping = activeEl && (activeEl.tagName === 'INPUT' || activeEl.tagName === 'TEXTAREA');
+
+            // 1. Fullscreen Toggle (Tombol 'F')
+            if (e.key === 'f' || e.key === 'F') {
+                
+                if (isTyping) {
+                    return; // Jika sedang ngetik, JANGAN lakukan apa-apa. Biarkan huruf 'f' terketik.
+                }
+
+                // Jika tidak sedang ngetik, baru jalankan fullscreen
+                e.preventDefault(); 
+                toggleFullscreen();
+            } 
+            
+            // 2. Escape untuk menutup modal/menu dan keluar fullscreen
+            if (e.key === "Escape") {
+                // Tutup semua modal dan context menu
+                document.querySelectorAll('.modal-overlay.active').forEach(modal => modal.classList.remove('active'));
+                messageContextMenu.style.display = 'none';
+                
+                // Keluar Fullscreen
+                if (document.fullscreenElement) {
+                     document.exitFullscreen();
+                }
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            if (!auth.currentUser) showScreen('auth'); 
+        });
+
+    </script>
+</body>
+</html>
