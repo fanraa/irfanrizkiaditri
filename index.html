@@ -5,7 +5,7 @@
     <meta charset="UTF-8" />
     <link rel="icon" href="https://cdn-icons-png.flaticon.com/128/11150/11150100.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>Irfan Rizki Aditri</title>
+    <title>irfanrizkiaditri</title>
     
     <!-- KaTeX CSS for Math Rendering -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" integrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI+WdtXRGWt2kTvGFasHpSy3SV" crossorigin="anonymous">
@@ -54,17 +54,16 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
       html {
-        /* This property allows the scrollbar to sit on top of content 
-           instead of taking up width (Webkit/Chrome/Edge) */
-        overflow-y: overlay; 
-        scrollbar-gutter: stable; /* Fallback for layout stability */
+        overflow-y: auto; /* Standard scroll */
+        scroll-behavior: smooth;
       }
       
       body {
         background-color: #ffffff;
         color: #0f172a;
         font-family: 'Inter', sans-serif;
-        overscroll-behavior-y: none;
+        /* overscroll-behavior-y: none; REMOVED to prevent locking issues */
+        overflow-x: hidden;
       }
 
       /* --- AESTHETIC INVISIBLE/LIGHT SCROLLBAR --- */
@@ -118,7 +117,7 @@
   }
 }
 </script>
-  <script type="module" crossorigin src="/assets/index-DR6diWra.js"></script>
+  <script type="module" crossorigin src="/assets/index-B9r4mYdi.js"></script>
 </head>
   <body>
     <div id="root"></div>
