@@ -5,7 +5,7 @@
     <meta charset="UTF-8" />
     <link rel="icon" href="https://cdn-icons-png.flaticon.com/128/11150/11150100.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>irfanrizkiaditri</title>
+    <title>Irfan Rizki Aditri</title>
     
     <!-- KaTeX CSS for Math Rendering -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" integrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI+WdtXRGWt2kTvGFasHpSy3SV" crossorigin="anonymous">
@@ -15,6 +15,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
       tailwind.config = {
+        darkMode: 'class',
         theme: {
           extend: {
             colors: {
@@ -32,6 +33,7 @@
               'fade-in': 'fadeIn 0.5s ease-out forwards',
               'fade-in-up': 'fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards', /* Smoother, modern easing */
               'shimmer': 'shimmer 2s linear infinite',
+              'spin-slow': 'spin 3s linear infinite',
             },
             keyframes: {
               fadeIn: {
@@ -52,7 +54,7 @@
       }
     </script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <style>
+      <style>
       html {
         overflow-y: auto; /* Standard scroll */
         scroll-behavior: smooth;
@@ -64,6 +66,29 @@
         font-family: 'Inter', sans-serif;
         /* overscroll-behavior-y: none; REMOVED to prevent locking issues */
         overflow-x: hidden;
+        transition: background-color 0.3s, color 0.3s;
+      }
+
+      /* Dark Mode Overrides */
+      .dark body {
+        background-color: #0f172a;
+        color: #f8fafc;
+      }
+      
+      .dark .bg-white {
+        background-color: #1e293b;
+      }
+
+      .dark .text-slate-900 {
+        color: #f8fafc;
+      }
+
+      .dark .text-slate-600, .dark .text-slate-500 {
+        color: #94a3b8;
+      }
+
+      .dark .border-slate-100, .dark .border-slate-200 {
+        border-color: #334155;
       }
 
       /* --- AESTHETIC INVISIBLE/LIGHT SCROLLBAR --- */
@@ -87,14 +112,28 @@
         background-color: rgba(0, 0, 0, 0.2); 
       }
 
-      .animate-shimmer-text {
-        background: linear-gradient(to right, #0f172a 20%, #94a3b8 40%, #94a3b8 60%, #0f172a 80%);
+      @keyframes shimmer-subtle {
+        0% { background-position: 200% center; }
+        15% { background-position: -200% center; }
+        100% { background-position: -200% center; }
+      }
+
+      .shimmer-dark {
+        background: linear-gradient(to right, #0f172a 40%, #64748b 50%, #0f172a 60%);
         background-size: 200% auto;
-        color: #000;
         background-clip: text;
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
-        animation: shimmer 2s linear infinite;
+        animation: shimmer-subtle 10s linear infinite;
+      }
+
+      .shimmer-light {
+        background: linear-gradient(to right, #94a3b8 40%, #e2e8f0 50%, #94a3b8 60%);
+        background-size: 200% auto;
+        background-clip: text;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        animation: shimmer-subtle 10s linear infinite;
       }
     </style>
 
@@ -117,7 +156,7 @@
   }
 }
 </script>
-  <script type="module" crossorigin src="/assets/index-D2UnkhGH.js"></script>
+  <script type="module" crossorigin src="/assets/index-DDTEcu2_.js"></script>
 </head>
   <body>
     <div id="root"></div>
