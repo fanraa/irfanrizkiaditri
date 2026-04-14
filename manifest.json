@@ -1,0 +1,21 @@
+{
+  "name": "Fanra AI Studio",
+  "short_name": "Fanra",
+  "description": "Perspective of Fanra - Physics, Code, and Creative Studio",
+  "start_url": "/#/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#0f172a",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/128/11150/11150100.png",
+      "sizes": "128x128",
+      "type": "image/png"
+    },
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/11150/11150100.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
