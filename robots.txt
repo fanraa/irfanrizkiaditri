@@ -3,4 +3,4 @@ Allow: /
 Disallow: /admin
 Disallow: /dashboard
 
-Sitemap: https://fanra-dev.firebaseapp.com/sitemap.xml
+Sitemap: https://www.irfanrizkiaditri.site/sitemap.xml
