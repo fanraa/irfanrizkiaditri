@@ -2,7 +2,7 @@
   "name": "Fanra AI Studio",
   "short_name": "Fanra",
   "description": "Perspective of Fanra - Physics, Code, and Creative Studio",
-  "start_url": "/#/",
+  "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#0f172a",

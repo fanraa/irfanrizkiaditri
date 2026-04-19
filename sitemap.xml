@@ -1,43 +1,68 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://fanra.site/</loc>
+    <loc>https://irfanrizkiaditri.site</loc>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://fanra.site/#/projects</loc>
+    <loc>https://irfanrizkiaditri.site/projects</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://fanra.site/#/blog</loc>
+    <loc>https://irfanrizkiaditri.site/blog</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://fanra.site/#/gallery</loc>
+    <loc>https://irfanrizkiaditri.site/gallery</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://fanra.site/#/music</loc>
+    <loc>https://irfanrizkiaditri.site/music</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://fanra.site/#/messages</loc>
+    <loc>https://irfanrizkiaditri.site/messages</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://fanra.site/#/aboutme</loc>
+    <loc>https://irfanrizkiaditri.site/aboutme</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://fanra.site/#/ralink</loc>
+    <loc>https://irfanrizkiaditri.site/ralink</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://irfanrizkiaditri.site/privacy</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://irfanrizkiaditri.site/terms</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://irfanrizkiaditri.site/blog/CZVjkxgg3xNoArDr3ZBq</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://irfanrizkiaditri.site/blog/OIzKYr6sV5tfjD63ncvB</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://irfanrizkiaditri.site/blog/PapA9YNOA9p84EaiQmXb</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
   </url>
 </urlset>
