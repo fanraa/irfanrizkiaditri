@@ -1,0 +1,204 @@
+rules_version = '2';
+service cloud.firestore {
+match /databases/{database}/documents {
+
+// ===============================================================
+// Assumed Data Model
+// ===============================================================
+//
+// Collection: users
+// Fields: name (string), email (string), isAdmin (bool), credits (int), apiKeys (list)
+//
+// Collection: messages
+// Fields: content (string), type (string: public|private), sender (string), timestamp (int)
+//
+// Collection: analytics_daily
+// Fields: visitors (int), errors (int), geo (map), date (string)
+//
+// ===============================================================
+
+// ===============================================================
+// Helper Functions
+// ===============================================================
+
+function isAuthenticated() {
+  return request.auth != null;
+}
+
+function isAdmin() {
+  return isAuthenticated() && 
+         (request.auth.token.email == 'ifansra@gmail.com' || 
+          request.auth.token.email == 'irfanrizkiaditri@gmail.com' || 
+          request.auth.token.email == 'irfan.125110007@student.itera.ac.id') && 
+         true;
+}
+
+function isOwner(userId) {
+  return isAuthenticated() && request.auth.uid == userId;
+}
+
+function hasOnlyAllowedFields(fields) {
+  return request.resource.data.keys().hasOnly(fields);
+}
+
+function isValidEmail(email) {
+  return email is string && email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$");
+}
+
+// ===============================================================
+// Domain Validators
+// ===============================================================
+
+function isValidUser(data) {
+  return data.name is string && data.name.size() > 0 && data.name.size() < 100 &&
+         isValidEmail(data.email);
+}
+
+function isValidMessage(data) {
+  return data.content is string && data.content.size() > 0 && data.content.size() <= 500 &&
+         data.type in ['public', 'private'] &&
+         data.timestamp is number;
+}
+
+function isValidContactMessage(data) {
+  return data.name is string && data.name.size() > 0 &&
+         data.email is string && data.email.size() > 0 &&
+         data.message is string && data.message.size() > 0 &&
+         data.subject is string;
+}
+
+// ===============================================================
+// Rules
+// ===============================================================
+
+// 1. COLLECTION USERS
+match /users/{userId} {
+  // PII Protection: Only owner or admin can read
+  allow read: if isOwner(userId) || isAdmin();
+  
+  // Prevent self-escalation to admin UNLESS they are in the hardcoded list
+  allow create: if isOwner(userId) && isValidUser(request.resource.data) && 
+                  (
+                    (!('isAdmin' in request.resource.data) || request.resource.data.isAdmin == false) ||
+                    isAdmin()
+                  );
+  
+  allow update: if (isOwner(userId) && isValidUser(request.resource.data) && 
+                    request.resource.data.isAdmin == resource.data.isAdmin) || isAdmin();
+  
+  allow delete: if isAdmin();
+
+  match /chats/{chatId} {
+    allow read, write: if isOwner(userId);
+  }
+}
+
+// 2. KNOWLEDGE BASE
+match /knowledge_base/{docId} {
+    allow read: if true;
+    allow write: if isAdmin();
+}
+
+// 3. SHARED API KEYS
+match /shared_api_keys/{docId} {
+    allow read: if true; 
+    allow write: if isAdmin(); 
+}
+
+// 4. GALLERY
+match /gallery_photos_production/{docId} {
+    allow read: if true;
+    allow create, update, delete: if isAdmin();
+}
+
+// 5. BLOG
+match /blog_posts_production/{docId} {
+    allow read: if true;
+    allow create, delete: if isAdmin();
+    allow update: if isAdmin() || (
+      // Cek apakah yang diubah HANYA field views untuk pencatatan view count pembaca
+      request.resource.data.diff(resource.data).affectedKeys().hasOnly(['views']) &&
+      (
+        // Kasus 1: Kalau sebelumnya belum ada views, set jadi 1
+        (!('views' in resource.data) && request.resource.data.views == 1) ||
+        // Kasus 2: Kalau sudah ada, harus tambah tepat 1
+        (request.resource.data.views == resource.data.views + 1)
+      )
+    );
+}
+
+// 6. SITE CONTENT
+match /site_content/{docId} {
+    allow read: if true;
+    allow write: if isAdmin();
+}
+
+// 7. ANALYTICS DAILY
+match /analytics_daily/{date} {
+    allow read: if isAdmin();
+    // Allow visitors to increment counts via merge/increment
+    allow create, update: if true; 
+}
+
+// 8. ANALYTICS LOGS
+match /analytics_logs/{logId} {
+    allow read: if isAdmin();
+    allow create: if true;
+}
+
+// 9. MESSAGES
+    match /messages/{messageId} {
+        allow read: if isAdmin() || (resource.data.get('type', '') == 'public');
+        allow create: if isValidMessage(request.resource.data) || isValidContactMessage(request.resource.data);
+        allow update: if isAdmin();
+        // Mengizinkan hapus jika admin ATAU jika waktu penghapusan kurang dari 5 menit (300.000 ms) dari waktu pesan dibuat
+        allow delete: if isAdmin() || (request.time.toMillis() < resource.data.timestamp + 300000);
+    }
+
+// 10. MUSIC
+match /music_playlist/{trackId} {
+    allow read: if true;
+    allow write: if isAdmin();
+}
+
+// 11. ANALYTICS COUNTS
+match /analytics_counts/{countId} {
+    allow read: if isAdmin();
+    allow create, update: if true;
+}
+
+// 12. RALINK
+match /ralink/{linkId} {
+    allow read: if true;
+    allow write: if isAdmin();
+}
+
+// 13. API KEYS
+match /api_keys/{provider} {
+    allow read, write: if isAdmin();
+}
+
+// 14. SETTINGS
+match /settings/{settingId} {
+    allow read: if true;
+    allow write: if isAdmin();
+}
+
+// 15. PROJECTS CUSTOM
+match /projects_custom/{docId} {
+    allow read: if true;
+    allow write: if isAdmin();
+}
+
+// 16. ANALYTICS
+match /analytics/{docId} {
+    allow read: if isAdmin();
+    allow create, update: if true;
+}
+
+// Default: Deny others
+match /{document=**} {
+  allow read, write: if false;
+}
+}
+}

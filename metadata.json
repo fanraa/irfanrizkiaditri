@@ -1,0 +1,8 @@
+{
+  "name": "Irfan Rizki Aditri V2",
+  "description": "Personal portfolio website with blog, gallery, and music integration.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
