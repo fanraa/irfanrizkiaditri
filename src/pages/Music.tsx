@@ -69,15 +69,17 @@ function SearchResultItem({ track, onAdd, onPlayToggle, isPlaying, loading }: an
     <div className="flex items-center p-2 rounded-xl hover:bg-slate-100/50 transition-colors group cursor-default w-full box-border">
       <div className="relative w-12 h-12 rounded-md overflow-hidden bg-slate-200 flex-shrink-0 mr-3">
         <ImageWithSkeleton src={track.coverUrl} alt="" className="w-full h-full object-cover" />
-        <button 
-          onClick={onPlayToggle}
-          className={cn(
-            "absolute inset-0 flex items-center justify-center bg-black/40 transition-opacity",
-            isPlaying ? "opacity-100" : "opacity-0 group-hover:opacity-100"
-          )}
-        >
-          {isPlaying ? <Pause className="w-5 h-5 text-white" fill="currentColor" /> : <Play className="w-5 h-5 text-white ml-0.5" fill="currentColor" />}
-        </button>
+        {(!track.youtubeId || !track.youtubeId.startsWith('itunes-')) && (
+          <button 
+            onClick={onPlayToggle}
+            className={cn(
+              "absolute inset-0 flex items-center justify-center bg-black/40 transition-opacity",
+              isPlaying ? "opacity-100" : "opacity-0 group-hover:opacity-100"
+            )}
+          >
+            {isPlaying ? <Pause className="w-5 h-5 text-white" fill="currentColor" /> : <Play className="w-5 h-5 text-white ml-0.5" fill="currentColor" />}
+          </button>
+        )}
       </div>
       <div className="flex-1 min-w-0 mr-3 overflow-hidden">
         <div 
@@ -132,16 +134,34 @@ function AddTrackModal({ isOpen, onClose, onAdded, existingTracks }: { isOpen: b
       const randomQueries = ["latest popular hits","top global songs","viral tiktok songs","billboard hot 100","indonesian top hits","chill pop music","trending pop songs"];
       const randomQuery = randomQueries[Math.floor(Math.random() * randomQueries.length)];
       const res = await fetch(`/api/search?q=${encodeURIComponent(randomQuery)}`);
-      if (res.ok) {
+      if (res.ok && !res.headers.get('content-type')?.includes('text/html')) {
         const data = await res.json();
         const results = data.results || [];
         // Filter out existing tracks
         const existingIds = new Set(existingTracks.map(t => t.youtubeId));
         const filtered = results.filter((t: any) => !existingIds.has(t.youtubeId));
         setRecommendations(filtered);
+      } else {
+         throw new Error('Backend not available');
       }
     } catch (err) {
-      console.error(err);
+      console.log('Falling back to iTunes recommendations...');
+      try {
+        const itunesRes = await fetch(`https://itunes.apple.com/search?term=pop+hits&entity=song&limit=15`);
+        if (itunesRes.ok) {
+           const itunesData = await itunesRes.json();
+           const formattedResults = (itunesData.results || []).map((item: any) => ({
+             youtubeId: item.trackId ? `itunes-${item.trackId}` : '', 
+             audio: item.previewUrl,
+             title: item.trackName,
+             artist: item.artistName,
+             coverUrl: item.artworkUrl100 ? item.artworkUrl100.replace('100x100bb', '600x600bb') : ''
+           }));
+           setRecommendations(formattedResults);
+        }
+      } catch (fallbackErr) {
+        console.error(fallbackErr);
+      }
     } finally {
       setIsFetchingRecommendations(false);
     }
@@ -186,12 +206,30 @@ function AddTrackModal({ isOpen, onClose, onAdded, existingTracks }: { isOpen: b
     setIsSearching(true);
     try {
       const res = await fetch(`/api/search?q=${encodeURIComponent(searchQuery)}`);
-      if (!res.ok) throw new Error('Search failed');
+      if (!res.ok || res.headers.get('content-type')?.includes('text/html')) {
+        throw new Error('Backend not available');
+      }
       const data = await res.json();
       setSearchResults(data.results || []);
     } catch (err) {
-      console.error(err);
-      alert('Failed to search. Please try again.');
+      console.log('Falling back to iTunes search...', err);
+      try {
+        const itunesRes = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(searchQuery)}&entity=song&limit=10`);
+        if (!itunesRes.ok) throw new Error('iTunes search failed');
+        const itunesData = await itunesRes.json();
+        
+        const formattedResults = (itunesData.results || []).map((item: any) => ({
+          youtubeId: item.trackId ? `itunes-${item.trackId}` : '', // Use iTunes ID as a dummy youtubeId to avoid empty keys rendering issues
+          audio: item.previewUrl,
+          title: item.trackName,
+          artist: item.artistName,
+          coverUrl: item.artworkUrl100 ? item.artworkUrl100.replace('100x100bb', '600x600bb') : ''
+        }));
+        setSearchResults(formattedResults);
+      } catch (fallbackErr) {
+        console.error(fallbackErr);
+        alert('Gagal mencari lagu. Fitur ini memerlukan backend atau koneksi internet yang stabil.');
+      }
     } finally {
       setIsSearching(false);
     }
@@ -200,13 +238,17 @@ function AddTrackModal({ isOpen, onClose, onAdded, existingTracks }: { isOpen: b
   const handleAddSearchResult = async (track: any) => {
     setLoading(true);
     try {
-      await addDoc(collection(db, "music_playlist"), {
+      const trackData: any = {
         title: track.title,
         artist: track.artist || track.author || 'Unknown Artist',
-        youtubeId: track.youtubeId,
+        youtubeId: track.youtubeId?.startsWith('itunes-') ? '' : track.youtubeId,
         coverUrl: track.coverUrl,
         order: Date.now()
-      });
+      };
+      if (track.audio) {
+        trackData.audio = track.audio;
+      }
+      await addDoc(collection(db, "music_playlist"), trackData);
       onAdded();
       
       // Stop preview when added
