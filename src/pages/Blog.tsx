@@ -486,12 +486,12 @@ export function Blog() {
                   <button
                     onClick={loadMore}
                     disabled={loadingMore}
-                    className="flex items-center space-x-2 bg-white hover:bg-slate-50 text-black px-6 py-2.5 rounded-full border border-slate-200 transition-all font-bold text-sm disabled:opacity-50 shadow-md hover:shadow-lg"
+                    className="flex items-center space-x-2 bg-white hover:bg-slate-50 text-black px-4 py-2 rounded-full border border-slate-200 transition-all font-bold text-xs disabled:opacity-50 shadow-md hover:shadow-lg"
                   >
                     {loadingMore ? (
                       <>
                         <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                        <span>Memuat...</span>
+                        <span>Loading...</span>
                       </>
                     ) : (
                       <span>Load More</span>

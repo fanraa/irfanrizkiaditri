@@ -288,41 +288,8 @@ export function Home() {
     fetchData();
   }, []);
 
-  const defaultBlogs = [
-    {
-      id: "fermi",
-      title: "Paradoks Fermi: Keheningan yang Memekakkan Telinga",
-      excerpt: "Jika alam semesta ini tak terhingga luasnya dan tua usianya, di mana semua orang? Mengapa hingga saat ini kita belum menemukan satupun tanda kehidupan lain di alam semesta yang maha luas ini? Mari menjelajahi berbagai kemungkinan dari ketiadaan bukti peradaban asing.",
-      imageUrl: "https://images.unsplash.com/photo-1462331940025-496dfbfc7564?q=80&w=800&auto=format&fit=crop"
-    },
-    {
-      id: "attractor",
-      title: "The Great Attractor: Monster Gravitasi",
-      excerpt: "Kita dan seluruh galaksi Bima Sakti sedang bergerak dengan kecepatan 600 km/detik menuju sesuatu yang tidak bisa kita lihat, bersembunyi di balik debu kosmik. Apa sebenarnya anomali gravitasi raksasa yang terus menarik jutaan galaksi menuju satu titik misterius ini?",
-      imageUrl: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=800&auto=format&fit=crop"
-    }
-  ];
-
-  const defaultPhotos = [
-    { id: "1", src: "https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=800&auto=format&fit=crop" },
-    { id: "2", src: "https://images.unsplash.com/photo-1531297172868-ed80a430963c?q=80&w=800&auto=format&fit=crop" },
-    { id: "3", src: "https://images.unsplash.com/photo-1481481600465-364210be895f?q=80&w=800&auto=format&fit=crop" },
-    { id: "4", src: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?q=80&w=800&auto=format&fit=crop" },
-    { id: "5", src: "https://images.unsplash.com/photo-1605810230434-7631ac76ec81?q=80&w=800&auto=format&fit=crop" },
-    { id: "6", src: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?q=80&w=800&auto=format&fit=crop" },
-  ];
-
-  const defaultMusicCovers = [
-    "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?q=80&w=300&auto=format&fit=crop",
-    "https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?q=80&w=300&auto=format&fit=crop",
-    "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?q=80&w=300&auto=format&fit=crop",
-    "https://images.unsplash.com/photo-1493225457124-a1a2a5956093?q=80&w=300&auto=format&fit=crop",
-    "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?q=80&w=300&auto=format&fit=crop",
-    "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?q=80&w=300&auto=format&fit=crop",
-  ];
-
-  const blogsToDisplay = recentBlogs.length > 0 ? recentBlogs : defaultBlogs;
-  const photosToDisplay = recentPhotos.length > 0 ? recentPhotos : defaultPhotos;
+  const blogsToDisplay = recentBlogs;
+  const photosToDisplay = recentPhotos;
 
   const validateForm = () => {
     let valid = true;
@@ -705,12 +672,16 @@ export function Home() {
               <div className="grid md:grid-cols-2 gap-10">
                 {blogsToDisplay.map((post) => (
                   <div key={post.id} onClick={() => navigate(`/blog?id=${post.id}`)} className="group/blog cursor-pointer flex flex-col">
-                    <div className="aspect-video w-full rounded-xl overflow-hidden mb-6 bg-slate-900/50">
-                      <img 
-                        src={post.image || post.imageUrl || "https://images.unsplash.com/photo-1462331940025-496dfbfc7564?q=80&w=800&auto=format&fit=crop"}
-                        alt={post.title} 
-                        className="w-full h-full object-cover transition-opacity duration-300 opacity-90 group-hover/blog:opacity-100" 
-                      />
+                    <div className="aspect-video w-full rounded-xl overflow-hidden mb-6 bg-slate-900/50 flex items-center justify-center">
+                      {(post.image || post.imageUrl) ? (
+                        <img 
+                          src={post.image || post.imageUrl}
+                          alt={post.title} 
+                          className="w-full h-full object-cover transition-opacity duration-300 opacity-90 group-hover/blog:opacity-100" 
+                        />
+                      ) : (
+                        <ImageIcon className="w-8 h-8 opacity-20 text-white" />
+                      )}
                     </div>
                     <div className="border-l-2 border-transparent group-hover/blog:border-slate-400 pl-4 transition-all duration-300">
                       <h4 className="font-semibold text-xl mb-3 text-slate-900 font-heading">
@@ -781,7 +752,8 @@ export function Home() {
                   }}
                 >
                   {(() => {
-                    const musicItems = recentMusic.length > 0 ? recentMusic : defaultMusicCovers.map(src => ({ coverUrl: src }));
+                    const musicItems = recentMusic;
+                    if (musicItems.length === 0) return null;
                     // Duplicate enough times to ensure it fills wide screens
                     const displayItems = [...musicItems, ...musicItems, ...musicItems, ...musicItems, ...musicItems, ...musicItems];
                     
