@@ -147,25 +147,24 @@ export function Contact() {
     <>
       <SEO title="Contact" description="Contact Irfan Rizki Aditri." url={window.location.href} />
       <PageTransition>
-        <div className="relative min-h-screen overflow-x-hidden">
-          {/* Subtle Clouds Background */}
-          <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
-            <div className="absolute top-[-10%] md:top-[-5%] left-0 right-0 h-[800px] pointer-events-none z-0 overflow-hidden flex items-center justify-center">
-            <motion.img 
-              src="https://res.cloudinary.com/dew39kqhy/image/upload/f_auto,q_auto/v1783403663/pexels-brett-sayles-4312324-removebg-preview_baeb0f.png" 
-              alt="Clouds" 
-              className="w-[350%] sm:w-[300%] md:w-[220%] max-w-none h-auto object-contain opacity-[0.12] mix-blend-overlay flex-shrink-0" 
-              initial={{ x: '10%' }}
-              animate={{ x: ['10%', '30%', '10%'] }}
-              transition={{ duration: 250, repeat: Infinity, ease: "easeInOut" }}
-            />
-            </div>
+        {/* Subtle Clouds Background */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
+          <div className="absolute top-[-10%] md:top-[-5%] left-0 right-0 h-[800px] pointer-events-none z-0 overflow-hidden flex items-center justify-center">
+          <motion.img 
+            src="https://res.cloudinary.com/dew39kqhy/image/upload/f_auto,q_auto/v1783403663/pexels-brett-sayles-4312324-removebg-preview_baeb0f.png" 
+            alt="Clouds" 
+            className="w-[350%] sm:w-[300%] md:w-[220%] max-w-none h-auto object-contain opacity-[0.12] mix-blend-overlay flex-shrink-0" 
+            initial={{ x: '10%' }}
+            animate={{ x: ['10%', '30%', '10%'] }}
+            transition={{ duration: 250, repeat: Infinity, ease: "easeInOut" }}
+          />
           </div>
-          
-          <div className="max-w-4xl mx-auto w-full pt-12 pb-24 px-4 sm:px-6 relative z-10">
+        </div>
+        
+        <div className="max-w-4xl mx-auto w-full pt-12 pb-24 px-4 sm:px-6 relative z-10">
           
           {/* Header */}
-                <header className="text-center space-y-3 mb-12 relative z-20 overflow-hidden py-4">
+                <header className="text-center space-y-3 mb-12 relative z-20">
           {/* Airplane Background */}
           <div className="absolute top-1/2 -translate-y-1/2 right-0 w-full pointer-events-none z-0 flex justify-end">
             <img 
@@ -312,7 +311,6 @@ export function Contact() {
             )}
           </div>
 
-        </div>
         </div>
       </div>
       </PageTransition>
