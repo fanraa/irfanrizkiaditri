@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { db } from '@/lib/firebase';
 import { collection, doc, getDoc, setDoc, getDocs, updateDoc, deleteDoc, addDoc, onSnapshot, query, orderBy } from 'firebase/firestore';
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
-import { Settings, Image as ImageIcon, Link as LinkIcon, Activity, Plus, Trash2, Edit2, Loader2, Save, X, ArrowLeft } from 'lucide-react';
+import { Settings, Image as ImageIcon, Link as LinkIcon, Activity, Plus, Trash2, Edit2, Loader2, Save, X, ArrowLeft, Music as MusicIcon } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { PageTransition } from '@/components/PageTransition';
 import { SEO } from '@/components/SEO';
@@ -19,7 +19,7 @@ const MOCK_DATA = [
 ];
 
 export function Admin() {
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'assets' | 'projects'>('dashboard');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'assets' | 'projects' | 'playlist'>('dashboard');
   const { isAdmin } = useAuth();
   
   if (!isAdmin) {
@@ -82,12 +82,20 @@ export function Admin() {
                   <LinkIcon className="w-4 h-4" />
                   Projects & Links
                 </button>
+                <button
+                  onClick={() => setActiveTab('playlist')}
+                  className={`flex items-center gap-2 px-6 py-4 text-sm font-medium transition-colors border-b-2 whitespace-nowrap ${activeTab === 'playlist' ? 'border-slate-900 text-slate-900' : 'border-transparent text-slate-500 hover:text-slate-700'}`}
+                >
+                  <MusicIcon className="w-4 h-4" />
+                  Playlist
+                </button>
               </div>
 
               <div className="p-6">
                 {activeTab === 'dashboard' && <DashboardTab />}
                 {activeTab === 'assets' && <AssetsTab />}
                 {activeTab === 'projects' && <ProjectsTab />}
+                {activeTab === 'playlist' && <PlaylistTab />}
               </div>
             </div>
           </div>
@@ -458,6 +466,154 @@ function ProjectsTab() {
                <button type="submit" className="w-full bg-slate-900 hover:bg-slate-800 text-white py-2 rounded-lg text-sm font-bold mt-2 transition-colors">
                  Save Project
                </button>
+             </form>
+           </div>
+         </div>
+       )}
+    </div>
+  );
+}
+
+function PlaylistTab() {
+  const [tracks, setTracks] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingTrack, setEditingTrack] = useState<any>(null);
+  const [formData, setFormData] = useState({ title: '', artist: '', youtubeId: '', audio: '', coverUrl: '' });
+
+  useEffect(() => {
+    const q = query(collection(db, 'music_playlist'), orderBy('order', 'asc'));
+    const unsub = onSnapshot(q, (snapshot) => {
+      setTracks(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+      setLoading(false);
+    });
+    return () => unsub();
+  }, []);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const data: any = { ...formData };
+    
+    try {
+      if (editingTrack) {
+        await updateDoc(doc(db, 'music_playlist', editingTrack.id), data);
+      } else {
+        await addDoc(collection(db, 'music_playlist'), { ...data, order: Date.now() });
+      }
+      setIsModalOpen(false);
+      setEditingTrack(null);
+      setFormData({ title: '', artist: '', youtubeId: '', audio: '', coverUrl: '' });
+    } catch (error) {
+      console.error(error);
+      alert('Error saving track');
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!confirm('Are you sure you want to delete this track?')) return;
+    try {
+      await deleteDoc(doc(db, 'music_playlist', id));
+    } catch (error) {
+      console.error(error);
+      alert('Error deleting track');
+    }
+  };
+
+  const openEdit = (track: any) => {
+    setEditingTrack(track);
+    setFormData({
+      title: track.title || '',
+      artist: track.artist || '',
+      youtubeId: track.youtubeId || '',
+      audio: track.audio || '',
+      coverUrl: track.coverUrl || ''
+    });
+    setIsModalOpen(true);
+  };
+
+  return (
+    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+       <div className="flex justify-between items-center">
+         <h3 className="font-bold text-slate-800">Music Playlist</h3>
+         <button 
+           onClick={() => {
+             setEditingTrack(null);
+             setFormData({ title: '', artist: '', youtubeId: '', audio: '', coverUrl: '' });
+             setIsModalOpen(true);
+           }}
+           className="flex items-center gap-1 text-sm bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-1.5 rounded-lg transition-colors font-medium"
+         >
+           <Plus className="w-4 h-4" /> Add Track
+         </button>
+       </div>
+       
+       {loading ? (
+         <div className="py-12 flex justify-center"><Loader2 className="w-6 h-6 animate-spin text-slate-400" /></div>
+       ) : (
+         <div className="space-y-3">
+           {tracks.length === 0 ? (
+             <p className="text-slate-500 text-sm py-4 text-center bg-slate-50 rounded-xl border border-dashed border-slate-200">No tracks found. Add some music!</p>
+           ) : (
+             tracks.map(track => (
+               <div key={track.id} className="flex items-center justify-between p-4 bg-slate-50 border border-slate-100 rounded-xl">
+                 <div className="flex items-center gap-4">
+                   <div className="w-10 h-10 rounded-md overflow-hidden bg-slate-200 flex-shrink-0">
+                     {track.coverUrl ? (
+                       <img src={track.coverUrl} alt="" className="w-full h-full object-cover" />
+                     ) : (
+                       <MusicIcon className="w-5 h-5 m-2.5 text-slate-400" />
+                     )}
+                   </div>
+                   <div>
+                     <h4 className="font-bold text-slate-900 line-clamp-1">{track.title}</h4>
+                     <p className="text-sm text-slate-500 line-clamp-1">{track.artist}</p>
+                   </div>
+                 </div>
+                 <div className="flex items-center gap-2">
+                   <button onClick={() => openEdit(track)} className="p-2 text-slate-400 hover:text-slate-800 transition-colors"><Edit2 className="w-4 h-4" /></button>
+                   <button onClick={() => handleDelete(track.id)} className="p-2 text-slate-400 hover:text-red-500 transition-colors"><Trash2 className="w-4 h-4" /></button>
+                 </div>
+               </div>
+             ))
+           )}
+         </div>
+       )}
+
+       {isModalOpen && (
+         <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+           <div className="bg-white rounded-2xl p-6 w-full max-w-md shadow-xl animate-in zoom-in-95 duration-200">
+             <div className="flex justify-between items-center mb-4">
+               <h3 className="font-bold text-lg text-slate-900">{editingTrack ? 'Edit Track' : 'Add Track'}</h3>
+               <button onClick={() => setIsModalOpen(false)} className="text-slate-400 hover:text-slate-900"><X className="w-5 h-5" /></button>
+             </div>
+             <form onSubmit={handleSubmit} className="space-y-4">
+               <div>
+                 <label className="text-xs font-bold text-slate-700 mb-1 block">Title</label>
+                 <input required type="text" value={formData.title} onChange={e => setFormData({...formData, title: e.target.value})} className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:outline-none focus:border-slate-900" />
+               </div>
+               <div>
+                 <label className="text-xs font-bold text-slate-700 mb-1 block">Artist</label>
+                 <input required type="text" value={formData.artist} onChange={e => setFormData({...formData, artist: e.target.value})} className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:outline-none focus:border-slate-900" />
+               </div>
+               <div>
+                 <label className="text-xs font-bold text-slate-700 mb-1 block">YouTube ID / Link</label>
+                 <input type="text" value={formData.youtubeId} onChange={e => setFormData({...formData, youtubeId: e.target.value})} placeholder="e.g. dQw4w9WgXcQ" className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:outline-none focus:border-slate-900" />
+               </div>
+               <div>
+                 <label className="text-xs font-bold text-slate-700 mb-1 block">Audio URL (Optional)</label>
+                 <input type="url" value={formData.audio} onChange={e => setFormData({...formData, audio: e.target.value})} placeholder="https://..." className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:outline-none focus:border-slate-900" />
+               </div>
+               <div>
+                 <label className="text-xs font-bold text-slate-700 mb-1 block">Cover Image URL</label>
+                 <input type="url" value={formData.coverUrl} onChange={e => setFormData({...formData, coverUrl: e.target.value})} placeholder="https://..." className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:outline-none focus:border-slate-900" />
+               </div>
+               
+               <div className="flex justify-end gap-2 mt-6">
+                 <button type="button" onClick={() => setIsModalOpen(false)} className="px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100 rounded-lg transition-colors">Cancel</button>
+                 <button type="submit" className="px-4 py-2 text-sm font-medium bg-slate-900 text-white rounded-lg hover:bg-slate-800 transition-colors flex items-center gap-2">
+                   <Save className="w-4 h-4" /> Save
+                 </button>
+               </div>
              </form>
            </div>
          </div>
