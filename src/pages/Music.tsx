@@ -134,7 +134,8 @@ function AddTrackModal({ isOpen, onClose, onAdded, existingTracks }: { isOpen: b
       const randomQueries = ["latest popular hits","top global songs","viral tiktok songs","billboard hot 100","indonesian top hits","chill pop music","trending pop songs"];
       const randomQuery = randomQueries[Math.floor(Math.random() * randomQueries.length)];
       const res = await fetch(`/api/search?q=${encodeURIComponent(randomQuery)}`);
-      if (res.ok && !res.headers.get('content-type')?.includes('text/html')) {
+      const contentType = res.headers.get('content-type');
+      if (res.ok && contentType?.includes('application/json')) {
         const data = await res.json();
         const results = data.results || [];
         // Filter out existing tracks
@@ -206,7 +207,8 @@ function AddTrackModal({ isOpen, onClose, onAdded, existingTracks }: { isOpen: b
     setIsSearching(true);
     try {
       const res = await fetch(`/api/search?q=${encodeURIComponent(searchQuery)}`);
-      if (!res.ok || res.headers.get('content-type')?.includes('text/html')) {
+      const contentType = res.headers.get('content-type');
+      if (!res.ok || !contentType?.includes('application/json')) {
         throw new Error('Backend not available');
       }
       const data = await res.json();
