@@ -494,7 +494,7 @@ export function Blog() {
                         <span>Memuat...</span>
                       </>
                     ) : (
-                      <span>Muat Lebih Banyak</span>
+                      <span>Load More</span>
                     )}
                   </button>
                 </div>
