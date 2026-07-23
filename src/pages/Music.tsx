@@ -135,7 +135,11 @@ function AddTrackModal({ isOpen, onClose, onAdded, existingTracks }: { isOpen: b
     try {
       const randomQueries = ["latest popular hits","top global songs","viral tiktok songs","billboard hot 100","indonesian top hits","chill pop music","trending pop songs"];
       const randomQuery = randomQueries[Math.floor(Math.random() * randomQueries.length)];
-      const res = await fetch(`/api/search?q=${encodeURIComponent(randomQuery)}`);
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 12000);
+      
+      const res = await fetch(`/api/search?q=${encodeURIComponent(randomQuery)}`, { signal: controller.signal });
+      clearTimeout(timeoutId);
       const contentType = res.headers.get('content-type');
       if (res.ok && contentType?.includes('application/json')) {
         const data = await res.json();
@@ -208,7 +212,10 @@ function AddTrackModal({ isOpen, onClose, onAdded, existingTracks }: { isOpen: b
     
     setIsSearching(true);
     try {
-      const res = await fetch(`/api/search?q=${encodeURIComponent(searchQuery)}`);
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 15000); // Wait a bit longer for explicit searches
+      const res = await fetch(`/api/search?q=${encodeURIComponent(searchQuery)}`, { signal: controller.signal });
+      clearTimeout(timeoutId);
       const contentType = res.headers.get('content-type');
       if (!res.ok || !contentType?.includes('application/json')) {
         throw new Error('Backend not available');

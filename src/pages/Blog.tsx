@@ -128,14 +128,24 @@ export function Blog() {
   useEffect(() => {
     const fetchNews = async () => {
       try {
-        const res = await fetch("/api/news");
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 10000); // 10s timeout for cold starts
+        
+        const res = await fetch("/api/news", { signal: controller.signal });
+        clearTimeout(timeoutId);
+        
+        if (!res.ok) throw new Error("API responded with an error");
+        
         const data = await res.json();
-        if (data.articles) {
+        if (data && data.articles) {
           // Keep up to 3 valid articles
           setNews(data.articles.filter((a: any) => a.title && a.url).slice(0, 3));
+        } else {
+          setNews([]);
         }
       } catch (e) {
-        console.error(e);
+        console.error("News fetch failed:", e);
+        setNews([]); // Fallback to empty array
       } finally {
         setNewsLoading(false);
       }

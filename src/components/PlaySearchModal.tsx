@@ -50,7 +50,10 @@ export function PlaySearchModal({ isOpen, onClose }: { isOpen: boolean; onClose:
     setIsSearching(true);
     setSearchResults([]);
     try {
-      const res = await fetch(`/api/search?q=${encodeURIComponent(searchQuery)}`);
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 12000);
+      const res = await fetch(`/api/search?q=${encodeURIComponent(searchQuery)}`, { signal: controller.signal });
+      clearTimeout(timeoutId);
       if (res.ok) {
         const data = await res.json();
         let results = data.results || [];

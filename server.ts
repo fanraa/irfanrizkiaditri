@@ -185,7 +185,8 @@ async function startServer() {
   // API route for News
   app.get("/api/news", async (req, res) => {
     try {
-      const response = await fetch(`https://newsapi.org/v2/top-headlines?country=us&category=technology&pageSize=5&apiKey=ce9a41c46a2849d7bfee4276179b0885&_t=${Date.now()}`, { cache: 'no-store' });
+      const apiKey = process.env.NEWS_API_KEY || 'ce9a41c46a2849d7bfee4276179b0885';
+      const response = await fetch(`https://newsapi.org/v2/top-headlines?country=us&category=technology&pageSize=5&apiKey=${apiKey}&_t=${Date.now()}`, { cache: 'no-store' });
       const data = await response.json();
       res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
       res.json(data);

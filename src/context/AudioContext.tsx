@@ -570,8 +570,10 @@ export function AudioProvider({ children }: { children: ReactNode }) {
       const currentTrack = temporaryTrackRef.current || queueRef.current.find(t => t.id === currentPlayingId);
       if (currentTrack) {
         showToast("Finding similar song...");
-        fetch(`/api/search?q=${encodeURIComponent(currentTrack.artist || 'popular')}`)
-          .then(res => res.json())
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 10000);
+        fetch(`/api/search?q=${encodeURIComponent(currentTrack.artist || 'popular')}`, { signal: controller.signal })
+          .then(res => { clearTimeout(timeoutId); return res.json(); })
           .then(data => {
             const results = data.results || [];
             if (results.length > 0) {
