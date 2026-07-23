@@ -371,14 +371,21 @@ export function AudioProvider({ children }: { children: ReactNode }) {
     setLyrics(prev => prev.map(l => ({ ...l, translation: undefined })));
     
     const translateUrl = `/api/translate`;
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 12000);
     fetch(translateUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ text: fullText, targetLanguage: "id" })
+      body: JSON.stringify({ text: fullText, targetLanguage: "id" }),
+      signal: controller.signal
     })
-      .then(res => res.json())
+      .then(res => {
+         clearTimeout(timeoutId);
+         if (!res.ok) throw new Error("Translation failed");
+         return res.json();
+      })
       .then(transData => {
         if (transData && transData[0]) {
           const translatedFullText = transData[0].map((item: any) => item[0]).join('');
@@ -573,7 +580,7 @@ export function AudioProvider({ children }: { children: ReactNode }) {
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 10000);
         fetch(`/api/search?q=${encodeURIComponent(currentTrack.artist || 'popular')}`, { signal: controller.signal })
-          .then(res => { clearTimeout(timeoutId); return res.json(); })
+          .then(res => { clearTimeout(timeoutId); if (!res.ok) throw new Error('API error'); return res.json(); })
           .then(data => {
             const results = data.results || [];
             if (results.length > 0) {

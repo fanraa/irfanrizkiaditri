@@ -112,9 +112,9 @@ export function About() {
     const opt = {
       margin:       0,
       filename:     `CV_Irfan_Rizki_Aditri_${isIndo ? 'ID' : 'EN'}.pdf`,
-      image:        { type: 'jpeg', quality: 1 },
+      image:        { type: 'jpeg' as const, quality: 1 },
       html2canvas:  { scale: 2, useCORS: true, windowWidth: 1024 },
-      jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      jsPDF:        { unit: 'mm' as const, format: 'a4', orientation: 'portrait' as const }
     };
 
     try {
