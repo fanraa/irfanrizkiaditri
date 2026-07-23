@@ -109,6 +109,7 @@ export function Home() {
       description: "Technology blog and tutorial site focusing on web development, AI, and modern software engineering.",
       icon: "https://res.cloudinary.com/dew39kqhy/image/upload/f_auto,q_auto/v1779594254/FanraTech_esy4kn.png",
       link: "https://fanratech.web.id",
+      previewImage: "https://res.cloudinary.com/dew39kqhy/image/upload/v1783235122/WhatsApp_Image_2026-07-05_at_14.04.59_ja7iqq.jpg"
     },
     {
       id: "vektorion",
@@ -116,6 +117,7 @@ export function Home() {
       description: "Visual exploration platform offering free graphic design assets and curated design inspiration.",
       icon: "https://res.cloudinary.com/dew39kqhy/image/upload/f_auto,q_auto/v1778700411/ChatGPT_Image_14_Mei_2026_02.26.25_nx3u4o.png",
       link: "https://vektorion.web.id",
+      previewImage: "https://res.cloudinary.com/dew39kqhy/image/upload/v1783239430/WhatsApp_Image_2026-07-05_at_15.16.46_r1s2al.jpg"
     },
     {
       id: "fanragem",
@@ -130,6 +132,7 @@ export function Home() {
       description: "An AI-powered web platform to create and manage smart WhatsApp bots, connecting them with various LLMs for automated replies and business automation.",
       icon: "https://res.cloudinary.com/dew39kqhy/image/upload/f_auto,q_auto/v1780578024/file_0000000030647209b33b695fffe52c90_gi9rwf.png",
       link: "https://fanrabot.biz.id",
+      previewImage: "https://res.cloudinary.com/dew39kqhy/image/upload/v1784736939/d3c941fb-9df9-4fab-b373-45961a08646a.png"
     },
     {
       id: "friendzone",
@@ -137,6 +140,7 @@ export function Home() {
       description: "A global social community platform connecting people to build friendships. Evolved from a chat group into a cross-platform ecosystem prioritizing authentic interactions.",
       icon: "https://res.cloudinary.com/dew39kqhy/image/upload/f_auto,q_auto/v1776967780/1774023663426_cv3c6b.png",
       link: "https://friendszone.web.id",
+      previewImage: "https://res.cloudinary.com/dew39kqhy/image/upload/v1783343855/Cuplikan_layar_2026-07-06_201510_n9yyya.png"
     }
   ];
   const featureCards = featuredProjects.length > 0 ? featuredProjects : defaultProjects;
@@ -395,9 +399,9 @@ export function Home() {
                     decoding="async"
                   />
                 ))}
+
               </div>
             </div>
-
             <div className="space-y-6 flex-1 flex flex-col items-center lg:items-start text-center lg:text-left relative z-10 w-full lg:max-w-2xl">
               <h1 className="text-5xl md:text-7xl font-bold font-heading tracking-tight text-slate-900 leading-tight">
                 <span className="text-slate-800">Fanra</span> is here.
@@ -422,7 +426,6 @@ export function Home() {
                 </a>
               </div>
             </div>
-            
             {/* Desktop Image (hidden below lg) */}
             <div 
               className="hidden lg:flex w-5/12 max-w-lg justify-end relative z-10 cursor-pointer"
@@ -459,6 +462,7 @@ export function Home() {
               </div>
             </div>
 
+
             <div className="w-[30%] sm:w-auto flex flex-col sm:flex-row items-center text-center sm:text-left space-y-2 sm:space-y-0 sm:space-x-3">
               <img src="https://cdn-icons-png.flaticon.com/128/4046/4046911.png" alt="Interests" className="w-6 h-6 sm:w-7 sm:h-7 object-contain opacity-75 grayscale-[20%]" />
               <div className="flex flex-col justify-center">
@@ -466,6 +470,7 @@ export function Home() {
                 <p className="text-slate-500 text-[10px] sm:text-xs leading-none mt-1 sm:mt-1.5">AI & Web Dev</p>
               </div>
             </div>
+
 
             <div className="w-[30%] sm:w-auto flex flex-col sm:flex-row items-center text-center sm:text-left space-y-2 sm:space-y-0 sm:space-x-3">
               <img src="https://cdn-icons-png.flaticon.com/128/14634/14634613.png" alt="Based In" className="w-6 h-6 sm:w-7 sm:h-7 object-contain opacity-75 grayscale-[20%]" />
@@ -475,6 +480,7 @@ export function Home() {
               </div>
             </div>
 
+
             <div className="w-[45%] sm:w-auto flex flex-col sm:flex-row items-center text-center sm:text-left space-y-2 sm:space-y-0 sm:space-x-3">
               <img src="https://cdn-icons-png.flaticon.com/128/7542/7542074.png" alt="Status" className="w-6 h-6 sm:w-7 sm:h-7 object-contain opacity-75 grayscale-[20%]" />
               <div className="flex flex-col justify-center">
@@ -482,6 +488,7 @@ export function Home() {
                 <p className="text-slate-500 text-[10px] sm:text-xs leading-none mt-1 sm:mt-1.5">Active Student</p>
               </div>
             </div>
+
 
             <div className="w-[45%] sm:w-auto flex flex-col sm:flex-row items-center text-center sm:text-left space-y-2 sm:space-y-0 sm:space-x-3">
               <img src="https://cdn-icons-png.flaticon.com/128/9828/9828893.png" alt="Languages" className="w-6 h-6 sm:w-7 sm:h-7 object-contain opacity-75 grayscale-[20%]" />
@@ -502,10 +509,10 @@ export function Home() {
                 <motion.div
                   key={activeFeatureIndex}
                   custom={featureDragDirection}
-                  initial={{ x: featureDragDirection > 0 ? "50%" : "-50%", opacity: 0 }}
-                  animate={{ x: 0, opacity: 1 }}
-                  exit={{ x: featureDragDirection > 0 ? "-50%" : "50%", opacity: 0 }}
-                  transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.8, ease: "easeInOut" }}
                   className="col-start-1 row-start-1 w-full h-full"
                 >
                   {(() => {
@@ -519,7 +526,7 @@ export function Home() {
       <div className="flex justify-between items-start gap-8 lg:gap-16 flex-1 relative z-10 w-full">
         <div className="max-w-lg lg:max-w-xl flex flex-col items-center sm:items-start w-full">
           <div className="flex flex-col items-center sm:flex-row sm:space-x-3 mb-4 space-y-3 sm:space-y-0 text-center sm:text-left">
-            {currentProject.icon && <img src={currentProject.icon} alt={currentProject.title} className="w-10 h-10 sm:w-12 sm:h-12 rounded-full object-cover shadow-sm border border-slate-200 pointer-events-none" />}
+            {currentProject.icon && <img src={currentProject.icon} alt={currentProject.title} className={cn("w-10 h-10 sm:w-12 sm:h-12 object-contain pointer-events-none", (currentProject.id === "fanra" || currentProject.id === "fanrabot") ? "" : "rounded-full border border-slate-200/50 shadow-sm bg-white")} />}
             <h3 className="text-2xl sm:text-3xl font-bold font-heading text-slate-900 pointer-events-none">{currentProject.title}</h3>
           </div>
           <p className="text-slate-600 text-base sm:text-lg leading-relaxed break-words text-center sm:text-left pr-0 sm:pr-12 lg:pr-0 pointer-events-none">
@@ -527,9 +534,15 @@ export function Home() {
           </p>
         </div>
         
-        <div className="hidden lg:flex flex-col justify-start shrink-0 pt-2">
-          <div className="w-64 xl:w-80 aspect-video rounded-xl overflow-hidden bg-white/50 flex items-center justify-center border border-slate-200 shadow-sm relative group-hover:border-slate-300 transition-colors">
-            <img src={contactImage || "https://res.cloudinary.com/dew39kqhy/image/upload/f_auto,q_auto/v1783234123/ChatGPT_Image_5_Jul_2026__13.47.35-removebg-preview_gztehs.png"} alt="Preview" className="w-16 h-16 opacity-10 object-contain pointer-events-none grayscale" />
+        <div className="hidden lg:flex flex-col justify-start shrink-0 pt-2 pr-8">
+          <div className="w-72 h-44 rounded-xl border border-slate-200 shadow-sm overflow-hidden bg-slate-50 relative pointer-events-none">
+            {currentProject.previewImage ? (
+              <img src={currentProject.previewImage} alt="Preview" className="w-full h-full object-cover" />
+            ) : (
+              <div className="w-full h-full flex flex-col items-center justify-center bg-slate-50/50">
+                <span className="text-4xl font-bold font-heading text-slate-300 tracking-tight">Irf.</span>
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -559,25 +572,17 @@ export function Home() {
                 </motion.div>
               </AnimatePresence>
             </div>
-            
-            {/* Dots indicator */}
-            <div className="absolute bottom-6 left-1/2 -translate-x-1/2 sm:bottom-8 sm:left-8 sm:translate-x-0 md:left-1/2 md:-translate-x-1/2 flex space-x-2 z-10">
-              {featureCards.map((_, idx) => (
-                <div 
-                  key={idx}
-                  className={cn("w-2 h-2 rounded-full transition-all duration-300", activeFeatureIndex === idx ? "bg-slate-800 w-4" : "bg-slate-300")}
-                />
-              ))}
-            </div>
           </div>
+        </div>
 
+          </div>
           <div className="py-16 md:py-24 px-4 sm:px-8 text-center max-w-4xl mx-auto flex flex-col items-center justify-center">
             <h2 className="text-2xl md:text-3xl font-bold font-heading text-slate-800 mb-6 tracking-tight">Stepping Further</h2>
             <p className="text-slate-600 text-base md:text-lg leading-relaxed text-center">
               After interacting with the virtual assistant, let's enter the experiment room. A place where curiosity, programming logic, and science exploration meet through a computational approach.
             </p>
-          </div>
 
+          </div>
           <div className="flex flex-col gap-16 md:gap-24 py-16 md:py-24">
             {/* The Lab */}
             <div className="w-full flex flex-col md:flex-row justify-between group px-4 sm:px-8 border-l-2 border-transparent hover:border-slate-400 transition-all duration-300">
@@ -650,8 +655,8 @@ export function Home() {
                 ))}
               </div>
             </div>
-          </div>
 
+          </div>
           <div className="py-16 md:py-24 px-4 sm:px-8 text-center max-w-4xl mx-auto flex flex-col items-center justify-center">
             <h2 className="text-2xl md:text-3xl font-bold font-heading text-slate-800 mb-6 tracking-tight">Capturing Moments</h2>
             <p className="text-slate-600 text-base md:text-lg leading-relaxed text-center">
@@ -727,7 +732,9 @@ export function Home() {
                   100% { transform: translateX(-50%); }
                 }
                 .animate-scroll-left {
-                  animation: scroll-left 240s linear infinite;
+                  animation-name: scroll-left;
+                  animation-timing-function: linear;
+                  animation-iteration-count: infinite;
                 }
               `}</style>
               <div 
@@ -737,70 +744,76 @@ export function Home() {
                   WebkitMaskImage: 'linear-gradient(to right, transparent, black 5%, black 95%, transparent)' 
                 }}
               >
-                <div 
-                  className={cn(
-                    "flex w-max animate-scroll-left hover:[animation-play-state:paused]",
-                    isMusicPaused && "[animation-play-state:paused]"
-                  )}
-                  onMouseEnter={() => {
-                    if (musicPauseTimeoutRef.current) {
-                      clearTimeout(musicPauseTimeoutRef.current);
-                      musicPauseTimeoutRef.current = null;
-                      setIsMusicPaused(false);
-                      setActiveMusicIndex(null);
-                    }
-                  }}
-                >
-                  {(() => {
-                    const musicItems = recentMusic;
-                    if (musicItems.length === 0) return null;
-                    // Duplicate enough times to ensure it fills wide screens
-                    const displayItems = [...musicItems, ...musicItems, ...musicItems, ...musicItems, ...musicItems, ...musicItems];
-                    
-                    const MarqueeBlock = () => (
-                      <div className="flex gap-3 sm:gap-4 pr-3 sm:pr-4">
-                        {displayItems.map((track, index) => {
-                          const cover = track.coverUrl || track.cover || track.image;
-                          const isActive = activeMusicIndex === index;
-                          return (
-                            <div 
-                              key={`${track.id || 'track'}-${index}`} 
-                              className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-lg overflow-hidden bg-slate-100 flex-shrink-0 shadow-sm border border-slate-200/50 group cursor-pointer"
-                              onClick={() => handleMusicClick(index)}
-                            >
-                              {cover ? (
-                                <ImageWithSkeleton src={cover} alt="Album Cover" className="w-full h-full object-cover" />
-                              ) : (
-                                <div className="w-full h-full flex items-center justify-center bg-slate-50">
-                                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6 text-slate-300"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg>
-                                </div>
-                              )}
-                              <div className={cn(
-                                "absolute inset-0 bg-black/40 flex items-center justify-center p-2 backdrop-blur-sm transition-opacity duration-300",
-                                isActive ? "opacity-100" : "opacity-0 group-hover:opacity-100"
-                              )}>
-                                <span className="text-[10px] sm:text-xs text-white font-medium text-center line-clamp-2 leading-tight">
-                                  {track.title || track.name || 'Unknown Track'}
-                                </span>
-                              </div>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    );
+                {(() => {
+                  const musicItems = recentMusic;
+                  if (musicItems.length === 0) return null;
+                  
+                  // Ensure we have enough items to fill the screen (at least ~50 items for 4k monitors)
+                  let displayItems = [...musicItems];
+                  while (displayItems.length < 50) {
+                    displayItems = [...displayItems, ...musicItems];
+                  }
+                  
+                  // Constant speed: 4 seconds per item
+                  const duration = displayItems.length * 4;
 
-                    return (
-                      <>
-                        <MarqueeBlock />
-                        <MarqueeBlock />
-                      </>
-                    );
-                  })()}
-                </div>
+                  const MarqueeBlock = () => (
+                    <div className="flex gap-3 sm:gap-4 pr-3 sm:pr-4">
+                      {displayItems.map((track, index) => {
+                        const cover = track.coverUrl || track.cover || track.image;
+                        const isActive = activeMusicIndex === index;
+                        return (
+                          <div 
+                            key={`${track.id || 'track'}-${index}`} 
+                            className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-lg overflow-hidden bg-slate-100 flex-shrink-0 shadow-sm border border-slate-200/50 group cursor-pointer"
+                            onClick={() => handleMusicClick(index)}
+                          >
+                            {cover ? (
+                              <ImageWithSkeleton src={cover} alt="Album Cover" className="w-full h-full object-cover" />
+                            ) : (
+                              <div className="w-full h-full flex items-center justify-center bg-slate-50">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6 text-slate-300"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg>
+                              </div>
+                            )}
+                            <div className={cn(
+                              "absolute inset-0 bg-black/60 flex items-center justify-center p-2 backdrop-blur-sm transition-all duration-300",
+                              isActive ? "opacity-100 visible" : "opacity-0 invisible group-hover:visible group-hover:opacity-100"
+                            )}>
+                              <span className="text-[10px] sm:text-xs text-white font-medium text-center line-clamp-2 leading-tight">
+                                {track.title || track.name || "Unknown Track"}
+                              </span>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  );
+
+                  return (
+                    <div 
+                      className={cn(
+                        "flex w-max animate-scroll-left hover:[animation-play-state:paused]",
+                        isMusicPaused && "[animation-play-state:paused]"
+                      )}
+                      style={{ animationDuration: `${duration}s` }}
+                      onMouseEnter={() => {
+                        if (musicPauseTimeoutRef.current) {
+                          clearTimeout(musicPauseTimeoutRef.current);
+                          musicPauseTimeoutRef.current = null;
+                          setIsMusicPaused(false);
+                          setActiveMusicIndex(null);
+                        }
+                      }}
+                    >
+                      <MarqueeBlock />
+                      <MarqueeBlock />
+                    </div>
+                  );
+                })()}
               </div>
             </div>
-          </div>
 
+          </div>
           {/* Transition to Contact */}
           <div className="py-16 md:py-24 px-4 sm:px-8 text-center max-w-3xl mx-auto flex flex-col items-center justify-center relative z-10">
             <h2 className="text-2xl md:text-3xl font-bold font-heading text-slate-800 mb-4 tracking-tight">Let's Connect</h2>
@@ -883,7 +896,6 @@ export function Home() {
                   )}
                 </div>
               </div>
-
               {/* Field Message */}
               <div className="space-y-1.5">
                 <div className="flex justify-between items-center">
@@ -925,10 +937,10 @@ export function Home() {
                 </button>
               </div>
             </form>
-          </div>
 
         </div>
 
+          </div>
           {/* Public Wall Preview */}
           {recentPublicMessages.length > 0 && (
             <div className="w-full mt-12 mb-4">
@@ -974,8 +986,6 @@ export function Home() {
               </div>
             </div>
           )}
-        </div>
-      </div>
 
       {/* Floating Toast Notification */}
       <AnimatePresence>

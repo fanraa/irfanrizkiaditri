@@ -122,6 +122,26 @@ interface BlogPost {
 
 export function Blog() {
   const [posts, setPosts] = useState<BlogPost[]>([]);
+  const [news, setNews] = useState<any[]>([]);
+  const [newsLoading, setNewsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchNews = async () => {
+      try {
+        const res = await fetch("/api/news");
+        const data = await res.json();
+        if (data.articles) {
+          // Keep up to 3 valid articles
+          setNews(data.articles.filter((a: any) => a.title && a.url).slice(0, 3));
+        }
+      } catch (e) {
+        console.error(e);
+      } finally {
+        setNewsLoading(false);
+      }
+    };
+    fetchNews();
+  }, []);
   const [loading, setLoading] = useState(true);
   const [searchParams, setSearchParams] = useSearchParams();
   const [selectedPost, setSelectedPost] = useState<BlogPost | null>(null);
@@ -257,6 +277,26 @@ export function Blog() {
     return "Unknown Date";
   };
 
+  const formatTimeAgo = (dateString?: string) => {
+    if (!dateString) return "";
+    try {
+      const date = new Date(dateString);
+      const now = new Date();
+      const diffMs = now.getTime() - date.getTime();
+      const diffSecs = Math.floor(diffMs / 1000);
+      const diffMins = Math.floor(diffSecs / 60);
+      const diffHours = Math.floor(diffMins / 60);
+      const diffDays = Math.floor(diffHours / 24);
+      
+      if (diffSecs < 60) return "Just now";
+      if (diffMins < 60) return `${diffMins} min${diffMins !== 1 ? 's' : ''} ago`;
+      if (diffHours < 24) return `${diffHours} hour${diffHours !== 1 ? 's' : ''} ago`;
+      return `${diffDays} day${diffDays !== 1 ? 's' : ''} ago`;
+    } catch (e) {
+      return "";
+    }
+  };
+
   const getReadTime = (content?: string) => {
     if (!content) return "1 min read";
     const words = content.trim().split(/\s+/).length;
@@ -286,7 +326,7 @@ export function Blog() {
   return (
     <>
       <SEO title={selectedPost ? selectedPost.title || "Blog Post" : "Blog"} description={selectedPost ? selectedPost.excerpt : "Read my latest articles, stories, and thoughts."} url={window.location.href} />
-      <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
+      <div className="absolute top-0 left-[50%] right-[50%] -ml-[50vw] -mr-[50vw] w-screen h-full overflow-hidden pointer-events-none z-0">
         <div className="absolute top-[-72px] inset-x-0 h-[600px] bg-slate-950 z-0 pointer-events-none" style={{ maskImage: 'linear-gradient(to bottom, black 50%, transparent 100%)', WebkitMaskImage: 'linear-gradient(to bottom, black 50%, transparent 100%)' }}><StarryBackground /></div>
       </div>
       <PageTransition>
@@ -427,7 +467,7 @@ export function Blog() {
 
               {loading ? (
                 <div className="flex justify-center py-12">
-                  <Loader2 className="w-8 h-8 animate-spin text-white/50" />
+                  <Loader2 className="w-8 h-8 animate-spin text-slate-400" />
                 </div>
               ) : posts.length === 0 ? (
                 <div className="text-center py-12 bg-white rounded-2xl">
@@ -486,7 +526,7 @@ export function Blog() {
                   <button
                     onClick={loadMore}
                     disabled={loadingMore}
-                    className="flex items-center space-x-2 bg-white hover:bg-slate-50 text-black px-4 py-2 rounded-full border border-slate-200 transition-all font-bold text-xs disabled:opacity-50 shadow-md hover:shadow-lg"
+                    className="flex items-center space-x-2 text-slate-600 hover:text-slate-900 px-4 py-2 transition-all font-bold text-xs disabled:opacity-50"
                   >
                     {loadingMore ? (
                       <>
@@ -497,6 +537,43 @@ export function Blog() {
                       <span>Load More</span>
                     )}
                   </button>
+                </div>
+              )}
+
+              {/* News Section */}
+              {!selectedPost && (
+                <div className="mt-12 border-t border-slate-200 pt-10 pb-8">
+                  <h3 className="text-xl sm:text-2xl font-bold text-slate-900 mb-6 text-center sm:text-left">Latest News</h3>
+                  {newsLoading ? (
+                    <div className="flex justify-center py-6"><Loader2 className="w-8 h-8 animate-spin text-slate-400" /></div>
+                  ) : news.length > 0 ? (
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
+                      {news.map((item, i) => (
+                        <a key={i} href={item.url} target="_blank" rel="noreferrer" className={`bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all group flex flex-col ${i === 2 ? 'hidden md:flex' : 'flex'}`}>
+                          <div className="aspect-video w-full overflow-hidden bg-slate-100">
+                            {item.urlToImage ? (
+                              <ImageWithSkeleton src={item.urlToImage} alt={item.title} className="w-full h-full object-cover" />
+                            ) : (
+                              <div className="w-full h-full flex items-center justify-center bg-slate-200 relative overflow-hidden">
+                                <img src="https://res.cloudinary.com/dew39kqhy/image/upload/f_auto,q_auto/v1783234123/ChatGPT_Image_5_Jul_2026__13.47.35-removebg-preview_gztehs.png" alt="Fallback" className="w-20 h-20 object-contain absolute z-10 opacity-70" />
+                                <div className="absolute inset-0 bg-slate-300/30 backdrop-blur-sm z-0"></div>
+                              </div>
+                            )}
+                          </div>
+                          <div className="p-3 sm:p-4 flex flex-col flex-1">
+                            <h4 className="font-bold text-slate-900 text-xs sm:text-sm line-clamp-3 mb-2 group-hover:text-slate-600 transition-colors">{item.title}</h4>
+                            <p className="text-[10px] sm:text-xs text-slate-500 mt-auto">{item.source?.name || "News"}{item.publishedAt ? ` • ${formatTimeAgo(item.publishedAt)}` : ""}</p>
+                          </div>
+                        </a>
+                      ))}
+                    </div>
+                  ) : null}
+                </div>
+              )}
+              {/* Footer Text */}
+              {!selectedPost && (
+                <div className="pt-8 text-center">
+                  <p className="text-xs text-slate-500">Exploring thoughts, technology, and life through words.</p>
                 </div>
               )}
             </motion.div>

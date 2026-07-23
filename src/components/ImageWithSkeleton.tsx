@@ -43,8 +43,9 @@ export function ImageWithSkeleton({
       )}
       
       {error ? (
-        <div className="absolute inset-0 flex items-center justify-center bg-slate-100 text-slate-400">
-          <ImageIcon className="w-1/3 h-1/3 opacity-20" />
+        <div className="absolute inset-0 flex items-center justify-center bg-slate-200 relative overflow-hidden">
+          <img src="https://res.cloudinary.com/dew39kqhy/image/upload/f_auto,q_auto/v1783234123/ChatGPT_Image_5_Jul_2026__13.47.35-removebg-preview_gztehs.png" alt="Fallback" className="w-1/2 h-1/2 object-contain absolute z-10 opacity-70" />
+          <div className="absolute inset-0 bg-slate-300/30 backdrop-blur-sm z-0"></div>
         </div>
       ) : (
         <img

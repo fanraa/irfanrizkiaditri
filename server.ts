@@ -1,3 +1,5 @@
+import { translate } from '@vitalets/google-translate-api';
+import { GoogleGenAI } from "@google/genai";
 import express from "express";
 import path from "path";
 import { createServer as createViteServer } from "vite";
@@ -143,7 +145,57 @@ async function startServer() {
     }
   });
 
-  // Vite middleware for development
+    // API route for Translation using Popcat API
+  app.post("/api/translate", async (req, res) => {
+    try {
+      const { text, targetLanguage = 'id' } = req.body;
+      if (!text) {
+        return res.status(400).json({ error: "Text is required" });
+      }
+      
+      const lines = text.split('\n');
+      const mockData = [[]];
+      
+      try {
+        const { text: translatedText } = await translate(text, { to: targetLanguage });
+        const translatedLines = translatedText.split('\n');
+        
+        // Ensure we return the exact number of lines
+        for (let i = 0; i < lines.length; i++) {
+          if (!lines[i].trim()) {
+            mockData[0].push([lines[i] + '\n']);
+          } else {
+            mockData[0].push([(translatedLines[i] || lines[i]) + '\n']);
+          }
+        }
+      } catch (e) {
+        console.error("Translate API Error:", e);
+        for (const line of lines) {
+           mockData[0].push([line + '\n']);
+        }
+      }
+      
+      res.json(mockData);
+    } catch (err) {
+      console.error("Translation error:", err);
+      res.status(500).json({ error: "Failed to translate text" });
+    }
+  });
+
+  // API route for News
+  app.get("/api/news", async (req, res) => {
+    try {
+      const response = await fetch(`https://newsapi.org/v2/top-headlines?country=us&category=technology&pageSize=5&apiKey=ce9a41c46a2849d7bfee4276179b0885&_t=${Date.now()}`, { cache: 'no-store' });
+      const data = await response.json();
+      res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
+      res.json(data);
+    } catch (error) {
+      console.error("News API Error:", error);
+      res.status(500).json({ error: "Failed to fetch news" });
+    }
+  });
+
+  // Vite middleware for development  // Vite middleware for development
   if (process.env.NODE_ENV !== "production") {
     const vite = await createViteServer({
       server: { middlewareMode: true },

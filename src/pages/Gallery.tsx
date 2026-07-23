@@ -714,7 +714,7 @@ export function Gallery() {
                 <button
                   onClick={loadMore}
                   disabled={loadingMore}
-                  className="flex items-center space-x-2 bg-white hover:bg-slate-50 text-black px-4 py-2 rounded-full border border-slate-200 transition-all font-bold text-xs disabled:opacity-50 shadow-md hover:shadow-lg"
+                  className="flex items-center space-x-2 text-slate-600 hover:text-slate-900 px-4 py-2 transition-all font-bold text-xs disabled:opacity-50"
                 >
                   {loadingMore ? (
                     <>

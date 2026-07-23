@@ -1,11 +1,13 @@
 import { SEO } from "@/components/SEO";
 import { ImageWithSkeleton } from "@/components/ImageWithSkeleton";
+import { PlaySearchModal } from "@/components/PlaySearchModal";
+
 import YouTube from 'react-youtube';
 import React, { useEffect, useState, useRef, useMemo } from "react";
 import { PageTransition } from "@/components/PageTransition";
-import { Play, Pause, GripVertical, Music as MusicIcon, Loader2, Shuffle, Edit2 } from "lucide-react";
+import { Languages, Palette, Play, Pause, GripVertical, Music as MusicIcon, Loader2, Shuffle, Edit2, MoreVertical, Clock, Repeat1 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { Reorder, useDragControls } from 'motion/react';
+import { Reorder, useDragControls, motion, AnimatePresence } from 'motion/react';
 
 import { useAudio, Track } from "@/context/AudioContext";
 import { useAuth } from "@/context/AuthContext";
@@ -212,7 +214,17 @@ function AddTrackModal({ isOpen, onClose, onAdded, existingTracks }: { isOpen: b
         throw new Error('Backend not available');
       }
       const data = await res.json();
-      setSearchResults(data.results || []);
+      let results = data.results || [];
+      const seen = new Set();
+      const deduped = [];
+      for (const r of results) {
+        const key = `${(r.title || '').toLowerCase()}|${(r.artist || '').toLowerCase()}`;
+        if (!seen.has(key)) {
+          seen.add(key);
+          deduped.push(r);
+        }
+      }
+      setSearchResults(deduped);
     } catch (err) {
       console.log('Falling back to iTunes search...', err);
       try {
@@ -640,7 +652,17 @@ function EditTrackModal({ isOpen, onClose, track, onSaved }: { isOpen: boolean; 
       const res = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(searchQuery)}&entity=song&limit=5`);
       if (!res.ok) throw new Error('Search failed');
       const data = await res.json();
-      setSearchResults(data.results || []);
+      let results = data.results || [];
+      const seen = new Set();
+      const deduped = [];
+      for (const r of results) {
+        const key = `${(r.title || '').toLowerCase()}|${(r.artist || '').toLowerCase()}`;
+        if (!seen.has(key)) {
+          seen.add(key);
+          deduped.push(r);
+        }
+      }
+      setSearchResults(deduped);
     } catch (err) {
       console.error(err);
       alert('Failed to search iTunes. Please try again.');
@@ -753,7 +775,7 @@ export function Music() {
     currentTime,
     duration,
     isShuffled,
-    isRepeat,
+    repeatMode, sleepTimerEnd, setSleepTimer,
     isInstrumental,
     lyrics,
     currentLyricIndex,
@@ -763,22 +785,77 @@ export function Music() {
     handleShuffle,
     handleRepeat,
     updateTracksOrder,
+    isIndoSong,
+    handleSeek,
   } = useAudio();
   const { isAdmin } = useAuth();
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isPlaySearchOpen, setIsPlaySearchOpen] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [showFullLyrics, setShowFullLyrics] = useState(false);
+  const [showTranslation, setShowTranslation] = useState(false);
+  const lyricsContainerRef = useRef<HTMLDivElement>(null);
+  const [timeLeft, setTimeLeft] = useState<string | null>(null);
   const [editTrack, setEditTrack] = useState<any>(null);
     const spotifyPlaylistId = "2EtLBMiPdkw0XiDhYr0Zrj";
 
     const [isDarkBg, setIsDarkBg] = useState(false);
+  const [invertLyricColor, setInvertLyricColor] = useState(false);
   const [musicImage, setMusicImage] = useState<string>('https://cdn-icons-png.flaticon.com/128/9240/9240687.png');
+
+  useEffect(() => {
+    setInvertLyricColor(false);
+  }, [playingId]);
+
+  useEffect(() => {
+    if (!sleepTimerEnd) {
+      setTimeLeft(null);
+      return;
+    }
+    const interval = setInterval(() => {
+      const diff = sleepTimerEnd - Date.now();
+      if (diff <= 0) {
+        setTimeLeft(null);
+        return;
+      }
+      const h = Math.floor(diff / 3600000);
+      const m = Math.floor((diff % 3600000) / 60000);
+      const s = Math.floor((diff % 60000) / 1000);
+      setTimeLeft(
+        (h > 0 ? `${h.toString().padStart(2, '0')}:` : '') +
+        `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`
+      );
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [sleepTimerEnd]);
+
   useEffect(() => { getDoc(doc(db, 'site_content', 'assets')).then(docSnap => { if (docSnap.exists() && docSnap.data().musicImage) { setMusicImage(docSnap.data().musicImage); } }); }, []);
+
+  useEffect(() => {
+    if (isIndoSong) setShowTranslation(false);
+  }, [isIndoSong]);
+
+  useEffect(() => {
+    if (showFullLyrics && lyricsContainerRef.current) {
+      const activeElement = lyricsContainerRef.current.querySelector(".active-lyric") as HTMLElement;
+      if (activeElement) {
+        const container = lyricsContainerRef.current;
+        const scrollPos = activeElement.offsetTop - (container.clientHeight / 2) + (activeElement.clientHeight / 2);
+        container.scrollTo({ top: scrollPos, behavior: 'smooth' });
+      }
+    }
+  }, [currentLyricIndex, showFullLyrics]);
 
   useEffect(() => {
     try {
       // @ts-ignore
       (window.adsbygoogle = window.adsbygoogle || []).push({});
     } catch (e) {
-      console.error("AdSense error", e);
+      if (e instanceof Error && e.message.includes("already have ads")) {
+        // Ignore this specific AdSense error
+      } else {
+        console.error("AdSense error", e);
+      }
     }
   }, []);
 
@@ -839,67 +916,174 @@ export function Music() {
       
       <div className="relative z-10 w-full pt-8 space-y-8 pb-32">
         {/* Mobile Lyrics */}
-        <div className="sm:hidden w-full px-4 mb-4 flex justify-center pointer-events-none h-[140px] relative overflow-hidden">
-          <div className="absolute inset-0 flex flex-col items-center justify-center">
-            {lyrics.map((lyric, idx) => {
-              const isCurrent = idx === currentLyricIndex;
-              const isNext = idx === currentLyricIndex + 1;
-              const isPrev = idx === currentLyricIndex - 1;
-              if (!isCurrent && !isNext && !isPrev) return null;
-              return (
-                <div 
-                  key={idx}
-                  className={cn(
-                    "absolute w-full flex justify-center transition-all duration-1000 ease-out",
-                    isCurrent ? "translate-y-[-12px] opacity-100 scale-100" : (isNext ? "translate-y-[52px] opacity-40 scale-95" : "translate-y-[-60px] opacity-0 scale-90")
-                  )}
-                >
-                  <span className={cn(
-                    "inline-block text-center px-2 line-clamp-2",
-                    isDarkBg ? "drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]" : "drop-shadow-[0_2px_4px_rgba(255,255,255,0.8)]",
-                    isCurrent ? (isDarkBg ? "text-lg font-bold text-white font-heading" : "text-lg font-bold text-slate-800 font-heading") : (isDarkBg ? "text-sm font-semibold text-slate-200" : "text-sm font-semibold text-slate-500")
-                  )}>
-                    {lyric.text}
-                  </span>
-                </div>
-              );
-            })}
+        {!showFullLyrics && (
+          <div className="sm:hidden w-full px-4 mb-4 flex justify-center pointer-events-none h-[140px] relative overflow-hidden">
+            <div className="absolute inset-0 flex flex-col items-center justify-center">
+              {lyrics.map((lyric, idx) => {
+                const isCurrent = idx === currentLyricIndex;
+                const isNext = idx === currentLyricIndex + 1;
+                const isPrev = idx === currentLyricIndex - 1;
+                if (!isCurrent && !isNext && !isPrev) return null;
+                return (
+                  <div 
+                    key={idx}
+                    className={cn(
+                      "absolute w-full flex justify-center transition-all duration-1000 ease-out",
+                      isCurrent ? "translate-y-[-12px] opacity-100 scale-100" : (isNext ? "translate-y-[52px] opacity-40 scale-95" : "translate-y-[-60px] opacity-0 scale-90")
+                    )}
+                  >
+                    <span className={cn(
+                      "inline-block text-center px-2 line-clamp-2",
+                      isDarkBg ? "drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]" : "drop-shadow-[0_2px_4px_rgba(255,255,255,0.8)]",
+                      isCurrent ? (isDarkBg ? "text-lg font-bold text-white font-heading" : "text-lg font-bold text-slate-800 font-heading") : (isDarkBg ? "text-sm font-semibold text-slate-200" : "text-sm font-semibold text-slate-500")
+                    )}>
+                      {lyric.text}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Character & Desktop Lyrics Area */}
-        <div className="relative w-full h-56 sm:h-72 flex justify-center items-center mb-2 overflow-hidden [mask-image:linear-gradient(to_bottom,black_70%,transparent_100%)] -webkit-[mask-image:linear-gradient(to_bottom,black_70%,transparent_100%)]">
+        <div className={cn(
+          "relative w-full overflow-hidden transition-all duration-500",
+          showFullLyrics ? "h-[50vh] sm:h-[60vh] max-h-[600px] my-6" : "h-56 sm:h-72 mb-2 [mask-image:linear-gradient(to_bottom,black_70%,transparent_100%)] -webkit-[mask-image:linear-gradient(to_bottom,black_70%,transparent_100%)]"
+        )}>
           {/* Desktop Lyrics */}
-          <div className="hidden sm:block absolute inset-0 pointer-events-none z-20">
-            {lyrics.map((lyric, idx) => {
-              const isCurrent = idx === currentLyricIndex;
-              const isNext = idx === currentLyricIndex + 1;
-              if (!isCurrent && !isNext) return null;
-              const isLeft = idx % 2 === 0;
-              return (
-                <div
-                  key={idx}
-                  className={cn(
-                    "absolute top-[15%] w-[50%] sm:w-[40%] md:w-[35%] lg:w-[30%] transition-all duration-500 ease-out",
-                    isLeft ? "left-1 sm:left-3 md:left-6 lg:left-8 text-right pr-2 sm:pr-4" : "right-1 sm:right-3 md:right-6 lg:right-8 text-left pl-2 sm:pl-4",
-                    isCurrent ? "opacity-100 scale-100 translate-y-0" : "opacity-40 scale-95 translate-y-2"
+          <div className={cn(
+            "absolute inset-0 pointer-events-none z-20 flex flex-col items-center justify-center space-y-4 px-4 sm:px-12",
+            showFullLyrics ? "opacity-100" : "hidden sm:block"
+          )}>
+            {showFullLyrics ? (
+              // Full Lyrics View (Scrollable / Centered list of current & surrounding lyrics)
+              <>
+                {/* Translate Toggle Icon (Fixed) */}
+                <div className="absolute top-4 right-4 z-50 flex items-center gap-4 pointer-events-auto">
+                  <button
+                    onClick={() => setInvertLyricColor(!invertLyricColor)}
+                    className={cn(
+                      "transition-opacity opacity-50 hover:opacity-100 outline-none",
+                      invertLyricColor ? (isDarkBg ? "text-slate-800" : "text-white/90") : (isDarkBg ? "text-white/90" : "text-slate-800")
+                    )}
+                    title="Toggle Lyric Color"
+                  >
+                    <img src="https://cdn-icons-png.flaticon.com/128/16167/16167362.png" alt="Color" className="w-5 h-5 brightness-0 opacity-80" />
+                  </button>
+                  {!isIndoSong && (
+                    <button
+                      onClick={() => setShowTranslation(!showTranslation)}
+                      className={cn(
+                        "transition-opacity opacity-50 hover:opacity-100 outline-none",
+                        invertLyricColor ? (isDarkBg ? "text-slate-800" : "text-white/90") : (isDarkBg ? "text-white/90" : "text-slate-800"),
+                        showTranslation ? "opacity-100" : ""
+                      )}
+                      title="Translate Lyrics"
+                    >
+                      <img src="https://cdn-icons-png.flaticon.com/128/8933/8933942.png" alt="Translate" className="w-5 h-5 brightness-0 opacity-80" />
+                    </button>
                   )}
-                >
-                  <span className={cn(
-                    "relative inline-block px-3 py-1.5 sm:px-4 sm:py-2 lg:px-5 lg:py-2.5 bg-white/40 backdrop-blur-lg shadow-[0_8px_32px_rgba(0,0,0,0.08)] border border-white/50 text-xs sm:text-sm lg:text-base font-bold text-slate-800",
-                    isLeft ? "rounded-3xl rounded-br-none" : "rounded-3xl rounded-bl-none"
-                  )}>
-                    {lyric.text}
-                  </span>
                 </div>
-              );
-            })}
+                
+                <div 
+                  ref={lyricsContainerRef}
+                  className="w-full h-full flex flex-col items-center justify-start relative pointer-events-auto overflow-y-auto scrollbar-hide pt-[30vh] pb-[30vh]"
+                >
+                  {(!playingId || (lyrics.length === 0 && !isInstrumental)) ? (
+                    <div className="flex flex-col items-center justify-center h-full opacity-60">
+                      <MusicIcon className={cn("w-12 h-12 mb-4", invertLyricColor ? (isDarkBg ? "text-slate-800" : "text-white/90") : (isDarkBg ? "text-white/90" : "text-slate-800"))} />
+                      <p className={cn("text-lg font-medium", invertLyricColor ? (isDarkBg ? "text-slate-800" : "text-white/90") : (isDarkBg ? "text-white/90" : "text-slate-800"))}>
+                        {!playingId ? "Play a song to see lyrics" : "Searching for lyrics..."}
+                      </p>
+                    </div>
+                  ) : lyrics.map((lyric, idx) => {
+                  const isCurrent = idx === currentLyricIndex;
+                  return (
+                    <div
+                      key={idx}
+                      onClick={() => duration && handleSeek(lyric.time / duration)}
+                      className={cn(
+                        "w-full text-center transition-all duration-500 py-2 sm:py-3 cursor-pointer hover:opacity-80",
+                        isCurrent ? "opacity-100 scale-105 active-lyric" : "opacity-40 scale-95"
+                      )}
+                    >
+                      <span className={cn(
+                        "inline-block max-w-2xl text-base sm:text-xl font-bold font-sans",
+                        invertLyricColor ? (isDarkBg ? "text-slate-800" : "text-white/90") : (isDarkBg ? "text-white/90" : "text-slate-800")
+                      )}>
+                        {lyric.text}
+                      </span>
+                      <AnimatePresence>
+                        {showTranslation && lyric.text && lyric.translation && (
+                          <motion.div 
+                            initial={{ opacity: 0, y: -5 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -5 }}
+                            transition={{ duration: 0.4 }}
+                            className={cn(
+                            "mt-1 text-[13px] sm:text-sm font-medium opacity-80",
+                            invertLyricColor ? (isDarkBg ? "text-slate-800" : "text-white/90") : (isDarkBg ? "text-white/90" : "text-slate-800")
+                          )}>
+                            {lyric.translation}
+                          </motion.div>
+                        )}
+                        {showTranslation && lyric.text && !lyric.translation && (
+                          <motion.div 
+                            initial={{ opacity: 0, y: -5 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -5 }}
+                            transition={{ duration: 0.4 }}
+                            className={cn(
+                            "mt-1 text-[12px] sm:text-[13px] font-medium italic opacity-50",
+                            invertLyricColor ? (isDarkBg ? "text-slate-800" : "text-white/90") : (isDarkBg ? "text-white/90" : "text-slate-800")
+                          )}>
+                            Translating...
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </div>
+                  );
+                })}
+              </div>
+              </>
+            ) : (
+              // Floating Lyrics View (Original)
+              lyrics.map((lyric, idx) => {
+                const isCurrent = idx === currentLyricIndex;
+                const isNext = idx === currentLyricIndex + 1;
+                if (!isCurrent && !isNext) return null;
+                const isLeft = idx % 2 === 0;
+
+                return (
+                  <div
+                    key={idx}
+                    className={cn(
+                      "absolute top-[15%] w-[50%] sm:w-[40%] md:w-[35%] lg:w-[30%] transition-all duration-500 ease-out",
+                      isLeft ? "left-1 sm:left-3 md:left-6 lg:left-8 text-right pr-2 sm:pr-4" : "right-1 sm:right-3 md:right-6 lg:right-8 text-left pl-2 sm:pl-4",
+                      isCurrent ? "opacity-100 scale-100 translate-y-0" : "opacity-40 scale-95 translate-y-2"
+                    )}
+                  >
+                    <span className={cn(
+                      "relative inline-block px-3 py-1.5 sm:px-4 sm:py-2 lg:px-5 lg:py-2.5 bg-white/40 backdrop-blur-lg shadow-[0_8px_32px_rgba(0,0,0,0.08)] border border-white/50 text-xs sm:text-sm lg:text-base font-bold text-slate-800",
+                      isLeft ? "rounded-3xl rounded-br-none" : "rounded-3xl rounded-bl-none"
+                    )}>
+                      {lyric.text}
+                    </span>
+                  </div>
+                );
+              })
+            )}
           </div>
           
           {/* Characters */}
-          <ImageWithSkeleton src="https://res.cloudinary.com/dew39kqhy/image/upload/f_auto,q_auto/v1783266447/Gemini_Generated_Image_q1fedfq1fedfq1fe-remove-bg-io_xunibq.png" alt="Character Idle" containerClassName={cn("absolute inset-0 z-10 flex items-center justify-center transition-opacity duration-700", (!playingId || !isPlaying) ? "opacity-100" : "opacity-0")} className="w-full h-full object-contain" disableOverflowHidden={true} loaderType="spinner" />
-          <ImageWithSkeleton src="https://res.cloudinary.com/dew39kqhy/image/upload/f_auto,q_auto/v1783269529/Gemini_Generated_Image_ycjtjgycjtjgycjt-remove-bg-io_qppuze.png" alt="Character Instrumental" containerClassName={cn("absolute inset-0 z-10 flex items-center justify-center transition-opacity duration-700", (playingId && isPlaying && isInstrumental) ? "opacity-100" : "opacity-0")} className="w-full h-full object-contain" disableOverflowHidden={true} loaderType="spinner" />
-          <ImageWithSkeleton src="https://res.cloudinary.com/dew39kqhy/image/upload/f_auto,q_auto/v1783266448/Gemini_Generated_Image_iv9kceiv9kceiv9k_1_-remove-bg-io_gmvnvs.png" alt="Character Playing" containerClassName={cn("absolute inset-0 z-10 flex items-center justify-center transition-opacity duration-700", (playingId && isPlaying && !isInstrumental) ? "opacity-100" : "opacity-0")} className="w-full h-full object-contain" disableOverflowHidden={true} loaderType="spinner" />
+          {!showFullLyrics && (
+            <>
+              <ImageWithSkeleton src="https://res.cloudinary.com/dew39kqhy/image/upload/f_auto,q_auto/v1783266447/Gemini_Generated_Image_q1fedfq1fedfq1fe-remove-bg-io_xunibq.png" alt="Character Idle" containerClassName={cn("absolute inset-0 z-10 flex items-center justify-center transition-opacity duration-700", (!playingId || !isPlaying) ? "opacity-100" : "opacity-0")} className="w-full h-full object-contain" disableOverflowHidden={true} loaderType="spinner" />
+              <ImageWithSkeleton src="https://res.cloudinary.com/dew39kqhy/image/upload/f_auto,q_auto/v1783269529/Gemini_Generated_Image_ycjtjgycjtjgycjt-remove-bg-io_qppuze.png" alt="Character Instrumental" containerClassName={cn("absolute inset-0 z-10 flex items-center justify-center transition-opacity duration-700", (playingId && isPlaying && isInstrumental) ? "opacity-100" : "opacity-0")} className="w-full h-full object-contain" disableOverflowHidden={true} loaderType="spinner" />
+              <ImageWithSkeleton src="https://res.cloudinary.com/dew39kqhy/image/upload/f_auto,q_auto/v1783266448/Gemini_Generated_Image_iv9kceiv9kceiv9k_1_-remove-bg-io_gmvnvs.png" alt="Character Playing" containerClassName={cn("absolute inset-0 z-10 flex items-center justify-center transition-opacity duration-700", (playingId && isPlaying && !isInstrumental) ? "opacity-100" : "opacity-0")} className="w-full h-full object-contain" disableOverflowHidden={true} loaderType="spinner" />
+            </>
+          )}
         </div>
 
                 <header className="flex flex-row items-center justify-between w-full gap-4">
@@ -927,17 +1111,28 @@ export function Music() {
               <p className="text-sm text-slate-500 line-clamp-2 sm:line-clamp-1">A curated collection of currently playing songs.</p>
             )}
           </div>
-          <div className="flex items-center gap-4 flex-shrink-0">
+          <div className="flex items-center gap-4 flex-shrink-0 relative">
+            <button
+              onClick={() => setIsPlaySearchOpen(true)}
+              className="flex items-center justify-center transition-opacity hover:opacity-70 outline-none"
+              title="Search Song"
+            >
+              <Search className="w-5 h-5 opacity-40 text-slate-800" />
+            </button>
             <button
               onClick={handleRepeat}
               className="flex items-center justify-center transition-opacity hover:opacity-70 outline-none"
-              title="Ulangi Lagu"
+              title={repeatMode === 0 ? "Mode putar biasa" : repeatMode === 1 ? "Ulangi Playlist" : "Ulangi Satu Lagu"}
             >
-              <img 
-                src="https://cdn-icons-png.flaticon.com/128/9041/9041602.png" 
-                alt="Repeat" 
-                className={cn("w-5 h-5", isRepeat ? "opacity-100" : "opacity-40")} 
-              />
+              {repeatMode === 2 ? (
+                <Repeat1 className="w-5 h-5 text-slate-800" />
+              ) : (
+                <img 
+                  src="https://cdn-icons-png.flaticon.com/128/9041/9041602.png" 
+                  alt="Repeat" 
+                  className={cn("w-5 h-5", repeatMode === 1 ? "opacity-100" : "opacity-40")} 
+                />
+              )}
             </button>
             <button
               onClick={handleShuffle}
@@ -945,11 +1140,75 @@ export function Music() {
               title="Shuffle Playlist"
             >
               <img 
-                src="https://cdn-icons-png.flaticon.com/128/2550/2550084.png" 
+                src="https://cdn-icons-png.flaticon.com/128/8191/8191664.png" 
                 alt="Shuffle" 
                 className={cn("w-5 h-5", isShuffled ? "opacity-100" : "opacity-40")} 
               />
             </button>
+            <div className="relative">
+              <button
+                onClick={() => setIsMenuOpen(!isMenuOpen)}
+                className="flex items-center justify-center transition-opacity hover:opacity-70 outline-none p-1 relative z-10"
+                title="More Options"
+              >
+                <MoreVertical className="w-5 h-5 text-slate-700" />
+              </button>
+              
+              {isMenuOpen && (
+                <>
+                  <div className="fixed inset-0 z-40" onClick={() => setIsMenuOpen(false)} />
+                  <div className="absolute right-0 top-full mt-2 w-48 bg-white border border-slate-200/80 rounded-2xl shadow-xl z-50 py-2 animate-in fade-in zoom-in duration-200 overflow-hidden font-sans">
+                    <div className="px-4 py-2 flex justify-between items-center text-[13px] font-medium text-slate-500">
+                      <span>Sleep timer</span>
+                      {timeLeft && (
+                        <span className="text-emerald-600 font-semibold tabular-nums">
+                          {timeLeft}
+                        </span>
+                      )}
+                    </div>
+                  <button
+                    onClick={() => { setSleepTimer(15); setIsMenuOpen(false); }}
+                    className="w-full text-left px-4 py-2.5 text-[15px] text-slate-700 hover:bg-slate-50 transition-colors"
+                  >
+                    15m
+                  </button>
+                  <button
+                    onClick={() => { setSleepTimer(30); setIsMenuOpen(false); }}
+                    className="w-full text-left px-4 py-2.5 text-[15px] text-slate-700 hover:bg-slate-50 transition-colors"
+                  >
+                    30m
+                  </button>
+                  <button
+                    onClick={() => { setSleepTimer(60); setIsMenuOpen(false); }}
+                    className="w-full text-left px-4 py-2.5 text-[15px] text-slate-700 hover:bg-slate-50 transition-colors"
+                  >
+                    1h
+                  </button>
+                  <button
+                    onClick={() => { setSleepTimer(120); setIsMenuOpen(false); }}
+                    className="w-full text-left px-4 py-2.5 text-[15px] text-slate-700 hover:bg-slate-50 transition-colors"
+                  >
+                    2h
+                  </button>
+                  {sleepTimerEnd && (
+                    <button
+                      onClick={() => { setSleepTimer(null); setIsMenuOpen(false); }}
+                      className="w-full text-left px-4 py-2.5 text-[15px] text-red-600 hover:bg-red-50 transition-colors"
+                    >
+                      Cancel sleep timer
+                    </button>
+                  )}
+                  <div className="h-px bg-slate-100 my-1"></div>
+                  <button
+                    onClick={() => { setShowFullLyrics(!showFullLyrics); setIsMenuOpen(false); }}
+                    className="w-full text-left px-4 py-2.5 text-[15px] text-slate-700 hover:bg-slate-50 transition-colors"
+                  >
+                    {showFullLyrics ? "Hide lyrics" : "Show lyrics"}
+                  </button>
+                </div>
+                </>
+              )}
+            </div>
           </div>
         </header>
 
@@ -1032,6 +1291,10 @@ export function Music() {
         isOpen={isAddModalOpen} existingTracks={tracks} 
         onClose={() => setIsAddModalOpen(false)} 
         onAdded={() => { window.location.reload(); }}
+      />
+      <PlaySearchModal 
+        isOpen={isPlaySearchOpen} 
+        onClose={() => setIsPlaySearchOpen(false)} 
       />
           
     </PageTransition>

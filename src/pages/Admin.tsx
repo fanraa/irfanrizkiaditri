@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { db } from '@/lib/firebase';
 import { collection, doc, getDoc, setDoc, getDocs, updateDoc, deleteDoc, addDoc, onSnapshot, query, orderBy } from 'firebase/firestore';
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
-import { Settings, Image as ImageIcon, Link as LinkIcon, Activity, Plus, Trash2, Edit2, Loader2, Save, X, ArrowLeft, Music as MusicIcon } from 'lucide-react';
+import { Settings, Image as ImageIcon, Link as LinkIcon, Activity, Plus, Trash2, Edit2, Loader2, Save, X, ArrowLeft, Music as MusicIcon, FileText } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { PageTransition } from '@/components/PageTransition';
 import { SEO } from '@/components/SEO';
@@ -19,7 +19,7 @@ const MOCK_DATA = [
 ];
 
 export function Admin() {
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'assets' | 'projects' | 'playlist'>('dashboard');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'assets' | 'projects' | 'playlist' | 'blog'>('dashboard');
   const { isAdmin } = useAuth();
   
   if (!isAdmin) {
@@ -96,6 +96,7 @@ export function Admin() {
                 {activeTab === 'assets' && <AssetsTab />}
                 {activeTab === 'projects' && <ProjectsTab />}
                 {activeTab === 'playlist' && <PlaylistTab />}
+                {activeTab === 'blog' && <BlogTab />}
               </div>
             </div>
           </div>
@@ -335,7 +336,7 @@ function ProjectsTab() {
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingProject, setEditingProject] = useState<any>(null);
-  const [formData, setFormData] = useState({ title: '', description: '', tags: '', icon: '', link: '' });
+  const [formData, setFormData] = useState({ title: '', description: '', tags: '', icon: '', link: '', color: '' });
 
   useEffect(() => {
     const q = query(collection(db, 'projects_custom'), orderBy('createdAt', 'desc'));
@@ -351,6 +352,7 @@ function ProjectsTab() {
     const data = {
       ...formData,
       tags: formData.tags.split(',').map(t => t.trim()).filter(Boolean),
+      color: formData.color || (editingProject ? editingProject.color : "from-blue-500/10 to-indigo-500/10"),
       updatedAt: Date.now(),
     };
 
@@ -362,7 +364,7 @@ function ProjectsTab() {
       }
       setIsModalOpen(false);
       setEditingProject(null);
-      setFormData({ title: '', description: '', tags: '', icon: '', link: '' });
+      setFormData({ title: '', description: '', tags: '', icon: '', link: '', color: '' });
     } catch (error) {
       console.error(error);
       alert('Error saving project');
@@ -386,7 +388,8 @@ function ProjectsTab() {
       description: proj.description || '',
       tags: (proj.tags || []).join(', '),
       icon: proj.icon || '',
-      link: proj.link || ''
+      link: proj.link || '',
+      color: proj.color || ''
     });
     setIsModalOpen(true);
   };
@@ -398,7 +401,7 @@ function ProjectsTab() {
          <button 
            onClick={() => {
              setEditingProject(null);
-             setFormData({ title: '', description: '', tags: '', icon: '', link: '' });
+             setFormData({ title: '', description: '', tags: '', icon: '', link: '', color: '' });
              setIsModalOpen(true);
            }}
            className="flex items-center gap-1 text-sm bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-1.5 rounded-lg transition-colors font-medium"
@@ -618,6 +621,206 @@ function PlaylistTab() {
            </div>
          </div>
        )}
+    </div>
+  );
+}
+
+function BlogTab() {
+  const [posts, setPosts] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingPost, setEditingPost] = useState<any>(null);
+  const [formData, setFormData] = useState({ title: '', excerpt: '', content: '', imageUrl: '', category: '' });
+
+  useEffect(() => {
+    const q = query(collection(db, 'blog_posts_production'), orderBy('timestamp', 'desc'));
+    const unsub = onSnapshot(q, (snapshot) => {
+      setPosts(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+      setLoading(false);
+    });
+    return () => unsub();
+  }, []);
+
+  const handleSave = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      if (editingPost) {
+        await updateDoc(doc(db, 'blog_posts_production', editingPost.id), {
+          ...formData,
+          updatedAt: Date.now()
+        });
+      } else {
+        await addDoc(collection(db, 'blog_posts_production'), {
+          ...formData,
+          views: 0,
+          timestamp: Date.now(),
+          updatedAt: Date.now()
+        });
+      }
+      setIsModalOpen(false);
+      setEditingPost(null);
+      setFormData({ title: '', excerpt: '', content: '', imageUrl: '', category: '' });
+    } catch (error) {
+      console.error(error);
+      alert('Failed to save post');
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    if (window.confirm('Are you sure you want to delete this post?')) {
+      await deleteDoc(doc(db, 'blog_posts_production', id));
+    }
+  };
+
+  return (
+    <div className="space-y-6">
+      <div className="flex justify-between items-center">
+        <h2 className="text-xl font-bold text-slate-900 font-heading">Blog Posts</h2>
+        <button
+          onClick={() => {
+            setEditingPost(null);
+            setFormData({ title: '', excerpt: '', content: '', imageUrl: '', category: '' });
+            setIsModalOpen(true);
+          }}
+          className="flex items-center gap-2 px-4 py-2 bg-slate-900 text-white text-sm font-medium rounded-lg hover:bg-slate-800 transition-colors"
+        >
+          <Plus className="w-4 h-4" /> Add Post
+        </button>
+      </div>
+
+      {loading ? (
+        <div className="flex items-center justify-center h-32">
+          <Loader2 className="w-6 h-6 animate-spin text-slate-400" />
+        </div>
+      ) : (
+        <div className="grid gap-4">
+          {posts.map(post => (
+            <div key={post.id} className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-100">
+              <div className="flex items-center gap-4">
+                {post.imageUrl && (
+                  <div className="w-16 h-16 rounded-lg overflow-hidden bg-slate-200 shrink-0">
+                    <img src={post.imageUrl} alt={post.title} className="w-full h-full object-cover" />
+                  </div>
+                )}
+                <div>
+                  <h3 className="font-medium text-slate-900">{post.title}</h3>
+                  <p className="text-sm text-slate-500 line-clamp-1">{post.excerpt}</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2 shrink-0">
+                <button
+                  onClick={() => {
+                    setEditingPost(post);
+                    setFormData({
+                      title: post.title || '',
+                      excerpt: post.excerpt || '',
+                      content: post.content || '',
+                      imageUrl: post.imageUrl || '',
+                      category: post.category || ''
+                    });
+                    setIsModalOpen(true);
+                  }}
+                  className="p-2 text-slate-400 hover:text-slate-600 transition-colors"
+                >
+                  <Edit2 className="w-4 h-4" />
+                </button>
+                <button
+                  onClick={() => handleDelete(post.id)}
+                  className="p-2 text-rose-400 hover:text-rose-600 transition-colors"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {isModalOpen && (
+        <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-xl">
+            <div className="flex items-center justify-between p-6 border-b border-slate-100 sticky top-0 bg-white/80 backdrop-blur-sm z-10">
+              <h3 className="text-lg font-bold text-slate-900 font-heading">
+                {editingPost ? 'Edit Post' : 'Add Post'}
+              </h3>
+              <button onClick={() => setIsModalOpen(false)} className="text-slate-400 hover:text-slate-600 p-2">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <form onSubmit={handleSave} className="p-6 space-y-6">
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">Title</label>
+                  <input
+                    type="text"
+                    required
+                    value={formData.title}
+                    onChange={e => setFormData({ ...formData, title: e.target.value })}
+                    className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-900/10"
+                    placeholder="Post title"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">Category</label>
+                  <input
+                    type="text"
+                    value={formData.category}
+                    onChange={e => setFormData({ ...formData, category: e.target.value })}
+                    className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-900/10"
+                    placeholder="e.g. Tech, Life, Music"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">Excerpt</label>
+                  <input
+                    type="text"
+                    required
+                    value={formData.excerpt}
+                    onChange={e => setFormData({ ...formData, excerpt: e.target.value })}
+                    className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-900/10"
+                    placeholder="Short summary"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">Cover Image URL</label>
+                  <input
+                    type="text"
+                    value={formData.imageUrl}
+                    onChange={e => setFormData({ ...formData, imageUrl: e.target.value })}
+                    className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-900/10"
+                    placeholder="https://..."
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">Content (Markdown / Text)</label>
+                  <textarea
+                    required
+                    value={formData.content}
+                    onChange={e => setFormData({ ...formData, content: e.target.value })}
+                    className="w-full h-48 px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-900/10 resize-y"
+                    placeholder="Write your content here..."
+                  />
+                </div>
+              </div>
+              <div className="flex justify-end gap-3 pt-6 border-t border-slate-100">
+                <button
+                  type="button"
+                  onClick={() => setIsModalOpen(false)}
+                  className="px-6 py-2 text-sm font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="flex items-center gap-2 px-6 py-2 text-sm font-medium text-white bg-slate-900 hover:bg-slate-800 rounded-xl transition-colors"
+                >
+                  <Save className="w-4 h-4" /> Save
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

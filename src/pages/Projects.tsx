@@ -22,7 +22,7 @@ const projects = [
     id: "fanratech",
     title: "Fanratech",
     description: "Technology blog and tutorial site focusing on web development, AI, and modern software engineering.",
-    icon: <ImageWithSkeleton src="https://res.cloudinary.com/dew39kqhy/image/upload/f_auto,q_auto/v1779594254/FanraTech_esy4kn.png" alt="Fanratech" className="w-full h-full object-cover rounded-full drop-shadow-sm" containerClassName="w-full h-full bg-transparent" />,
+    icon: <ImageWithSkeleton src="https://res.cloudinary.com/dew39kqhy/image/upload/f_auto,q_auto/v1779594254/FanraTech_esy4kn.png" alt="Fanratech" className="w-full h-full object-cover rounded-full drop-shadow-sm bg-white" containerClassName="w-full h-full bg-transparent" />,
     url: "https://fanratech.web.id",
     color: "from-emerald-500/10 to-teal-500/10",
     border: "group-hover:border-emerald-500/40",
@@ -32,7 +32,7 @@ const projects = [
     id: "vektorion",
     title: "Vektorion",
     description: "Visual exploration platform offering free graphic design assets and curated design inspiration.",
-    icon: <ImageWithSkeleton src="https://res.cloudinary.com/dew39kqhy/image/upload/f_auto,q_auto/v1778700411/ChatGPT_Image_14_Mei_2026_02.26.25_nx3u4o.png" alt="Vektorion" className="w-full h-full object-cover rounded-full drop-shadow-sm" containerClassName="w-full h-full bg-transparent" />,
+    icon: <ImageWithSkeleton src="https://res.cloudinary.com/dew39kqhy/image/upload/f_auto,q_auto/v1778700411/ChatGPT_Image_14_Mei_2026_02.26.25_nx3u4o.png" alt="Vektorion" className="w-full h-full object-cover rounded-full drop-shadow-sm bg-white" containerClassName="w-full h-full bg-transparent" />,
     url: "https://vektorion.web.id",
     color: "from-amber-500/10 to-orange-500/10",
     border: "group-hover:border-amber-500/40",
@@ -42,7 +42,7 @@ const projects = [
     id: "fanragem",
     title: "Fanragem",
     description: "A web-based peer-to-peer economic simulation game featuring a player-driven market where users trade resources, manage factories, and invest in a dynamic economy.",
-    icon: <ImageWithSkeleton src="https://res.cloudinary.com/dew39kqhy/image/upload/f_auto,q_auto/v1783234123/ChatGPT_Image_5_Jul_2026__13.47.35-removebg-preview_gztehs.png" alt="Fanragem" className="w-full h-full object-contain drop-shadow-sm grayscale opacity-60" containerClassName="w-full h-full bg-transparent" />,
+    icon: <ImageWithSkeleton src="https://res.cloudinary.com/dew39kqhy/image/upload/f_auto,q_auto/v1783234123/ChatGPT_Image_5_Jul_2026__13.47.35-removebg-preview_gztehs.png" alt="Fanragem" className="w-full h-full object-cover rounded-full drop-shadow-sm bg-white" containerClassName="w-full h-full bg-transparent" />,
     url: "https://fanragem.my.id",
     color: "from-purple-500/10 to-pink-500/10",
     border: "group-hover:border-purple-500/40",
@@ -52,7 +52,7 @@ const projects = [
     id: "fanrabot",
     title: "Fanrabot",
     description: "An AI-powered web platform to create and manage smart WhatsApp bots, connecting them with various LLMs for automated replies and business automation.",
-    icon: <ImageWithSkeleton src="https://res.cloudinary.com/dew39kqhy/image/upload/f_auto,q_auto/v1780578024/file_0000000030647209b33b695fffe52c90_gi9rwf.png" alt="Fanrabot" className="w-full h-full object-cover rounded-full drop-shadow-sm" containerClassName="w-full h-full bg-transparent" />,
+    icon: <ImageWithSkeleton src="https://res.cloudinary.com/dew39kqhy/image/upload/f_auto,q_auto/v1780578024/file_0000000030647209b33b695fffe52c90_gi9rwf.png" alt="Fanrabot" className="w-full h-full object-contain drop-shadow-sm" containerClassName="w-full h-full bg-transparent" />,
     url: "https://fanrabot.biz.id",
     color: "from-cyan-500/10 to-blue-500/10",
     border: "group-hover:border-cyan-500/40",
@@ -62,7 +62,7 @@ const projects = [
     id: "friendzone",
     title: "FriendsZone",
     description: "A global social community platform connecting people to build friendships. Evolved from a chat group into a cross-platform ecosystem prioritizing authentic interactions.",
-    icon: <ImageWithSkeleton src="https://res.cloudinary.com/dew39kqhy/image/upload/f_auto,q_auto/v1776967780/1774023663426_cv3c6b.png" alt="Friendzone" className="w-full h-full object-cover rounded-full drop-shadow-sm" containerClassName="w-full h-full bg-transparent" />,
+    icon: <ImageWithSkeleton src="https://res.cloudinary.com/dew39kqhy/image/upload/f_auto,q_auto/v1776967780/1774023663426_cv3c6b.png" alt="Friendzone" className="w-full h-full object-cover rounded-full drop-shadow-sm bg-white" containerClassName="w-full h-full bg-transparent" />,
     url: "https://friendszone.web.id",
     color: "from-rose-500/10 to-red-500/10",
     border: "group-hover:border-rose-500/40",
@@ -111,7 +111,7 @@ export function Projects() {
               rel="noreferrer"
               className="group relative flex flex-col bg-white/20 backdrop-blur-lg rounded-2xl p-6 border border-white/40 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] hover:border-white/60 hover:bg-white/30 transition-all duration-300 overflow-hidden"
             >
-              <div className={cn("absolute inset-0 bg-gradient-to-br opacity-0 group-hover:opacity-100 transition-opacity duration-500", project.color)} />
+              <div className={cn("absolute inset-0 bg-gradient-to-br opacity-0 group-hover:opacity-100 transition-opacity duration-500", project.color || "from-slate-500/10 to-slate-400/10")} />
               
               <div className="relative w-12 h-12 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
                 {typeof project.icon === 'string' ? <img src={project.icon} alt={project.title} className="w-full h-full object-cover rounded-full shadow-sm" /> : project.icon}
