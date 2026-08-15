@@ -196,7 +196,13 @@ match /analytics/{docId} {
     allow create, update: if true;
 }
 
-// 17. SONG DETAILS\nmatch /song_details/{docId} {\n    allow read, write: if true;\n}\n\n// Default: Deny others
+// 17. SONG DETAILS
+match /song_details/{docId} {
+    allow read: if true;
+    allow write: if isAdmin();
+}
+
+// Default: Deny others
 match /{document=**} {
   allow read, write: if false;
 }

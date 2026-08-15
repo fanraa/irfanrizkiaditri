@@ -24,6 +24,8 @@ import { cn } from "@/lib/utils";
 import { SEO } from "@/components/SEO";
 import { format } from "date-fns";
 import { useAuth } from "@/context/AuthContext";
+import { motion, AnimatePresence } from "motion/react";
+import { useSearchParams } from "react-router-dom";
 
 interface Photo {
   id: string;
@@ -157,6 +159,8 @@ export function Gallery() {
 
   // Lightbox state
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
+  const [direction, setDirection] = useState<number>(0);
+  const [searchParams] = useSearchParams();
   const [showOverlay, setShowOverlay] = useState(false);
 
   const overlayTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -280,8 +284,9 @@ export function Gallery() {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [selectedIndex, photos.length]);
 
-  const navigate = (dir: number) => {
+    const navigate = (dir: number) => {
     if (selectedIndex === null) return;
+    setDirection(dir);
     let nextIndex = selectedIndex + dir;
     if (nextIndex < 0) nextIndex = photos.length - 1;
     if (nextIndex >= photos.length) nextIndex = 0;
@@ -395,18 +400,42 @@ export function Gallery() {
     }
   };
 
-  const handleShare = async (
+      const handleShare = async (
     e: React.MouseEvent,
     url: string,
     caption?: string,
+    photoId?: string
   ) => {
     e.stopPropagation();
     resetOverlayTimer();
+    const shareText = caption || "Visual Diary";
+    const shareUrl = photoId ? `${window.location.origin}${window.location.pathname}?photo=${photoId}` : window.location.href;
+
+    try {
+      // Try to share as actual image file
+      const response = await fetch(url);
+      const blob = await response.blob();
+      const file = new File([blob], 'photo.jpg', { type: blob.type || 'image/jpeg' });
+
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        await navigator.share({
+          files: [file],
+          title: shareText,
+          text: shareText
+        });
+        return;
+      }
+    } catch (fetchError) {
+      console.error("Could not fetch image for sharing", fetchError);
+    }
+
+    // Fallback to URL sharing
     if (navigator.share) {
       try {
         await navigator.share({
-          title: caption || "Gallery Photo",
-          url: url,
+          title: shareText,
+          text: shareText,
+          url: shareUrl,
         });
       } catch (error) {
         if ((error as Error).name !== "AbortError") {
@@ -651,7 +680,7 @@ export function Gallery() {
                       )
                     )}
                     <button
-                      onClick={(e) => handleShare(e, photo.src, photo.caption)}
+                      onClick={(e) => handleShare(e, photo.src, photo.caption, photo.id)}
                       className="p-2 text-white hover:text-white/80 transition-colors drop-shadow-md"
                       aria-label="Share photo"
                       title="Share"
@@ -740,19 +769,31 @@ export function Gallery() {
           <div className="relative w-full h-full flex flex-col items-center justify-center overflow-hidden">
             
             <div className="relative flex flex-col items-center justify-center w-full max-w-[90vw] sm:max-w-[80vw]">
-              <ImageWithSkeleton
-                src={selectedPhoto.src}
-                alt={selectedPhoto.caption || "Gallery preview"}
-                className="max-w-full max-h-[60vh] sm:max-h-[65vh] object-contain select-none cursor-pointer rounded-lg shadow-xl"
-                draggable={false}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setShowOverlay(prev => !prev);
-                }}
-                onTouchStart={handleTouchStart}
-                onTouchMove={handleTouchMove}
-                onTouchEnd={handleTouchEnd}
-              />
+              <AnimatePresence mode="popLayout" custom={direction}>
+                <motion.div
+                  key={selectedPhoto.id}
+                  custom={direction}
+                  initial={{ opacity: 0, x: direction > 0 ? 100 : -100, rotate: direction > 0 ? 8 : -8 }}
+                  animate={{ opacity: 1, x: 0, rotate: 0 }}
+                  exit={{ opacity: 0, x: direction < 0 ? 100 : -100, rotate: direction < 0 ? 8 : -8 }}
+                  transition={{ type: "spring", stiffness: 300, damping: 25 }}
+                  className="flex justify-center items-center w-full"
+                  onTouchStart={handleTouchStart}
+                  onTouchMove={handleTouchMove}
+                  onTouchEnd={handleTouchEnd}
+                >
+                  <ImageWithSkeleton
+                    src={selectedPhoto.src}
+                    alt={selectedPhoto.caption || "Gallery preview"}
+                    className="max-w-full max-h-[60vh] sm:max-h-[65vh] object-contain select-none cursor-pointer rounded-lg shadow-2xl"
+                    draggable={false}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setShowOverlay(prev => !prev);
+                    }}
+                  />
+                </motion.div>
+              </AnimatePresence>
 
               {/* UI controls below the image */}
               <div 
@@ -800,7 +841,7 @@ export function Gallery() {
                     </button>
                     
                     <button
-                      onClick={(e) => handleShare(e, selectedPhoto.src, selectedPhoto.caption)}
+                      onClick={(e) => handleShare(e, selectedPhoto.src, selectedPhoto.caption, selectedPhoto.id)}
                       className="hover:text-slate-900 transition-colors"
                       title="Share"
                     >

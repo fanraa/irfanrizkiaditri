@@ -115,3 +115,25 @@
     scrollbar-width: none;
   }
 }
+
+
+@keyframes sliding-text {
+  from { transform: translateX(200px); }
+  to { transform: translateX(-100%); }
+}
+
+.animate-sliding-text {
+  display: inline-block;
+  white-space: nowrap;
+  animation: sliding-text 12s linear infinite;
+}
+
+@media (min-width: 640px) {
+  @keyframes sliding-text-sm {
+    from { transform: translateX(350px); }
+    to { transform: translateX(-100%); }
+  }
+  .animate-sliding-text {
+    animation: sliding-text-sm 15s linear infinite;
+  }
+}

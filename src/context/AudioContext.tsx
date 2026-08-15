@@ -1,8 +1,8 @@
 import React, { createContext, useContext, useState, useRef, useEffect, ReactNode, useMemo } from "react";
 import { motion } from "motion/react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { collection, getDocs, writeBatch, doc, updateDoc, increment, getDoc, setDoc } from "firebase/firestore";
-import { db } from "@/lib/firebase";
+import { collection, getDocs, writeBatch, doc, updateDoc, increment, getDoc, setDoc, addDoc } from "firebase/firestore";
+import { db, auth } from "@/lib/firebase";
 import YouTube, { YouTubeEvent, YouTubePlayer } from "react-youtube";
 import {  Pause, Play, SkipBack, SkipForward, MoreVertical, Clock, X, ChevronUp, ChevronDown, Volume2, Volume1, VolumeX, Shuffle, Repeat, Repeat1, ListMusic, Trash2, ListPlus, Languages, Copy, Check  } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
@@ -867,26 +867,17 @@ const fetchSongDetailForTrack = async (trackId: string | null, forceRegenerate: 
     setSongDetail({ isLoading: true });
     
     try {
-      const dbSongId = `${track.artist}-${track.title}`.toLowerCase().replace(/[^a-z0-9]/g, '-');
-      const songDocRef = doc(db, 'song_details', dbSongId);
-      
-      if (!forceRegenerate) {
-        const songDoc = await getDoc(songDocRef);
-        if (songDoc.exists()) {
-          const data = songDoc.data();
-          setSongDetail({ 
-            isLoading: false, 
-            description: data.description, 
-            lyrics: data.lyrics,
-            translatedDescription: data.translatedDescription
-          });
-          return;
+      let authHeader = "";
+      try {
+        if (auth.currentUser) {
+          const token = await auth.currentUser.getIdToken();
+          authHeader = `Bearer ${token}`;
         }
-      }
-
+      } catch(e) {}
+      
       const res = await fetch("/api/song-detail", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", "Authorization": authHeader },
         body: JSON.stringify({
           title: track.title || track.name || "",
           artist: track.artist || ""
@@ -898,25 +889,11 @@ const fetchSongDetailForTrack = async (trackId: string | null, forceRegenerate: 
       } else {
         const cleanLyrics = data.lyrics ? data.lyrics.replace(/\[\d{1,2}:\d{2}(\.\d+)?\]/g, '').trim() : "";
         setSongDetail({ isLoading: false, description: data.description, lyrics: cleanLyrics });
-        
-        // Save to Firestore for future
-        try {
-          await setDoc(songDocRef, {
-            title: track.title,
-            artist: track.artist,
-            description: data.description,
-            lyrics: cleanLyrics,
-            updatedAt: new Date().toISOString()
-          }, { merge: true });
-        } catch(e) {
-          console.error("Failed to save song detail to Firestore", e);
-        }
       }
     } catch (e) {
       setSongDetail({ isLoading: false, error: "An error occurred." });
     }
   };
-
   const removeFromQueue = (index: number) => {
     setQueue(prev => prev.filter((_, i) => i !== index));
     showToast("Removed from queue");
@@ -1151,7 +1128,7 @@ const fetchSongDetailForTrack = async (trackId: string | null, forceRegenerate: 
     >
       {/* Hidden YouTube Player for Audio */}
       {playingTrack?.youtubeId && (
-        <div className="fixed top-0 left-0 w-[200px] h-[200px] pointer-events-none opacity-0 -z-50">
+        <div className="fixed top-0 left-0 w-[200px] h-[200px] pointer-events-none opacity-[0.01] z-0 overflow-hidden" aria-hidden="true">
           <YouTube 
             videoId={extractYouTubeId(playingTrack.youtubeId)}
             opts={{
@@ -1162,7 +1139,8 @@ const fetchSongDetailForTrack = async (trackId: string | null, forceRegenerate: 
                 controls: 0,
                 showinfo: 0,
                 rel: 0,
-                modestbranding: 1
+                modestbranding: 1,
+                playsinline: 1
               }
             }}
             onReady={(e: YouTubeEvent) => {
@@ -1201,7 +1179,7 @@ const fetchSongDetailForTrack = async (trackId: string | null, forceRegenerate: 
             <div className="max-w-7xl mx-auto w-full flex items-center justify-between gap-3 relative z-10 pointer-events-none">
               {/* Left: Cover & Info */}
               <div className="flex items-center min-w-0 gap-3 shrink-0 pointer-events-auto">
-                <div className="w-10 h-10 rounded-lg overflow-hidden shrink-0 bg-slate-100 shadow-sm border border-slate-200/50">
+                <div onClick={() => navigate("/music")} className="w-10 h-10 rounded-lg overflow-hidden shrink-0 bg-slate-100 shadow-sm border border-slate-200/50 cursor-pointer hover:opacity-80 transition-opacity">
                   {trackCover ? (
                     <img src={trackCover} alt={trackTitle} className="w-full h-full object-cover" />
                   ) : (
@@ -1369,6 +1347,32 @@ const fetchSongDetailForTrack = async (trackId: string | null, forceRegenerate: 
                           Cancel sleep timer
                         </button>
                       )}
+                      {isAdmin && (
+                        <button
+                          onClick={async () => {
+                            setIsPlayerMenuOpen(false);
+                            if (playingTrack) {
+                              try {
+                                await addDoc(collection(db, 'music_playlist'), {
+                                  title: playingTrack.title || playingTrack.name || "Unknown Title",
+                                  artist: playingTrack.artist || "Unknown Artist",
+                                  youtubeId: playingTrack.youtubeId,
+                                  cover: playingTrack.coverUrl || playingTrack.cover || playingTrack.image || "",
+                                  addedAt: Date.now()
+                                });
+                                showToast("Added to playlist");
+                              } catch (error) {
+                                console.error(error);
+                                showToast("Failed to add to playlist");
+                              }
+                            }
+                          }}
+                          className="w-full text-left px-4 py-2.5 text-[14px] text-slate-700 hover:bg-slate-50 transition-colors border-t border-slate-100 mt-1 flex items-center gap-2"
+                        >
+                          <ListPlus className="w-4 h-4" />
+                          Add to Playlist
+                        </button>
+                      )}
                       <button
                         onClick={async () => {
                           setIsPlayerMenuOpen(false);
@@ -1437,8 +1441,10 @@ const fetchSongDetailForTrack = async (trackId: string | null, forceRegenerate: 
                 <span className="font-semibold hidden md:inline">Now Playing</span>
               </button>
 
-              <div className="text-center font-medium text-xs sm:text-sm text-slate-500 truncate max-w-[180px] sm:max-w-xs">
-                {trackTitle} &bull; {trackArtist}
+              <div className="text-center font-medium text-xs sm:text-sm text-slate-500 overflow-hidden max-w-[180px] sm:max-w-xs relative flex items-center justify-center whitespace-nowrap mask-fade-edges">
+                <div className={(trackTitle.length + trackArtist.length > 25) ? "animate-sliding-text" : ""}>
+                  {trackTitle} &bull; {trackArtist}
+                </div>
               </div>
 
               <button 
@@ -1502,16 +1508,7 @@ const fetchSongDetailForTrack = async (trackId: string | null, forceRegenerate: 
                     <p className="text-slate-600 text-sm sm:text-base font-medium mb-3">
                       {trackArtist}
                     </p>
-                    <div className="flex items-center justify-center gap-4 text-xs font-medium text-slate-400">
-                      <div className="flex items-center gap-1">
-                        <Play className="w-3.5 h-3.5" fill="currentColor" />
-                        {getTrack(playingId)?.playCount || 0} plays
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <Clock className="w-3.5 h-3.5" />
-                        {formatTime(getTrack(playingId)?.totalTimePlayed || 0)}
-                      </div>
-                    </div>
+                    
                   </div>
 
                   {/* Full Screen Interactive Seekbar */}

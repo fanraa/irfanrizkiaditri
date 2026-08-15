@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Settings, Save, Check } from 'lucide-react';
+import { auth } from '@/lib/firebase';
 
 export function SettingsTab() {
   const [apiKey, setApiKey] = useState('');
@@ -17,9 +18,10 @@ export function SettingsTab() {
   const handleSave = async () => {
     setIsSaving(true);
     try {
+      const token = await auth.currentUser?.getIdToken();
       await fetch('/api/admin/settings', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
         body: JSON.stringify({ geminiApiKey: apiKey })
       });
       setIsSaved(true);

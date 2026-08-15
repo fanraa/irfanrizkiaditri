@@ -25,9 +25,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       };
       // For REST API, we can use PATCH to update the document.
       // We append ?updateMask.fieldPaths=geminiApiKey to only update that field.
+      const authHeader = req.headers.authorization || '';
       const snap = await fetch(`${URL}?updateMask.fieldPaths=geminiApiKey`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'Authorization': authHeader },
         body: JSON.stringify(payload)
       });
       
