@@ -55,7 +55,7 @@ const lyricsNew = `                  {/* Lyrics Section */}
                       </div>
                     ) : songDetail.error || !songDetail.lyrics ? (
                       <div className="flex items-center gap-3 p-4 bg-slate-50/50 rounded-xl border border-slate-100 text-slate-500 text-sm mt-3">
-                        <span className="text-lg"></span>
+                        <span className="text-lg">🎵</span>
                         <p>Lyrics are not available for this track yet.</p>
                       </div>
                     ) : (
@@ -79,7 +79,7 @@ const descOld = `                    ) : songDetail.error ? (
 
 const descNew = `                    ) : songDetail.error ? (
                       <div className="flex items-center gap-3 p-4 bg-slate-50/50 rounded-xl border border-slate-100 text-slate-500 text-sm mt-3">
-                        <span className="text-lg">ℹ</span>
+                        <span className="text-lg">ℹ️</span>
                         <p>About the artist is currently unavailable.</p>
                       </div>
                     ) : (

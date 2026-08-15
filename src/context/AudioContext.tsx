@@ -1674,7 +1674,7 @@ const fetchSongDetailForTrack = async (trackId: string | null, forceRegenerate: 
                       </div>
                     ) : songDetail.error ? (
                       <div className="flex items-center gap-3 p-4 bg-slate-50/50 rounded-xl border border-slate-100 text-slate-500 text-sm mt-3">
-                        <span className="text-lg">ℹ️</span>
+                        
                         <p>About the artist is currently unavailable.</p>
                       </div>
                     ) : (
@@ -1714,7 +1714,7 @@ const fetchSongDetailForTrack = async (trackId: string | null, forceRegenerate: 
                       </div>
                     ) : songDetail.error || !songDetail.lyrics ? (
                       <div className="flex items-center gap-3 p-4 bg-slate-50/50 rounded-xl border border-slate-100 text-slate-500 text-sm mt-3">
-                        <span className="text-lg">🎵</span>
+                        
                         <p>Lyrics are not available for this track yet.</p>
                       </div>
                     ) : (

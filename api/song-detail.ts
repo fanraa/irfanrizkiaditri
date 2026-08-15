@@ -1,14 +1,6 @@
 import { VercelRequest, VercelResponse } from '@vercel/node';
 import { GoogleGenAI } from '@google/genai';
-import { initializeApp } from 'firebase/app';
-import { getFirestore, doc, getDoc } from 'firebase/firestore';
 
-const firebaseConfig = {
-  apiKey: "AIzaSyDjgrBvKUaVg9U1XustHj9TeO4lHZDrcNg",
-  projectId: "fanra-dev"
-};
-const app = initializeApp(firebaseConfig, "SongDetailApp");
-const db = getFirestore(app);
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') {
@@ -27,12 +19,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     // 1. Fetch AI API Key from Firestore
     let aiKey = "";
     try {
-      const snap = await getDoc(doc(db, 'site_content', 'settings'));
-      if (snap.exists()) {
-        aiKey = snap.data().geminiApiKey || "";
+      const snap = await fetch('https://firestore.googleapis.com/v1/projects/fanra-dev/databases/(default)/documents/site_content/settings');
+      if (snap.ok) {
+        const data = await snap.json();
+        aiKey = data?.fields?.geminiApiKey?.stringValue || "";
       }
     } catch(e) {
-      console.error("Failed to read settings from Firestore", e);
+      console.error("Failed to read settings from Firestore REST", e);
     }
 
     if (aiKey) {
