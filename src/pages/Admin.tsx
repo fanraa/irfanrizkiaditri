@@ -1,3 +1,4 @@
+import { SettingsTab } from "../components/SettingsTab";
 import React, { useState, useEffect } from 'react';
 import { db } from '@/lib/firebase';
 import { collection, doc, getDoc, setDoc, getDocs, updateDoc, deleteDoc, addDoc, onSnapshot, query, orderBy } from 'firebase/firestore';
@@ -19,7 +20,7 @@ const MOCK_DATA = [
 ];
 
 export function Admin() {
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'assets' | 'projects' | 'playlist' | 'blog'>('dashboard');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'assets' | 'projects' | 'playlist' | 'blog' | 'settings' | 'settings'>('dashboard');
   const { isAdmin } = useAuth();
   
   if (!isAdmin) {
@@ -90,6 +91,13 @@ export function Admin() {
                   Playlist
                 </button>
               </div>
+                <button
+                  onClick={() => setActiveTab('settings')}
+                  className={`flex items-center gap-2 px-6 py-4 text-sm font-medium transition-colors border-b-2 whitespace-nowrap ${activeTab === 'settings' ? 'border-slate-900 text-slate-900' : 'border-transparent text-slate-500 hover:text-slate-700'}`}
+                >
+                  <Settings className="w-4 h-4" />
+                  Settings
+                </button>
 
               <div className="p-6">
                 {activeTab === 'dashboard' && <DashboardTab />}
@@ -97,6 +105,7 @@ export function Admin() {
                 {activeTab === 'projects' && <ProjectsTab />}
                 {activeTab === 'playlist' && <PlaylistTab />}
                 {activeTab === 'blog' && <BlogTab />}
+                {activeTab === 'settings' && <SettingsTab />}
               </div>
             </div>
           </div>

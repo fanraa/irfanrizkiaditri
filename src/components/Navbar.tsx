@@ -6,10 +6,12 @@ import { motion, AnimatePresence, useScroll, useMotionValueEvent } from "motion/
 import { useState, useEffect } from "react";
 
 import { useAuth } from "@/context/AuthContext";
+import { useAudio } from "@/context/AudioContext";
 
 export function Navbar() {
   const location = useLocation();
   const { isAdmin, logout } = useAuth();
+  const { isPlaying } = useAudio();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   
   const { scrollY } = useScroll();
@@ -138,7 +140,16 @@ export function Navbar() {
                             isActive ? (useWhiteTop ? "text-white font-semibold" : "text-slate-900 font-semibold") : (useWhiteTop ? "text-white/70 hover:text-white font-medium" : "text-slate-500 hover:text-slate-900 font-medium")
                           )}
                         >
-                          <span className="text-[15px]">{link.label}</span>
+                          <span className="flex items-center gap-1.5 text-[15px]">
+                            {link.label}
+                            {link.href === "/music" && isPlaying && (
+                              <span className="flex items-end gap-[2px] h-3 ml-0.5">
+                                <motion.span animate={{ height: ["4px", "10px", "4px"] }} transition={{ duration: 0.8, repeat: Infinity, ease: "easeInOut" }} className="w-[2px] bg-current rounded-full" />
+                                <motion.span animate={{ height: ["12px", "4px", "12px"] }} transition={{ duration: 0.9, repeat: Infinity, ease: "easeInOut" }} className="w-[2px] bg-current rounded-full" />
+                                <motion.span animate={{ height: ["6px", "12px", "6px"] }} transition={{ duration: 1.0, repeat: Infinity, ease: "easeInOut" }} className="w-[2px] bg-current rounded-full" />
+                              </span>
+                            )}
+                          </span>
                         </Link>
                       );
                     })}
@@ -228,17 +239,24 @@ export function Navbar() {
                   const isActive = location.pathname === link.href;
                   
                   return (
-                    <Link
-                      key={link.href}
-                      to={link.href}
-                      onClick={() => setMobileMenuOpen(false)}
-                      className={cn(
-                        "flex justify-center px-4 py-3.5 rounded-xl font-bold transition-colors outline-none text-base tracking-wide bg-white/40 backdrop-blur-sm border border-transparent",
-                        isActive ? "bg-slate-900 text-white border-slate-800" : "text-slate-600 hover:bg-slate-100/60 hover:text-slate-900 hover:border-slate-200/50"
-                      )}
-                    >
-                      {link.label}
-                    </Link>
+                      <Link
+                        key={link.href}
+                        to={link.href}
+                        onClick={() => setMobileMenuOpen(false)}
+                        className={cn(
+                          "flex justify-center items-center gap-2 px-4 py-3.5 rounded-xl font-bold transition-colors outline-none text-base tracking-wide bg-white/40 backdrop-blur-sm border border-transparent",
+                          isActive ? "bg-slate-900 text-white border-slate-800" : "text-slate-600 hover:bg-slate-100/60 hover:text-slate-900 hover:border-slate-200/50"
+                        )}
+                      >
+                        <span>{link.label}</span>
+                        {link.href === "/music" && isPlaying && (
+                          <span className="flex items-end gap-[2px] h-3 ml-0.5">
+                            <motion.span animate={{ height: ["4px", "10px", "4px"] }} transition={{ duration: 0.8, repeat: Infinity, ease: "easeInOut" }} className="w-[2px] bg-current rounded-full" />
+                            <motion.span animate={{ height: ["12px", "4px", "12px"] }} transition={{ duration: 0.9, repeat: Infinity, ease: "easeInOut" }} className="w-[2px] bg-current rounded-full" />
+                            <motion.span animate={{ height: ["6px", "12px", "6px"] }} transition={{ duration: 1.0, repeat: Infinity, ease: "easeInOut" }} className="w-[2px] bg-current rounded-full" />
+                          </span>
+                        )}
+                      </Link>
                   );
                 })}
                 {isAdmin && (

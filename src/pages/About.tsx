@@ -2,15 +2,13 @@ import { SEO } from "@/components/SEO";
 import React, { useState } from 'react';
 import { PageTransition } from "@/components/PageTransition";
 import { useAuth } from "@/context/AuthContext";
-import { Mail, MapPin, Globe, Languages, Download, Loader2 } from "lucide-react";
+import { Mail, MapPin, Globe, Languages } from "lucide-react";
 import { cn } from "@/lib/utils";
-// @ts-ignore
-import html2pdf from "html2pdf.js";
+import { motion, AnimatePresence } from "motion/react";
 
 export function About() {
   const { userEmail, logout, isAdmin, loginWithGoogle } = useAuth();
   const [isIndo, setIsIndo] = useState(false);
-  const [isDownloading, setIsDownloading] = useState(false);
 
 
   const t = {
@@ -94,40 +92,6 @@ export function About() {
     ]
   };
 
-  const handlePrint = async () => {
-    if (isDownloading) return;
-    setIsDownloading(true);
-    const element = document.getElementById('cv-container');
-    if (!element) {
-      setIsDownloading(false);
-      return;
-    }
-    
-    const originalClasses = element.className;
-    element.className = "bg-[#ffffff] p-12 text-[#1e293b]";
-    
-    const originalWidth = element.style.width;
-    element.style.width = "800px";
-
-    const opt = {
-      margin:       0,
-      filename:     `CV_Irfan_Rizki_Aditri_${isIndo ? 'ID' : 'EN'}.pdf`,
-      image:        { type: 'jpeg' as const, quality: 1 },
-      html2canvas:  { scale: 2, useCORS: true, windowWidth: 1024 },
-      jsPDF:        { unit: 'mm' as const, format: 'a4', orientation: 'portrait' as const }
-    };
-
-    try {
-      await html2pdf().from(element).set(opt).save();
-    } catch (error) {
-      console.error("Error generating PDF", error);
-    } finally {
-      element.className = originalClasses;
-      element.style.width = originalWidth;
-      setIsDownloading(false);
-    }
-  };
-
   return (
     <>
       <SEO title="About" description="About Irfan Rizki Aditri - Physics Student and Web Developer." url={window.location.href} />
@@ -159,13 +123,21 @@ export function About() {
           </div>
 
           {/* CV Container */}
-          <div id="cv-container" className="bg-[#ffffff] border border-[#e2e8f0] shadow-sm p-6 sm:p-12 text-[#1e293b] print:border-none print:shadow-none print:p-0">
-            
+          <div id="cv-container" className="w-full max-w-[800px] mx-auto bg-[#ffffff] border border-[#e2e8f0] shadow-sm p-6 sm:p-12 text-[#1e293b] print:border-none print:shadow-none print:p-0 min-h-[1130px] flex flex-col relative overflow-hidden">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={isIndo ? 'id' : 'en'}
+                initial={{ opacity: 0, y: 5 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -5 }}
+                transition={{ duration: 0.3 }}
+                className="flex flex-col flex-1"
+              >
             {/* Header */}
             <div className="flex flex-row items-start sm:items-center justify-between border-b-2 border-[#1e293b] pb-4 sm:pb-6 mb-4 sm:mb-8 gap-4 sm:gap-6 print:flex-row print:items-center">
-              <div className="flex-1 order-1">
-                <h1 className="text-2xl sm:text-4xl font-bold text-[#0f172a] uppercase tracking-wider mb-2 print:text-3xl">Irfan Rizki Aditri</h1>
-                <h2 className="text-sm sm:text-xl text-[#475569] font-medium mb-4 print:text-lg">{t.role}</h2>
+              <div className="flex-1 order-1 min-w-0">
+                <h1 className="text-2xl sm:text-4xl font-bold text-[#0f172a] uppercase tracking-wider mb-2 print:text-3xl break-words">Irfan Rizki Aditri</h1>
+                <h2 className="text-sm sm:text-xl text-[#475569] font-medium mb-4 print:text-lg break-words">{t.role}</h2>
                 
                 <div className="flex flex-col sm:flex-row flex-wrap justify-start gap-x-4 gap-y-1.5 sm:gap-x-6 sm:gap-y-2 text-xs sm:text-sm text-[#475569] print:gap-4 print:text-xs">
                   <div className="flex items-center gap-2">
@@ -210,10 +182,10 @@ export function About() {
               {/* Education */}
               <section>
                 <h3 className="text-sm sm:text-lg font-bold text-[#0f172a] uppercase tracking-widest border-b border-[#cbd5e1] pb-2 mb-4 print:text-base print:mb-2">{t.education}</h3>
-                <div className="mb-4 print:mb-2">
-                  <div className="flex flex-row justify-between items-center mb-1 print:flex-row print:items-center">
-                    <h4 className="font-bold text-[#1e293b] text-sm sm:text-base print:text-sm">Sumatera Institute of Technology (ITERA)</h4>
-                    <span className="text-xs sm:text-sm font-medium text-[#475569] print:text-xs">2025 - {isIndo ? "Sekarang" : "Present"}</span>
+                <div className="mb-4 print:mb-2 hover:bg-slate-50 transition-colors p-2 -mx-2 rounded-lg cursor-default">
+                  <div className="flex flex-row justify-between items-start sm:items-center mb-1 print:flex-row print:items-center gap-2">
+                    <h4 className="font-bold text-[#1e293b] text-sm sm:text-base print:text-sm flex-1 min-w-0">Sumatera Institute of Technology (ITERA)</h4>
+                    <span className="text-xs sm:text-sm font-medium text-[#475569] whitespace-nowrap shrink-0 print:text-xs">2025 - {isIndo ? "Sekarang" : "Present"}</span>
                   </div>
                   <div className="text-xs sm:text-sm text-[#475569] italic mb-2 print:text-xs print:mb-1">{t.eduDegree}</div>
                   <ul className="list-disc list-outside text-xs sm:text-sm text-[#334155] space-y-1 ml-5 print:text-xs">
@@ -227,10 +199,10 @@ export function About() {
                 <h3 className="text-sm sm:text-lg font-bold text-[#0f172a] uppercase tracking-widest border-b border-[#cbd5e1] pb-2 mb-4 print:text-base print:mb-2">{t.experience}</h3>
                 
                 {t.expList.map((exp, index) => (
-                  <div key={index} className="mb-6 last:mb-0 print:mb-4">
-                    <div className="flex flex-row justify-between items-center mb-1 print:flex-row print:items-center">
-                      <h4 className="font-bold text-[#1e293b] text-sm sm:text-base print:text-sm">{exp.title}</h4>
-                      <span className="text-xs sm:text-sm font-medium text-[#475569] whitespace-nowrap ml-4 print:text-xs">{exp.date}</span>
+                  <div key={index} className="mb-6 last:mb-0 print:mb-4 hover:bg-slate-50 transition-colors p-2 -mx-2 rounded-lg cursor-default">
+                    <div className="flex flex-row justify-between items-start sm:items-center mb-1 print:flex-row print:items-center gap-2">
+                      <h4 className="font-bold text-[#1e293b] text-sm sm:text-base print:text-sm flex-1 min-w-0">{exp.title}</h4>
+                      <span className="text-xs sm:text-sm font-medium text-[#475569] whitespace-nowrap shrink-0 print:text-xs">{exp.date}</span>
                     </div>
                     <div className="text-xs sm:text-sm text-[#475569] italic mb-2 print:text-xs print:mb-1">{exp.role}</div>
                     <ul className="list-disc list-outside text-xs sm:text-sm text-[#334155] space-y-1 ml-5 print:text-xs">
@@ -261,7 +233,7 @@ export function About() {
               </section>
 
               {/* Signature */}
-              <div className="flex justify-end mt-12 print:mt-8 print:break-inside-avoid">
+              <div className="flex justify-end mt-auto pt-12 print:mt-8 print:pt-8 print:break-inside-avoid">
                 <div className="flex flex-col items-center">
                   <img 
                     src="https://res.cloudinary.com/dew39kqhy/image/upload/v1784825764/bb573778-768e-4cb7-8c07-83d9263b3365_mtv43f.png" 
@@ -273,24 +245,15 @@ export function About() {
               </div>
 
             </div>
-          </div>
+            </motion.div>
+          </AnimatePresence>
+        </div>
 
-          {/* Action Buttons */}
-          <div className="flex justify-center gap-8 mt-6 print:hidden">
-            <button
-              onClick={handlePrint}
-              disabled={isDownloading}
-              className="flex items-center gap-1.5 text-[#64748b] hover:text-[#0f172a] transition-colors bg-transparent border-none outline-none cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-              title={isIndo ? "Unduh CV" : "Download CV"}
-            >
-              {isDownloading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Download className="w-3.5 h-3.5" />}
-              <span className="text-[10px] font-bold uppercase tracking-wider">
-                {isDownloading ? (isIndo ? "Mengunduh..." : "Downloading...") : (isIndo ? "Unduh CV" : "Download CV")}
-              </span>
-            </button>
+          {/* Translate Button */}
+          <div className="w-full max-w-[800px] mx-auto flex justify-end mt-2 print:hidden">
             <button
               onClick={() => setIsIndo(prev => !prev)}
-              className="flex items-center gap-1.5 text-[#64748b] hover:text-[#0f172a] transition-colors bg-transparent border-none outline-none cursor-pointer"
+              className="flex items-center gap-1.5 py-1 text-[#64748b] hover:text-[#0f172a] transition-colors bg-transparent border-none outline-none cursor-pointer"
               title={isIndo ? "Translate to English" : "Terjemahkan ke Bahasa Indonesia"}
             >
               <Languages className="w-3.5 h-3.5" />

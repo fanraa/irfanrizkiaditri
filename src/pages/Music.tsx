@@ -16,6 +16,17 @@ import { db } from "@/lib/firebase";
 import { Plus, X } from "lucide-react";
 import { createPortal } from "react-dom";
 
+const formatTrackTime = (time: number) => {
+  if (isNaN(time) || time === 0) return "0:00";
+  const hours = Math.floor(time / 3600);
+  const mins = Math.floor((time % 3600) / 60);
+  const secs = Math.floor(time % 60);
+  if (hours > 0) {
+    return `${hours}:${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
+  }
+  return `${mins}:${secs.toString().padStart(2, "0")}`;
+};
+
 const MarqueeText = ({ text, className }: { text: string; className?: string }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const textRef = useRef<HTMLDivElement>(null);
@@ -488,9 +499,19 @@ function AddTrackModal({ isOpen, onClose, onAdded, existingTracks }: { isOpen: b
 
 function TrackItem({ track, isAdmin, isCurrentTrack, togglePlay, isPlaying, onEdit }: any) {
   const controls = useDragControls();
+  const { addToQueue } = useAudio();
+  const [showMenu, setShowMenu] = useState(false);
   const trackTitle = track.title || track.name || "Unknown Track";
   const trackArtist = track.artist || "Unknown Artist";
   const trackCover = track.coverUrl || track.cover || track.image;
+
+  // Add click outside handler for the menu
+  useEffect(() => {
+    if (!showMenu) return;
+    const handleClick = () => setShowMenu(false);
+    window.addEventListener('click', handleClick);
+    return () => window.removeEventListener('click', handleClick);
+  }, [showMenu]);
 
   if (track.spotifyId && !track.youtubeId) {
     return (
@@ -583,6 +604,29 @@ function TrackItem({ track, isAdmin, isCurrentTrack, togglePlay, isPlaying, onEd
       >
         {(isCurrentTrack && isPlaying) ? <Pause className="w-5 h-5" fill="currentColor" /> : <Play className="w-5 h-5 ml-0.5" fill="currentColor" />}
       </button>
+
+      <div className="relative ml-1 sm:ml-2">
+        <button
+          onClick={(e) => { e.stopPropagation(); setShowMenu(!showMenu); }}
+          className="w-10 h-10 flex items-center justify-center text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-full transition-colors"
+        >
+          <MoreVertical className="w-5 h-5" />
+        </button>
+        {showMenu && (
+          <div className="absolute right-0 top-full mt-1 w-40 bg-white border border-slate-200 rounded-xl shadow-lg z-50 overflow-hidden py-1">
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                addToQueue(track);
+                setShowMenu(false);
+              }}
+              className="w-full text-left px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
+            >
+              Add to queue
+            </button>
+          </div>
+        )}
+      </div>
     </Reorder.Item>
   );
 }

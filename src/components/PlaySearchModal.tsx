@@ -10,6 +10,40 @@ export function PlaySearchModal({ isOpen, onClose }: { isOpen: boolean; onClose:
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [debouncedQuery, setDebouncedQuery] = useState("");
+  const [trendingSongs, setTrendingSongs] = useState<any[]>([]);
+
+  useEffect(() => {
+    if (isOpen && trendingSongs.length === 0) {
+      const fetchTrending = async () => {
+        setIsSearching(true);
+        try {
+          const queries = ["top songs 2025", "trending pop music", "viral hits", "tiktok songs", "new music friday"];
+          const randomQuery = queries[Math.floor(Math.random() * queries.length)];
+          const res = await fetch(`/api/search?q=${encodeURIComponent(randomQuery)}`);
+          if (res.ok) {
+            const data = await res.json();
+            let results = data.results || [];
+            const seen = new Set();
+            const deduped = [];
+            for (const r of results) {
+              const key = `${(r.title || '').toLowerCase()}|${(r.artist || '').toLowerCase()}`;
+              if (!seen.has(key)) {
+                seen.add(key);
+                deduped.push(r);
+              }
+            }
+            // Just take a few for recommendations
+            setTrendingSongs(deduped.slice(0, 10));
+          }
+        } catch (error) {
+          console.error("Failed to fetch trending", error);
+        } finally {
+          setIsSearching(false);
+        }
+      };
+      fetchTrending();
+    }
+  }, [isOpen]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -177,6 +211,51 @@ export function PlaySearchModal({ isOpen, onClose }: { isOpen: boolean; onClose:
             ) : searchQuery && !isSearching ? (
               <div className="py-8 text-center text-[13px] text-slate-500">
                 No results found.
+              </div>
+            ) : trendingSongs.length > 0 ? (
+              <div className="space-y-1">
+                <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-wider px-2 pt-1 pb-2">Trending Suggestions</h3>
+                {trendingSongs.map((item, idx) => (
+                  <div key={`trend-${idx}`} className="flex items-center gap-3 p-2 hover:bg-slate-50 rounded-lg transition-colors border border-transparent hover:border-slate-100 relative">
+                    <div className="flex-1 min-w-0 flex items-center gap-3 cursor-pointer" onClick={() => playSong(item)}>
+                      {item.coverUrl || item.artworkUrl100 ? (
+                        <ImageWithSkeleton src={item.coverUrl || item.artworkUrl100} alt="Cover" className="w-12 h-12 rounded-md object-cover flex-shrink-0" />
+                      ) : (
+                        <div className="w-12 h-12 flex-shrink-0 rounded-md bg-slate-100 flex items-center justify-center">
+                          <MusicIcon className="w-5 h-5 text-slate-400" />
+                        </div>
+                      )}
+                      <div className="min-w-0 flex-1">
+                        <p className="text-[14px] font-semibold text-slate-800 truncate">{item.title || item.trackName}</p>
+                        <p className="text-[12px] text-slate-500 truncate">{item.artist || item.artistName}</p>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-center gap-1 pr-1">
+                      <button 
+                        onClick={() => playSong(item)}
+                        className="p-2 text-slate-400 hover:text-slate-600 outline-none rounded-full hover:bg-slate-100 transition-colors"
+                      >
+                        <Play className="w-4 h-4 fill-current" />
+                      </button>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          const rect = e.currentTarget.getBoundingClientRect();
+                          setMenuState(menuState?.id === idx ? null : {
+                            id: idx,
+                            top: rect.bottom + 8,
+                            right: window.innerWidth - rect.right,
+                            item
+                          });
+                        }}
+                        className="p-2 text-slate-400 hover:text-slate-600 outline-none rounded-full hover:bg-slate-100 transition-colors relative"
+                      >
+                        <MoreVertical className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+                ))}
               </div>
             ) : (
               <div className="py-8 text-center text-[13px] text-slate-400 flex flex-col items-center justify-center gap-2">
