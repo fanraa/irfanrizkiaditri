@@ -26,6 +26,30 @@
     -ms-overflow-style: none;  /* IE and Edge */
     scrollbar-width: none;  /* Firefox */
   }
+
+  /* Lenis smooth scroll foundation */
+  html.lenis,
+  html.lenis body {
+    height: auto;
+  }
+
+  .lenis.lenis-smooth {
+    scroll-behavior: auto !important;
+  }
+
+  .lenis:not(.lenis-autoToggle).lenis-stopped {
+    overflow: clip;
+  }
+
+  .lenis [data-lenis-prevent],
+  .lenis [data-lenis-prevent-wheel],
+  .lenis [data-lenis-prevent-touch] {
+    overscroll-behavior: contain;
+  }
+
+  .lenis.lenis-smooth iframe {
+    pointer-events: none;
+  }
 }
 
 @keyframes shine-hex {
@@ -136,4 +160,30 @@
   .animate-sliding-text {
     animation: sliding-text-sm 15s linear infinite;
   }
+}
+
+.custom-mini-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(148, 163, 184, 0.45) transparent;
+  overscroll-behavior: contain;
+  touch-action: pan-y;
+  -webkit-overflow-scrolling: touch;
+}
+
+.custom-mini-scrollbar::-webkit-scrollbar {
+  display: block !important;
+  width: 3.5px !important;
+}
+
+.custom-mini-scrollbar::-webkit-scrollbar-track {
+  background: transparent !important;
+}
+
+.custom-mini-scrollbar::-webkit-scrollbar-thumb {
+  background-color: rgba(148, 163, 184, 0.45) !important;
+  border-radius: 9999px !important;
+}
+
+.custom-mini-scrollbar::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(100, 116, 139, 0.75) !important;
 }

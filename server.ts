@@ -27,11 +27,14 @@ async function startServer() {
 
   app.get("/api/admin/settings", (req, res) => {
     try {
-      let settings = { geminiApiKey: '' };
+      let key = process.env.GEMINI_API_KEY || '';
       if (fs.existsSync(SETTINGS_FILE)) {
-        settings = JSON.parse(fs.readFileSync(SETTINGS_FILE, 'utf-8'));
+        const settings = JSON.parse(fs.readFileSync(SETTINGS_FILE, 'utf-8'));
+        if (settings.geminiApiKey) {
+          key = settings.geminiApiKey;
+        }
       }
-      res.json({ hasGeminiKey: !!settings.geminiApiKey, key: settings.geminiApiKey });
+      res.json({ hasGeminiKey: !!key, key });
     } catch(e) {
       res.status(500).json({ error: 'Failed' });
     }
@@ -229,11 +232,13 @@ async function startServer() {
       
 
       // 1. Fetch AI API Key
-      let aiKey = "";
+      let aiKey = process.env.GEMINI_API_KEY || "";
       try {
         if (fs.existsSync(SETTINGS_FILE)) {
           const settings = JSON.parse(fs.readFileSync(SETTINGS_FILE, 'utf-8'));
-          aiKey = settings.geminiApiKey;
+          if (settings.geminiApiKey) {
+            aiKey = settings.geminiApiKey;
+          }
         }
       } catch(e) {}
 
@@ -250,7 +255,7 @@ async function startServer() {
           const prompt = `Provide a brief, engaging background and description of the song "${title}" by "${artist}". Explain the song's meaning, background, and release info. If it's relatively unknown, describe the typical style or theme based on the title. Do NOT mention unrelated topics like TV shows. Output in English, max 3 paragraphs.`;
           
           const response = await ai.models.generateContent({
-            model: "gemini-3.7-flash",
+            model: "gemini-2.5-flash",
             contents: prompt,
             config: {
               systemInstruction: "You are a music assistant. Focus ONLY on music, songs, and artists. Avoid discussing TV shows or irrelevant topics.",

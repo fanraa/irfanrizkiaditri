@@ -1,6 +1,7 @@
 import { SEO } from "@/components/SEO";
 import React, { useState } from 'react';
 import { PageTransition } from "@/components/PageTransition";
+import { HomeVideo } from "@/components/HomeVideo";
 import { useAuth } from "@/context/AuthContext";
 import { Mail, MapPin, Globe, Languages } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -113,7 +114,12 @@ export function About() {
       `}</style>
       
       <PageTransition>
-                <div className="w-full max-w-4xl mx-auto py-12 px-4 sm:px-8 print:py-0 print:px-0">
+        {/* Full-bleed Top Ambient Video Background */}
+        <div className="print:hidden w-full relative mb-4 sm:mb-6">
+          <HomeVideo fullBleed={false} className="w-full" />
+        </div>
+
+        <div className="w-full max-w-4xl mx-auto py-4 sm:py-6 px-4 sm:px-8 print:py-0 print:px-0">
           
           <div className="mb-16 print:hidden text-center flex flex-col items-center">
             <h1 className="text-3xl font-bold text-[#0f172a] mb-4">{isIndo ? "Tentang Saya" : "About Me"}</h1>
@@ -134,37 +140,27 @@ export function About() {
                 className="flex flex-col flex-1"
               >
             {/* Header */}
-            <div className="flex flex-row items-start sm:items-center justify-between border-b-2 border-[#1e293b] pb-4 sm:pb-6 mb-4 sm:mb-8 gap-4 sm:gap-6 print:flex-row print:items-center">
-              <div className="flex-1 order-1 min-w-0">
-                <h1 className="text-2xl sm:text-4xl font-bold text-[#0f172a] uppercase tracking-wider mb-2 print:text-3xl break-words">Irfan Rizki Aditri</h1>
-                <h2 className="text-sm sm:text-xl text-[#475569] font-medium mb-4 print:text-lg break-words">{t.role}</h2>
-                
-                <div className="flex flex-col sm:flex-row flex-wrap justify-start gap-x-4 gap-y-1.5 sm:gap-x-6 sm:gap-y-2 text-xs sm:text-sm text-[#475569] print:gap-4 print:text-xs">
-                  <div className="flex items-center gap-2">
-                    <Mail className="w-3 h-3 sm:w-4 sm:h-4 print:w-3 print:h-3" />
-                    <a href="mailto:irfanrizkiaditri@gmail.com" className="hover:text-[#0f172a]">irfanrizkiaditri@gmail.com</a>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Globe className="w-3 h-3 sm:w-4 sm:h-4 print:w-3 print:h-3" />
-                    <a href="https://irfanrizkiaditri.site" target="_blank" rel="noreferrer" className="hover:text-[#0f172a]">irfanrizkiaditri.site</a>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <img src="https://cdn-icons-png.flaticon.com/128/3128/3128219.png" alt="LinkedIn" className="w-3.5 h-3.5 object-contain grayscale opacity-70 print:w-3 print:h-3" />
-                    <a href="https://www.linkedin.com/in/irfan-rizki-aditri-b12162368" target="_blank" rel="noreferrer" className="hover:text-[#0f172a]">LinkedIn</a>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <MapPin className="w-3 h-3 sm:w-4 sm:h-4 print:w-3 print:h-3" />
-                    <span>Sumatra, Indonesia</span>
-                  </div>
-                </div>
-              </div>
+            <div className="border-b-2 border-[#1e293b] pb-4 sm:pb-6 mb-4 sm:mb-8">
+              <h1 className="text-2xl sm:text-4xl font-bold text-[#0f172a] uppercase tracking-wider mb-2 print:text-3xl break-words">Irfan Rizki Aditri</h1>
+              <h2 className="text-sm sm:text-xl text-[#475569] font-medium mb-4 print:text-lg break-words">{t.role}</h2>
               
-              <div className="shrink-0 order-2 hidden sm:block print:block">
-                <img 
-                  src="https://res.cloudinary.com/dew39kqhy/image/upload/v1784826922/pasfoto_irfan_ra_rvh5v0.jpg" 
-                  alt="Irfan Rizki Aditri" 
-                  className="w-[84px] h-[112px] sm:w-[120px] sm:h-[160px] object-cover rounded-sm print:w-[96px] print:h-[128px]"
-                />
+              <div className="flex flex-col sm:flex-row flex-wrap justify-start gap-x-4 gap-y-1.5 sm:gap-x-6 sm:gap-y-2 text-xs sm:text-sm text-[#475569] print:gap-4 print:text-xs">
+                <div className="flex items-center gap-2">
+                  <Mail className="w-3 h-3 sm:w-4 sm:h-4 print:w-3 print:h-3" />
+                  <a href="mailto:irfanrizkiaditri@gmail.com" className="hover:text-[#0f172a]">irfanrizkiaditri@gmail.com</a>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Globe className="w-3 h-3 sm:w-4 sm:h-4 print:w-3 print:h-3" />
+                  <a href="https://irfanrizkiaditri.site" target="_blank" rel="noreferrer" className="hover:text-[#0f172a]">irfanrizkiaditri.site</a>
+                </div>
+                <div className="flex items-center gap-2">
+                  <img src="https://cdn-icons-png.flaticon.com/128/3128/3128219.png" alt="LinkedIn" className="w-3.5 h-3.5 object-contain grayscale opacity-70 print:w-3 print:h-3" />
+                  <a href="https://www.linkedin.com/in/irfan-rizki-aditri-b12162368" target="_blank" rel="noreferrer" className="hover:text-[#0f172a]">LinkedIn</a>
+                </div>
+                <div className="flex items-center gap-2">
+                  <MapPin className="w-3 h-3 sm:w-4 sm:h-4 print:w-3 print:h-3" />
+                  <span>Sumatra, Indonesia</span>
+                </div>
               </div>
             </div>
 

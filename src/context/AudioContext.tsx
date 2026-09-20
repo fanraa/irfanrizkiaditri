@@ -4,7 +4,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { collection, getDocs, writeBatch, doc, updateDoc, increment, getDoc, setDoc, addDoc } from "firebase/firestore";
 import { db, auth } from "@/lib/firebase";
 import YouTube, { YouTubeEvent, YouTubePlayer } from "react-youtube";
-import {  Pause, Play, SkipBack, SkipForward, MoreVertical, Clock, X, ChevronUp, ChevronDown, Volume2, Volume1, VolumeX, Shuffle, Repeat, Repeat1, ListMusic, Trash2, ListPlus, Languages, Copy, Check  } from "lucide-react";
+import {  Pause, Play, SkipBack, SkipForward, MoreVertical, Clock, X, ChevronUp, ChevronDown, ChevronRight, Volume2, Volume1, VolumeX, Shuffle, Repeat, Repeat1, ListMusic, Trash2, ListPlus, Languages, Copy, Check  } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { cn } from "@/lib/utils";
 import { FastAverageColor } from "fast-average-color";
@@ -104,6 +104,9 @@ interface AudioContextType {
   isMuted: boolean;
   setVolume: (volume: number) => void;
   toggleMute: () => void;
+  isCharacterMode: boolean;
+  setIsCharacterMode: (val: boolean) => void;
+  temporaryTrack: Track | null;
 }
 
 const AudioContext = createContext<AudioContextType | undefined>(undefined);
@@ -119,6 +122,14 @@ export function AudioProvider({ children }: { children: ReactNode }) {
   const [temporaryTrack, setTemporaryTrack] = useState<Track | null>(null);
   const [queue, setQueue] = useState<Track[]>([]);
   const queueRef = useRef<Track[]>([]);
+  const [isCharacterMode, setIsCharacterMode] = useState(false);
+  const [isPlayerTimerOpen, setIsPlayerTimerOpen] = useState(false);
+
+  useEffect(() => {
+    if (location.pathname !== '/music' && isCharacterMode) {
+      setIsCharacterMode(false);
+    }
+  }, [location.pathname, isCharacterMode]);
   
   useEffect(() => {
     queueRef.current = queue;
@@ -1124,6 +1135,9 @@ const fetchSongDetailForTrack = async (trackId: string | null, forceRegenerate: 
         isMuted,
         setVolume,
         toggleMute,
+        isCharacterMode,
+        setIsCharacterMode,
+        temporaryTrack,
       }}
     >
       {/* Hidden YouTube Player for Audio */}
@@ -1166,7 +1180,7 @@ const fetchSongDetailForTrack = async (trackId: string | null, forceRegenerate: 
           <div 
             className={cn(
               "fixed bottom-0 left-0 right-0 h-[64px] bg-white/85 backdrop-blur-3xl shadow-[0_-8px_30px_rgba(0,0,0,0.08)] transition-transform duration-300 ease-out border-t border-slate-200/60 z-[40] flex items-center px-3 sm:px-6",
-              (isIdle || isSongDetailOpen) ? "translate-y-full pointer-events-none" : "translate-y-0"
+              (isIdle || isSongDetailOpen || isCharacterMode) ? "translate-y-full pointer-events-none" : "translate-y-0"
             )}
           >
             <div 
@@ -1307,45 +1321,62 @@ const fetchSongDetailForTrack = async (trackId: string | null, forceRegenerate: 
                         />
                       </div>
 
-                      <div className="px-4 py-2 flex justify-between items-center text-[13px] font-medium text-slate-500">
-                        <span>Sleep timer</span>
-                        {playerTimeLeft && (
-                          <span className="text-emerald-600 font-semibold tabular-nums">
-                            {playerTimeLeft}
-                          </span>
-                        )}
-                      </div>
                       <button
-                        onClick={() => { setSleepTimer(15); setIsPlayerMenuOpen(false); }}
-                        className="w-full text-left px-4 py-2.5 text-[14px] text-slate-700 hover:bg-slate-50 transition-colors"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setIsPlayerTimerOpen(!isPlayerTimerOpen);
+                        }}
+                        className="w-full flex items-center justify-between px-4 py-2.5 text-[14px] text-slate-700 hover:bg-slate-50 transition-colors"
                       >
-                        15m
+                        <div className="flex items-center gap-2">
+                          <Clock className="w-4 h-4 text-slate-400" />
+                          <span>Sleep timer</span>
+                        </div>
+                        <div className="flex items-center gap-1.5">
+                          {playerTimeLeft && (
+                            <span className="text-emerald-600 font-semibold tabular-nums text-xs bg-emerald-50 px-2 py-0.5 rounded-full">
+                              {playerTimeLeft}
+                            </span>
+                          )}
+                          <ChevronRight className={cn("w-4 h-4 text-slate-400 transition-transform duration-200", isPlayerTimerOpen ? "rotate-90" : "")} />
+                        </div>
                       </button>
-                      <button
-                        onClick={() => { setSleepTimer(30); setIsPlayerMenuOpen(false); }}
-                        className="w-full text-left px-4 py-2.5 text-[14px] text-slate-700 hover:bg-slate-50 transition-colors"
-                      >
-                        30m
-                      </button>
-                      <button
-                        onClick={() => { setSleepTimer(60); setIsPlayerMenuOpen(false); }}
-                        className="w-full text-left px-4 py-2.5 text-[14px] text-slate-700 hover:bg-slate-50 transition-colors"
-                      >
-                        1h
-                      </button>
-                      <button
-                        onClick={() => { setSleepTimer(120); setIsPlayerMenuOpen(false); }}
-                        className="w-full text-left px-4 py-2.5 text-[14px] text-slate-700 hover:bg-slate-50 transition-colors"
-                      >
-                        2h
-                      </button>
-                      {sleepTimerEnd && (
-                        <button
-                          onClick={() => { setSleepTimer(null); setIsPlayerMenuOpen(false); }}
-                          className="w-full text-left px-4 py-2.5 text-[14px] text-red-600 hover:bg-red-50 transition-colors border-t border-slate-100 mt-1"
-                        >
-                          Cancel sleep timer
-                        </button>
+
+                      {isPlayerTimerOpen && (
+                        <div className="bg-slate-50/80 py-1 border-y border-slate-100 animate-in fade-in duration-150">
+                          <button
+                            onClick={() => { setSleepTimer(15); setIsPlayerMenuOpen(false); setIsPlayerTimerOpen(false); }}
+                            className="w-full text-left pl-8 pr-4 py-2 text-[13px] text-slate-600 hover:text-slate-900 hover:bg-slate-100/80 transition-colors"
+                          >
+                            15m
+                          </button>
+                          <button
+                            onClick={() => { setSleepTimer(30); setIsPlayerMenuOpen(false); setIsPlayerTimerOpen(false); }}
+                            className="w-full text-left pl-8 pr-4 py-2 text-[13px] text-slate-600 hover:text-slate-900 hover:bg-slate-100/80 transition-colors"
+                          >
+                            30m
+                          </button>
+                          <button
+                            onClick={() => { setSleepTimer(60); setIsPlayerMenuOpen(false); setIsPlayerTimerOpen(false); }}
+                            className="w-full text-left pl-8 pr-4 py-2 text-[13px] text-slate-600 hover:text-slate-900 hover:bg-slate-100/80 transition-colors"
+                          >
+                            1h
+                          </button>
+                          <button
+                            onClick={() => { setSleepTimer(120); setIsPlayerMenuOpen(false); setIsPlayerTimerOpen(false); }}
+                            className="w-full text-left pl-8 pr-4 py-2 text-[13px] text-slate-600 hover:text-slate-900 hover:bg-slate-100/80 transition-colors"
+                          >
+                            2h
+                          </button>
+                          {sleepTimerEnd && (
+                            <button
+                              onClick={() => { setSleepTimer(null); setIsPlayerMenuOpen(false); setIsPlayerTimerOpen(false); }}
+                              className="w-full text-left pl-8 pr-4 py-2 text-[13px] text-red-600 hover:bg-red-50 transition-colors"
+                            >
+                              Cancel sleep timer
+                            </button>
+                          )}
+                        </div>
                       )}
                       {isAdmin && (
                         <button

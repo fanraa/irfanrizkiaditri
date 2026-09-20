@@ -176,7 +176,7 @@ export function PlaySearchModal({ isOpen, onClose }: { isOpen: boolean; onClose:
             </div>
           </form>
 
-          <div className="flex-1 overflow-y-auto min-h-0 space-y-1 pr-1 custom-scrollbar">
+          <div data-lenis-prevent className="flex-1 overflow-y-auto min-h-0 space-y-1 pr-1 custom-scrollbar">
             {isSearching ? (
               <div className="py-12 flex justify-center">
                 <Loader2 className="w-6 h-6 animate-spin text-slate-400" />

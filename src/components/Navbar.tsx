@@ -11,7 +11,7 @@ import { useAudio } from "@/context/AudioContext";
 export function Navbar() {
   const location = useLocation();
   const { isAdmin, logout } = useAuth();
-  const { isPlaying } = useAudio();
+  const { isPlaying, isCharacterMode } = useAudio();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   
   const { scrollY } = useScroll();
@@ -78,6 +78,10 @@ export function Navbar() {
   useEffect(() => {
     setMobileMenuOpen(false);
   }, [location.pathname]);
+
+  if (isCharacterMode && location.pathname === "/music") {
+    return null;
+  }
 
   return (
     <>

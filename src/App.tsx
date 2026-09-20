@@ -14,6 +14,7 @@ import { logVisit } from '@/lib/analytics';
 import { useEffect } from 'react';
 function AnalyticsTracker() { useEffect(() => { logVisit(); }, []); return null; }
 import { Loader2 } from "lucide-react";
+import { SmoothScroll } from "@/components/SmoothScroll";
 
 // Lazy-loaded components
 const Home = lazy(() => import("@/pages/Home").then(m => ({ default: m.Home })));
@@ -44,26 +45,28 @@ export default function App() {
       <FullscreenHandler />
       <AuthProvider>
         <AudioProvider>
-          <Layout>
-            <AnimatePresence mode="wait">
-              <Suspense fallback={<PageFallback />}>
-                <Routes>
-                  <Route path="/" element={<Home />} />
-                  <Route path="/projects" element={<Projects />} />
-                  <Route path="/lab" element={<Lab />} />
-                  <Route path="/gallery" element={<Gallery />} />
-                  <Route path="/music" element={<Music />} />
-                  <Route path="/blog" element={<Blog />} />
-                  <Route path="/contact" element={<Contact />} />
-                  <Route path="/privacy" element={<Privacy />} />
-                  <Route path="/terms" element={<Terms />} />
-                  <Route path="/about" element={<About />} />
-                  <Route path="/admin" element={<Admin />} />
-                  <Route path="*" element={<NotFound />} />
-                </Routes>
-              </Suspense>
-            </AnimatePresence>
-          </Layout>
+          <SmoothScroll>
+            <Layout>
+              <AnimatePresence mode="wait">
+                <Suspense fallback={<PageFallback />}>
+                  <Routes>
+                    <Route path="/" element={<Home />} />
+                    <Route path="/projects" element={<Projects />} />
+                    <Route path="/lab" element={<Lab />} />
+                    <Route path="/gallery" element={<Gallery />} />
+                    <Route path="/music" element={<Music />} />
+                    <Route path="/blog" element={<Blog />} />
+                    <Route path="/contact" element={<Contact />} />
+                    <Route path="/privacy" element={<Privacy />} />
+                    <Route path="/terms" element={<Terms />} />
+                    <Route path="/about" element={<About />} />
+                    <Route path="/admin" element={<Admin />} />
+                    <Route path="*" element={<NotFound />} />
+                  </Routes>
+                </Suspense>
+              </AnimatePresence>
+            </Layout>
+          </SmoothScroll>
         </AudioProvider>
       </AuthProvider>
     </Router>

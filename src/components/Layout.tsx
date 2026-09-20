@@ -3,6 +3,7 @@ import { Navbar } from "./Navbar";
 import { Link, useLocation } from "react-router-dom";
 import { Mail, Instagram, Linkedin } from "lucide-react";
 import { useAudio } from "@/context/AudioContext";
+import { cn } from "@/lib/utils";
 
 interface LayoutProps {
   children: ReactNode;
@@ -10,7 +11,8 @@ interface LayoutProps {
 
 export function Layout({ children }: LayoutProps) {
   const location = useLocation();
-  const { playingId, tracks } = useAudio();
+  const { playingId, tracks, isCharacterMode } = useAudio();
+  const inCharacterMode = isCharacterMode && location.pathname === '/music';
   const playingTrack = tracks.find(t => t.id === playingId);
   const trackCover = playingTrack?.coverUrl || playingTrack?.cover || playingTrack?.image;
 
@@ -63,12 +65,20 @@ export function Layout({ children }: LayoutProps) {
         </div>
       </div>
 
-      <Navbar />
-      <main className="flex-1 w-full container mx-auto px-4 sm:px-8 lg:px-12 pt-12 pb-10 md:pt-20 md:pb-16 max-w-7xl relative z-10">
+      {!inCharacterMode && <Navbar />}
+      <main className={cn(
+        "flex-1 w-full relative z-10",
+        inCharacterMode
+          ? "w-full min-h-[100dvh] flex flex-col justify-center items-center overflow-hidden p-0 m-0 max-w-none"
+          : location.pathname === '/about'
+            ? "w-full p-0 m-0 max-w-none pt-0 pb-10 md:pb-16"
+            : "container mx-auto px-4 sm:px-8 lg:px-12 pt-12 pb-10 md:pt-20 md:pb-16 max-w-7xl"
+      )}>
         {children}
       </main>
       
-      <div className="w-full mt-auto relative flex-shrink-0 bg-slate-950">
+      {!inCharacterMode && (
+        <div className="w-full mt-auto relative flex-shrink-0 bg-slate-950">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 120" className="w-full absolute bottom-full left-0 pointer-events-none block" style={{ marginBottom: "-1px" }}>
           <path fill="#020617" fillOpacity="1" d="M0,32L48,42.7C96,53,192,75,288,80C384,85,480,75,576,64C672,53,768,43,864,48C960,53,1056,75,1152,80C1248,85,1344,75,1392,70L1440,64L1440,120L1392,120C1344,120,1248,120,1152,120C1056,120,960,120,864,120C768,120,672,120,576,120C480,120,384,120,288,120C192,120,96,120,48,120L0,120Z"></path>
         </svg>
@@ -161,6 +171,7 @@ export function Layout({ children }: LayoutProps) {
           </div>
         </footer>
       </div>
+      )}
     </div>
   );
 }
